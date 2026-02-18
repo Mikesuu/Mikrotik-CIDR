@@ -1,0 +1,54 @@
+name: Generate MikroTik v7 IP Lists
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Process IP Lists
+        run: |
+          mkdir -p dist
+          
+          gen_rsc() {
+            local url=$1
+            local list_name=$2
+            local file_name=$3
+            local proto=$4
+            
+            echo "/$proto firewall address-list remove [find list=\"$list_name\"]" > "dist/$file_name"
+            echo "/$proto firewall address-list" >> "dist/$file_name"
+            
+            if [ "$file_name" = "cn.rsc" ]; then
+              echo "add list=\"$list_name\" address=10.10.10.0/25" >> "dist/$file_name"
+            fi
+            
+            curl -sSL "$url" | grep -v '^#' | sed "s|^|add list=\"$list_name\" address=|g" >> "dist/$file_name"
+          }
+
+          # IPv4 列表
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt" "CN" "cn.rsc" "ip"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet.txt" "China_Telecom" "telecom.rsc" "ip"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom.txt" "China_Unicom" "unicom.rsc" "ip"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc.txt" "China_Mobile" "cmcc.rsc" "ip"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet.txt" "CERNET" "cernet.rsc" "ip"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet.txt" "CSTNET" "cstnet.rsc" "ip"
+
+          # IPv6 列表
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt" "CN6" "cn6.rsc" "ipv6"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet6.txt" "China_Telecom6" "telecom6.rsc" "ipv6"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom6.txt" "China_Unicom6" "unicom6.rsc" "ipv6"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc6.txt" "China_Mobile6" "cmcc6.rsc" "ipv6"
+
+      - name: Upload to Branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: release
