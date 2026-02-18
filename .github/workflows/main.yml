@@ -18,7 +18,6 @@ jobs:
       - name: Process IP Lists
         run: |
           set -e
-          mkdir -p dist
           
           gen_rsc() {
             local url=$1
@@ -26,8 +25,6 @@ jobs:
             local file_name=$3
             local proto=$4
             
-            echo "Fetching $url ..."
-            # 获取数据并检查是否成功
             content=$(curl -sSL --fail "$url")
             
             {
@@ -39,29 +36,29 @@ jobs:
               fi
               
               echo "$content" | grep -v '^#' | grep -v '^$' | sed "s|^|add list=\"$list_name\" address=|g"
-            } > "dist/$file_name"
-            
-            echo "Generated dist/$file_name"
+            } > "$file_name"
           }
 
-          # IPv4
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt" "CN" "cn.rsc" "ip"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet.txt" "China_Telecom" "telecom.rsc" "ip"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom.txt" "China_Unicom" "unicom.rsc" "ip"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc.txt" "China_Mobile" "cmcc.rsc" "ip"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet.txt" "CERNET" "cernet.rsc" "ip"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet.txt" "CSTNET" "cstnet.rsc" "ip"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng.txt" "DrPeng" "drpeng.rsc" "ip"
 
-          # IPv6
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt" "CN6" "cn6.rsc" "ipv6"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet6.txt" "China_Telecom6" "telecom6.rsc" "ipv6"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom6.txt" "China_Unicom6" "unicom6.rsc" "ipv6"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc6.txt" "China_Mobile6" "cmcc6.rsc" "ipv6"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet6.txt" "CERNET6" "cernet6.rsc" "ipv6"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet6.txt" "CSTNET6" "cstnet6.rsc" "ipv6"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng6.txt" "DrPeng6" "drpeng6.rsc" "ipv6"
 
-      - name: Deploy to Release Branch
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          publish_branch: release
-          force_orphan: true # 这会强制创建一个干净的 release 分支
+      - name: Commit and Push
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add *.rsc
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update IP lists $(date +%Y-%m-%d)"
+          git push origin main
