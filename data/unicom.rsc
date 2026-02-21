@@ -1844,7 +1844,8 @@ add list="China_Unicom" address=124.42.49.0/24
 add list="China_Unicom" address=124.42.64.0/18
 add list="China_Unicom" address=124.42.132.0/22
 add list="China_Unicom" address=124.42.140.0/22
-add list="China_Unicom" address=124.42.144.0/20
+add list="China_Unicom" address=124.42.148.0/22
+add list="China_Unicom" address=124.42.152.0/22
 add list="China_Unicom" address=124.42.160.0/19
 add list="China_Unicom" address=124.42.192.0/18
 add list="China_Unicom" address=124.64.0.0/15
