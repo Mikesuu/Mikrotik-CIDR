@@ -1786,7 +1786,6 @@ add list="China_Unicom" address=122.200.124.0/24
 add list="China_Unicom" address=123.4.0.0/14
 add list="China_Unicom" address=123.8.0.0/13
 add list="China_Unicom" address=123.49.192.0/23
-add list="China_Unicom" address=123.49.245.0/24
 add list="China_Unicom" address=123.58.32.0/23
 add list="China_Unicom" address=123.58.34.0/24
 add list="China_Unicom" address=123.58.36.0/24
