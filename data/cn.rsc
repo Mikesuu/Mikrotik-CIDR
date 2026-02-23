@@ -1695,6 +1695,10 @@ add list="CN" address=106.112.0.0/12
 add list="CN" address=106.224.0.0/14
 add list="CN" address=106.228.0.0/15
 add list="CN" address=106.230.0.0/16
+add list="CN" address=107.148.240.0/21
+add list="CN" address=107.148.248.0/24
+add list="CN" address=107.148.250.0/23
+add list="CN" address=107.148.252.0/23
 add list="CN" address=109.111.255.0/24
 add list="CN" address=109.244.0.0/16
 add list="CN" address=110.6.0.0/15
