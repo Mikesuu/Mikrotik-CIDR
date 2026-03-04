@@ -417,10 +417,7 @@ add list="China_Mobile" address=114.112.136.0/21
 add list="China_Mobile" address=114.112.144.0/21
 add list="China_Mobile" address=114.113.64.0/22
 add list="China_Mobile" address=114.113.118.0/23
-add list="China_Mobile" address=114.113.144.0/22
-add list="China_Mobile" address=114.113.148.0/24
-add list="China_Mobile" address=114.113.150.0/23
-add list="China_Mobile" address=114.113.152.0/21
+add list="China_Mobile" address=114.113.144.0/20
 add list="China_Mobile" address=114.113.224.0/20
 add list="China_Mobile" address=114.115.192.0/19
 add list="China_Mobile" address=114.116.0.0/18
