@@ -2945,6 +2945,7 @@ add list="CN" address=151.242.10.0/24
 add list="CN" address=151.242.180.0/22
 add list="CN" address=151.243.25.0/24
 add list="CN" address=151.247.148.0/23
+add list="CN" address=151.247.174.0/24
 add list="CN" address=152.104.128.0/17
 add list="CN" address=152.136.0.0/16
 add list="CN" address=153.0.0.0/16
