@@ -2168,7 +2168,9 @@ add list="CN" address=118.72.0.0/13
 add list="CN" address=118.80.0.0/15
 add list="CN" address=118.84.0.0/15
 add list="CN" address=118.88.32.0/19
-add list="CN" address=118.88.64.0/18
+add list="CN" address=118.88.64.0/19
+add list="CN" address=118.88.96.0/21
+add list="CN" address=118.88.104.0/22
 add list="CN" address=118.88.128.0/17
 add list="CN" address=118.89.0.0/16
 add list="CN" address=118.102.16.0/20
