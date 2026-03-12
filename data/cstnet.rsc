@@ -2,6 +2,7 @@
 /ip firewall address-list
 add list="CSTNET" address=1.8.1.0/24
 add list="CSTNET" address=1.8.8.0/24
+add list="CSTNET" address=42.247.33.0/24
 add list="CSTNET" address=49.210.0.0/15
 add list="CSTNET" address=60.245.128.0/17
 add list="CSTNET" address=103.2.208.0/22
