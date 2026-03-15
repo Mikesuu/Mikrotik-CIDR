@@ -1062,7 +1062,8 @@ add list="China_Unicom" address=103.253.60.0/22
 add list="China_Unicom" address=103.254.77.0/24
 add list="China_Unicom" address=103.254.78.0/24
 add list="China_Unicom" address=103.255.92.0/22
-add list="China_Unicom" address=103.255.203.0/24
+add list="China_Unicom" address=103.255.201.0/24
+add list="China_Unicom" address=103.255.202.0/23
 add list="China_Unicom" address=106.3.96.0/22
 add list="China_Unicom" address=106.3.128.0/19
 add list="China_Unicom" address=106.3.208.0/21
