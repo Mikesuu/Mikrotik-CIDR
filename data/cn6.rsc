@@ -1465,12 +1465,13 @@ add list="CN6" address=2a0f:1cc5:1310::/44
 add list="CN6" address=2a0f:1cc5:1400::/48
 add list="CN6" address=2a0f:1cc5:1c00::/47
 add list="CN6" address=2a0f:1cc5:1c02::/48
+add list="CN6" address=2a0f:1cc5:1c30::/48
 add list="CN6" address=2a0f:1cc5:1cc0::/48
 add list="CN6" address=2a0f:1cc5:1d10::/47
 add list="CN6" address=2a0f:1cc5:1d14::/47
 add list="CN6" address=2a0f:1cc5:2300::/40
 add list="CN6" address=2a0f:1cc5:2600::/42
-add list="CN6" address=2a0f:1cc5:2640::/44
+add list="CN6" address=2a0f:1cc5:2640::/43
 add list="CN6" address=2a0f:1cc5:2d01::/48
 add list="CN6" address=2a0f:1cc5:2d02::/47
 add list="CN6" address=2a0f:1cc5:2e01::/48

@@ -73,6 +73,7 @@ add list="CN" address=14.255.254.0/24
 add list="CN" address=16.2.142.0/23
 add list="CN" address=17.33.145.0/24
 add list="CN" address=23.161.8.0/24
+add list="CN" address=23.162.120.0/24
 add list="CN" address=23.236.111.0/24
 add list="CN" address=26.234.64.0/22
 add list="CN" address=26.241.140.0/22
