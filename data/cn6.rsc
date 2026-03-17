@@ -1482,6 +1482,7 @@ add list="CN6" address=2a0f:1cc6:b120::/48
 add list="CN6" address=2a0f:1cc6:bab4::/48
 add list="CN6" address=2a0f:1cc6:bab9::/48
 add list="CN6" address=2a0f:2706::/32
+add list="CN6" address=2a0f:6284:51::/48
 add list="CN6" address=2a0f:6284:300::/40
 add list="CN6" address=2a0f:6284:400::/42
 add list="CN6" address=2a0f:6284:440::/43
