@@ -287,7 +287,8 @@ add list="China_Unicom6" address=2001:da8:802c::/46
 add list="China_Unicom6" address=2001:da8:8030::/48
 add list="China_Unicom6" address=2001:da8:8032::/47
 add list="China_Unicom6" address=2001:da8:9000::/45
-add list="China_Unicom6" address=2001:da8:9008::/46
+add list="China_Unicom6" address=2001:da8:9008::/48
+add list="China_Unicom6" address=2001:da8:900a::/47
 add list="China_Unicom6" address=2001:da8:900c::/48
 add list="China_Unicom6" address=2001:da8:900e::/47
 add list="China_Unicom6" address=2001:da8:9010::/48
