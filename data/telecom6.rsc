@@ -130,7 +130,12 @@ add list="China_Telecom6" address=2402:db40:5100::/48
 add list="China_Telecom6" address=2402:db40:5f00::/46
 add list="China_Telecom6" address=2402:f140:ff00::/46
 add list="China_Telecom6" address=2402:f140:ff04::/48
-add list="China_Telecom6" address=2402:f8c0::/42
+add list="China_Telecom6" address=2402:f8c0::/48
+add list="China_Telecom6" address=2402:f8c0:2::/47
+add list="China_Telecom6" address=2402:f8c0:4::/46
+add list="China_Telecom6" address=2402:f8c0:8::/45
+add list="China_Telecom6" address=2402:f8c0:10::/44
+add list="China_Telecom6" address=2402:f8c0:20::/43
 add list="China_Telecom6" address=2403:600::/32
 add list="China_Telecom6" address=2403:1b80::/48
 add list="China_Telecom6" address=2403:1ec0:1200::/48
