@@ -352,7 +352,6 @@ add list="China_Unicom6" address=2401:cc00::/32
 add list="China_Unicom6" address=2401:ce00::/32
 add list="China_Unicom6" address=2401:ec00::/32
 add list="China_Unicom6" address=2402:2000::/32
-add list="China_Unicom6" address=2402:4060:8888::/48
 add list="China_Unicom6" address=2402:5ec0:1000::/39
 add list="China_Unicom6" address=2402:7d80:240::/48
 add list="China_Unicom6" address=2402:8cc0::/40

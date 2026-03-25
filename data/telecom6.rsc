@@ -311,7 +311,6 @@ add list="China_Telecom6" address=2605:9d80:8011::/48
 add list="China_Telecom6" address=2605:9d80:8021::/48
 add list="China_Telecom6" address=2605:9d80:8031::/48
 add list="China_Telecom6" address=2605:9d80:8041::/48
-add list="China_Telecom6" address=2605:9d80:8081::/48
 add list="China_Telecom6" address=2605:9d80:9003::/48
 add list="China_Telecom6" address=2605:9d80:9013::/48
 add list="China_Telecom6" address=2605:9d80:9023::/48
