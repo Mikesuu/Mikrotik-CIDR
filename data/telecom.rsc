@@ -3674,7 +3674,11 @@ add list="China_Telecom" address=219.216.0.0/17
 add list="China_Telecom" address=219.216.128.0/18
 add list="China_Telecom" address=219.216.192.0/20
 add list="China_Telecom" address=219.216.216.0/21
-add list="China_Telecom" address=219.216.224.0/19
+add list="China_Telecom" address=219.216.224.0/21
+add list="China_Telecom" address=219.216.232.0/22
+add list="China_Telecom" address=219.216.236.0/23
+add list="China_Telecom" address=219.216.238.0/24
+add list="China_Telecom" address=219.216.240.0/20
 add list="China_Telecom" address=219.217.0.0/18
 add list="China_Telecom" address=219.217.64.0/22
 add list="China_Telecom" address=219.217.72.0/21
