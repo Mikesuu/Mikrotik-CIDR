@@ -1,6 +1,6 @@
 /ip firewall address-list remove [find list="DrPeng"]
 /ip firewall address-list
-add list="DrPeng" address=60.195.248.0/21
+add list="DrPeng" address=60.195.252.0/22
 add list="DrPeng" address=115.182.0.0/19
 add list="DrPeng" address=115.182.32.0/22
 add list="DrPeng" address=115.182.40.0/21

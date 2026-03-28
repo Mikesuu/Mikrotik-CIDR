@@ -113,4 +113,15 @@ add list="China_Mobile6" address=240a:42c0::/27
 add list="China_Mobile6" address=240a:42e0::/28
 add list="China_Mobile6" address=240a:42f0::/29
 add list="China_Mobile6" address=240a:42f8::/30
-add list="China_Mobile6" address=240a:c000::/20
+add list="China_Mobile6" address=240a:c000::/25
+add list="China_Mobile6" address=240a:c080::/26
+add list="China_Mobile6" address=240a:c0c1::/32
+add list="China_Mobile6" address=240a:c0c2::/31
+add list="China_Mobile6" address=240a:c0c4::/30
+add list="China_Mobile6" address=240a:c0c8::/29
+add list="China_Mobile6" address=240a:c0d0::/28
+add list="China_Mobile6" address=240a:c0e0::/27
+add list="China_Mobile6" address=240a:c100::/24
+add list="China_Mobile6" address=240a:c200::/23
+add list="China_Mobile6" address=240a:c400::/22
+add list="China_Mobile6" address=240a:c800::/21
