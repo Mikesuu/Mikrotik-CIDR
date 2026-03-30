@@ -15,6 +15,7 @@ add list="CERNET6" address=2400:6000::/32
 add list="CERNET6" address=2400:6600::/48
 add list="CERNET6" address=2400:89c0:1130::/44
 add list="CERNET6" address=2400:89c0:2100::/48
+add list="CERNET6" address=2400:89c0:2200::/48
 add list="CERNET6" address=2400:89c0:6100::/48
 add list="CERNET6" address=2400:a980::/29
 add list="CERNET6" address=2400:b600::/32
