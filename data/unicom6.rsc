@@ -1046,6 +1046,7 @@ add list="China_Unicom6" address=240a:2001:1900::/40
 add list="China_Unicom6" address=240a:2001:1a00::/39
 add list="China_Unicom6" address=240a:2001:1c00::/38
 add list="China_Unicom6" address=240a:a000::/20
+add list="China_Unicom6" address=240a:c0c0::/32
 add list="China_Unicom6" address=240b:e001::/32
 add list="China_Unicom6" address=240b:e002::/31
 add list="China_Unicom6" address=240b:e004::/30
