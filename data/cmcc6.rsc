@@ -1,5 +1,6 @@
 /ipv6 firewall address-list remove [find list="China_Mobile6"]
 /ipv6 firewall address-list
+add list="China_Mobile6" address=2001:dc7:fffb::/48
 add list="China_Mobile6" address=2400:9020:f012::/47
 add list="China_Mobile6" address=2400:a860:1::/48
 add list="China_Mobile6" address=2400:a860:2::/47
@@ -15,7 +16,6 @@ add list="China_Mobile6" address=2401:9a00:10::/46
 add list="China_Mobile6" address=2401:c020:6::/48
 add list="China_Mobile6" address=2401:c020:8::/47
 add list="China_Mobile6" address=2401:c020:14::/48
-add list="China_Mobile6" address=2401:d0e0:2::/48
 add list="China_Mobile6" address=2402:1440:30::/48
 add list="China_Mobile6" address=2402:1440:200::/39
 add list="China_Mobile6" address=2402:1440:400::/38
@@ -37,6 +37,7 @@ add list="China_Mobile6" address=2402:e880::/48
 add list="China_Mobile6" address=2403:7580::/32
 add list="China_Mobile6" address=2403:b400::/32
 add list="China_Mobile6" address=2403:c980::/32
+add list="China_Mobile6" address=2404:7240:6000::/48
 add list="China_Mobile6" address=2404:e280::/47
 add list="China_Mobile6" address=2405:6c0:2::/48
 add list="China_Mobile6" address=2405:6c0:4::/48
@@ -53,6 +54,7 @@ add list="China_Mobile6" address=2407:2840::/48
 add list="China_Mobile6" address=2407:37c0::/32
 add list="China_Mobile6" address=2407:6c40:1210::/48
 add list="China_Mobile6" address=2407:8f40:2::/48
+add list="China_Mobile6" address=2407:c080:1800::/37
 add list="China_Mobile6" address=2409:8000::/20
 add list="China_Mobile6" address=240a:4020:83a::/48
 add list="China_Mobile6" address=240a:4020:883a::/48
