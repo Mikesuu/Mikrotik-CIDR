@@ -34,7 +34,6 @@ add list="China_Telecom" address=8.148.169.0/24
 add list="China_Telecom" address=8.152.75.0/24
 add list="China_Telecom" address=8.153.116.0/24
 add list="China_Telecom" address=8.155.196.0/24
-add list="China_Telecom" address=11.210.240.0/23
 add list="China_Telecom" address=14.16.0.0/12
 add list="China_Telecom" address=14.103.0.0/19
 add list="China_Telecom" address=14.103.32.0/20
@@ -51,8 +50,6 @@ add list="China_Telecom" address=14.208.0.0/12
 add list="China_Telecom" address=14.255.249.0/24
 add list="China_Telecom" address=14.255.254.0/24
 add list="China_Telecom" address=17.33.145.0/24
-add list="China_Telecom" address=26.234.64.0/22
-add list="China_Telecom" address=26.241.140.0/22
 add list="China_Telecom" address=27.0.204.0/22
 add list="China_Telecom" address=27.0.208.0/21
 add list="China_Telecom" address=27.16.0.0/12
@@ -946,6 +943,7 @@ add list="China_Telecom" address=103.135.192.0/24
 add list="China_Telecom" address=103.135.236.0/24
 add list="China_Telecom" address=103.139.172.0/23
 add list="China_Telecom" address=103.139.212.0/23
+add list="China_Telecom" address=103.142.82.0/24
 add list="China_Telecom" address=103.143.16.0/22
 add list="China_Telecom" address=103.144.66.0/23
 add list="China_Telecom" address=103.144.158.0/24
@@ -2073,7 +2071,6 @@ add list="China_Telecom" address=122.240.0.0/13
 add list="China_Telecom" address=122.248.48.0/21
 add list="China_Telecom" address=122.248.56.0/22
 add list="China_Telecom" address=123.49.192.0/23
-add list="China_Telecom" address=123.49.195.0/24
 add list="China_Telecom" address=123.49.240.0/24
 add list="China_Telecom" address=123.49.242.0/23
 add list="China_Telecom" address=123.49.245.0/24
@@ -2368,6 +2365,7 @@ add list="China_Telecom" address=140.246.0.0/16
 add list="China_Telecom" address=140.249.0.0/16
 add list="China_Telecom" address=140.250.0.0/16
 add list="China_Telecom" address=140.255.0.0/16
+add list="China_Telecom" address=141.11.50.0/24
 add list="China_Telecom" address=144.0.0.0/16
 add list="China_Telecom" address=144.7.0.0/17
 add list="China_Telecom" address=144.12.0.0/16
