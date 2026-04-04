@@ -544,6 +544,7 @@ add list="China_Mobile" address=118.145.19.0/24
 add list="China_Mobile" address=118.145.20.0/22
 add list="China_Mobile" address=118.145.24.0/22
 add list="China_Mobile" address=118.145.29.0/24
+add list="China_Mobile" address=118.145.32.0/20
 add list="China_Mobile" address=118.184.168.0/21
 add list="China_Mobile" address=118.184.176.0/20
 add list="China_Mobile" address=118.186.7.0/24
@@ -662,9 +663,7 @@ add list="China_Mobile" address=121.46.200.0/22
 add list="China_Mobile" address=121.52.208.0/23
 add list="China_Mobile" address=121.52.210.0/24
 add list="China_Mobile" address=121.52.212.0/22
-add list="China_Mobile" address=121.52.217.0/24
-add list="China_Mobile" address=121.52.218.0/23
-add list="China_Mobile" address=121.52.220.0/22
+add list="China_Mobile" address=121.52.216.0/21
 add list="China_Mobile" address=121.70.0.0/17
 add list="China_Mobile" address=121.79.128.0/20
 add list="China_Mobile" address=121.79.144.0/22
@@ -782,7 +781,6 @@ add list="China_Mobile" address=124.251.244.0/22
 add list="China_Mobile" address=124.251.248.0/22
 add list="China_Mobile" address=124.251.253.0/24
 add list="China_Mobile" address=124.251.254.0/23
-add list="China_Mobile" address=125.208.33.0/24
 add list="China_Mobile" address=125.208.35.0/24
 add list="China_Mobile" address=125.208.41.0/24
 add list="China_Mobile" address=125.208.42.0/23
