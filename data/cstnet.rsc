@@ -4,7 +4,6 @@ add list="CSTNET" address=1.8.1.0/24
 add list="CSTNET" address=1.8.8.0/24
 add list="CSTNET" address=49.210.0.0/15
 add list="CSTNET" address=60.245.128.0/17
-add list="CSTNET" address=64.96.4.0/24
 add list="CSTNET" address=103.2.208.0/22
 add list="CSTNET" address=113.130.96.0/20
 add list="CSTNET" address=113.130.112.0/21
