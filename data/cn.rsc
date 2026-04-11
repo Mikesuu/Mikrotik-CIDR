@@ -40,7 +40,7 @@ add list="CN" address=8.136.0.0/13
 add list="CN" address=8.144.0.0/14
 add list="CN" address=8.148.0.0/19
 add list="CN" address=8.148.36.0/22
-add list="CN" address=8.148.40.0/23
+add list="CN" address=8.148.41.0/24
 add list="CN" address=8.148.43.0/24
 add list="CN" address=8.148.64.0/18
 add list="CN" address=8.148.128.0/17
@@ -1106,7 +1106,6 @@ add list="CN" address=103.96.224.0/23
 add list="CN" address=103.97.60.0/24
 add list="CN" address=103.97.112.0/23
 add list="CN" address=103.97.144.0/22
-add list="CN" address=103.98.0.0/24
 add list="CN" address=103.98.44.0/22
 add list="CN" address=103.98.92.0/22
 add list="CN" address=103.98.96.0/22
