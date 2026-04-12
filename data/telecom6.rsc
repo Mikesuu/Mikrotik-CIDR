@@ -618,7 +618,6 @@ add list="China_Telecom6" address=2404:7600:1000::/36
 add list="China_Telecom6" address=2404:7600:2000::/35
 add list="China_Telecom6" address=2404:7600:4000::/34
 add list="China_Telecom6" address=2404:7600:8000::/33
-add list="China_Telecom6" address=2404:7cc0:7f04::/47
 add list="China_Telecom6" address=2404:e8c0::/32
 add list="China_Telecom6" address=2405:1480:1000::/48
 add list="China_Telecom6" address=2405:1480:2000::/48
