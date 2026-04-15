@@ -126,6 +126,7 @@ add list="CN6" address=2400:cb80:e30::/44
 add list="CN6" address=2400:cb80:e40::/44
 add list="CN6" address=2400:da00::/32
 add list="CN6" address=2400:dd00::/28
+add list="CN6" address=2400:e680::/32
 add list="CN6" address=2400:ee00::/32
 add list="CN6" address=2400:f6e0::/32
 add list="CN6" address=2400:f720::/32

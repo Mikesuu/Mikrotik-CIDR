@@ -445,6 +445,7 @@ add list="China_Telecom6" address=2400:da00:1000::/36
 add list="China_Telecom6" address=2400:da00:2000::/35
 add list="China_Telecom6" address=2400:da00:4000::/34
 add list="China_Telecom6" address=2400:da00:8000::/33
+add list="China_Telecom6" address=2400:e680::/32
 add list="China_Telecom6" address=2400:ee00::/33
 add list="China_Telecom6" address=2400:ee00:8000::/34
 add list="China_Telecom6" address=2400:ee00:c000::/35
