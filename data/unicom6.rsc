@@ -568,6 +568,8 @@ add list="China_Unicom6" address=2402:db40:5f00::/46
 add list="China_Unicom6" address=2402:dfc0::/44
 add list="China_Unicom6" address=2402:dfc0:50::/44
 add list="China_Unicom6" address=2402:e740::/32
+add list="China_Unicom6" address=2402:e7c0:400::/42
+add list="China_Unicom6" address=2402:e7c0:800::/42
 add list="China_Unicom6" address=2402:ef40::/32
 add list="China_Unicom6" address=2402:f000::/47
 add list="China_Unicom6" address=2402:f000:5::/48
