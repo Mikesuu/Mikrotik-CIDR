@@ -3313,6 +3313,7 @@ add list="China_Telecom" address=210.76.88.0/21
 add list="China_Telecom" address=210.76.160.0/19
 add list="China_Telecom" address=210.77.128.0/20
 add list="China_Telecom" address=210.77.183.0/24
+add list="China_Telecom" address=210.77.185.0/24
 add list="China_Telecom" address=210.77.186.0/23
 add list="China_Telecom" address=210.77.188.0/24
 add list="China_Telecom" address=210.78.128.0/24
