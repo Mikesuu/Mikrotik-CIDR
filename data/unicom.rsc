@@ -265,7 +265,11 @@ add list="China_Unicom" address=58.59.138.0/24
 add list="China_Unicom" address=58.68.236.0/24
 add list="China_Unicom" address=58.68.247.0/24
 add list="China_Unicom" address=58.83.17.0/24
-add list="China_Unicom" address=58.83.128.0/19
+add list="China_Unicom" address=58.83.128.0/21
+add list="China_Unicom" address=58.83.136.0/22
+add list="China_Unicom" address=58.83.141.0/24
+add list="China_Unicom" address=58.83.142.0/23
+add list="China_Unicom" address=58.83.144.0/20
 add list="China_Unicom" address=58.83.162.0/23
 add list="China_Unicom" address=58.83.164.0/22
 add list="China_Unicom" address=58.83.168.0/21
