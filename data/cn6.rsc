@@ -237,6 +237,7 @@ add list="CN6" address=2402:c60::/48
 add list="CN6" address=2402:1440::/32
 add list="CN6" address=2402:18a0::/32
 add list="CN6" address=2402:2000::/32
+add list="CN6" address=2402:2e60::/39
 add list="CN6" address=2402:34e0::/32
 add list="CN6" address=2402:36e0::/44
 add list="CN6" address=2402:3c00::/32
