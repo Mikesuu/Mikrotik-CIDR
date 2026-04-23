@@ -58,7 +58,6 @@ add list="CERNET" address=202.4.128.0/19
 add list="CERNET" address=202.38.2.0/23
 add list="CERNET" address=202.38.64.0/18
 add list="CERNET" address=202.38.140.0/23
-add list="CERNET" address=202.38.146.0/23
 add list="CERNET" address=202.38.184.0/21
 add list="CERNET" address=202.38.192.0/18
 add list="CERNET" address=202.106.125.0/24
@@ -67,16 +66,6 @@ add list="CERNET" address=202.112.0.0/13
 add list="CERNET" address=202.120.0.0/15
 add list="CERNET" address=202.127.216.0/21
 add list="CERNET" address=202.127.224.0/19
-add list="CERNET" address=202.179.240.0/21
-add list="CERNET" address=202.179.248.0/24
-add list="CERNET" address=202.179.249.0/26
-add list="CERNET" address=202.179.249.64/28
-add list="CERNET" address=202.179.249.80/30
-add list="CERNET" address=202.179.249.88/29
-add list="CERNET" address=202.179.249.96/27
-add list="CERNET" address=202.179.249.128/25
-add list="CERNET" address=202.179.250.0/23
-add list="CERNET" address=202.179.252.0/22
 add list="CERNET" address=202.192.0.0/12
 add list="CERNET" address=203.91.120.0/21
 add list="CERNET" address=210.25.128.0/17
