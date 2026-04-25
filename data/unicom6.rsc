@@ -381,7 +381,7 @@ add list="China_Unicom6" address=2001:da8:8000::/47
 add list="China_Unicom6" address=2001:da8:8002::/48
 add list="China_Unicom6" address=2001:da8:8004::/46
 add list="China_Unicom6" address=2001:da8:8008::/48
-add list="China_Unicom6" address=2001:da8:800a::/47
+add list="China_Unicom6" address=2001:da8:800a::/48
 add list="China_Unicom6" address=2001:da8:800c::/46
 add list="China_Unicom6" address=2001:da8:8010::/46
 add list="China_Unicom6" address=2001:da8:8014::/47
@@ -470,7 +470,6 @@ add list="China_Unicom6" address=2001:da8:e81e::/47
 add list="China_Unicom6" address=2001:da8:e820::/46
 add list="China_Unicom6" address=2001:da8:ef00::/48
 add list="China_Unicom6" address=2001:dc7:5d00::/40
-add list="China_Unicom6" address=2001:df0:e540::/48
 add list="China_Unicom6" address=2001:4510:1480::/41
 add list="China_Unicom6" address=2001:4511:1480::/41
 add list="China_Unicom6" address=2400:5280:f803::/48
@@ -1226,7 +1225,7 @@ add list="China_Unicom6" address=240c:409f:4::/46
 add list="China_Unicom6" address=240c:409f:4004::/46
 add list="China_Unicom6" address=240c:c001::/32
 add list="China_Unicom6" address=240c:c017::/32
-add list="China_Unicom6" address=240c:c018::/32
+add list="China_Unicom6" address=240c:c018::/31
 add list="China_Unicom6" address=240c:c02f::/32
 add list="China_Unicom6" address=240c:c0a0::/31
 add list="China_Unicom6" address=240c:c0a8::/32
