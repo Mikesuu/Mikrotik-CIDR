@@ -248,8 +248,7 @@ add list="China_Telecom" address=43.254.106.0/24
 add list="China_Telecom" address=43.254.152.0/24
 add list="China_Telecom" address=43.254.156.0/22
 add list="China_Telecom" address=43.254.168.0/22
-add list="China_Telecom" address=43.254.192.0/24
-add list="China_Telecom" address=43.254.194.0/23
+add list="China_Telecom" address=43.254.192.0/22
 add list="China_Telecom" address=43.254.200.0/22
 add list="China_Telecom" address=43.254.220.0/22
 add list="China_Telecom" address=43.254.234.0/23
@@ -1577,6 +1576,10 @@ add list="China_Telecom" address=116.199.66.0/23
 add list="China_Telecom" address=116.199.110.0/23
 add list="China_Telecom" address=116.207.0.0/16
 add list="China_Telecom" address=116.208.0.0/14
+add list="China_Telecom" address=116.214.129.0/24
+add list="China_Telecom" address=116.214.130.0/23
+add list="China_Telecom" address=116.214.132.0/23
+add list="China_Telecom" address=116.214.134.0/24
 add list="China_Telecom" address=116.224.0.0/12
 add list="China_Telecom" address=116.242.128.0/17
 add list="China_Telecom" address=116.246.0.0/15
