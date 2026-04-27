@@ -1576,10 +1576,6 @@ add list="China_Telecom" address=116.199.66.0/23
 add list="China_Telecom" address=116.199.110.0/23
 add list="China_Telecom" address=116.207.0.0/16
 add list="China_Telecom" address=116.208.0.0/14
-add list="China_Telecom" address=116.214.129.0/24
-add list="China_Telecom" address=116.214.130.0/23
-add list="China_Telecom" address=116.214.132.0/23
-add list="China_Telecom" address=116.214.134.0/24
 add list="China_Telecom" address=116.224.0.0/12
 add list="China_Telecom" address=116.242.128.0/17
 add list="China_Telecom" address=116.246.0.0/15

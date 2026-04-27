@@ -2427,9 +2427,8 @@ add list="China_Unicom" address=211.101.0.0/18
 add list="China_Unicom" address=211.101.192.0/20
 add list="China_Unicom" address=211.101.240.0/22
 add list="China_Unicom" address=211.102.128.0/21
-add list="China_Unicom" address=211.102.144.0/20
+add list="China_Unicom" address=211.102.144.0/21
 add list="China_Unicom" address=211.102.160.0/20
-add list="China_Unicom" address=211.102.184.0/21
 add list="China_Unicom" address=211.103.128.0/20
 add list="China_Unicom" address=211.103.144.0/21
 add list="China_Unicom" address=211.103.160.0/19
