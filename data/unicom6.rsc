@@ -109,6 +109,7 @@ add list="China_Unicom6" address=2001:250:5078::/47
 add list="China_Unicom6" address=2001:250:507a::/48
 add list="China_Unicom6" address=2001:250:507c::/46
 add list="China_Unicom6" address=2001:250:5080::/48
+add list="China_Unicom6" address=2001:250:5083::/48
 add list="China_Unicom6" address=2001:250:5400::/43
 add list="China_Unicom6" address=2001:250:5420::/45
 add list="China_Unicom6" address=2001:250:5428::/47
@@ -1147,6 +1148,7 @@ add list="China_Unicom6" address=2408:8872::/32
 add list="China_Unicom6" address=2408:8878::/31
 add list="China_Unicom6" address=2408:887e::/32
 add list="China_Unicom6" address=2408:8906:20::/44
+add list="China_Unicom6" address=2408:8906:40::/43
 add list="China_Unicom6" address=2408:8907:9000::/44
 add list="China_Unicom6" address=2408:890c::/31
 add list="China_Unicom6" address=2408:8912::/31

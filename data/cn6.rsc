@@ -1044,6 +1044,7 @@ add list="CN6" address=2408:8872::/32
 add list="CN6" address=2408:8878::/31
 add list="CN6" address=2408:887e::/32
 add list="CN6" address=2408:8906:20::/44
+add list="CN6" address=2408:8906:40::/43
 add list="CN6" address=2408:8907:9000::/44
 add list="CN6" address=2408:890c::/31
 add list="CN6" address=2408:8912::/31
