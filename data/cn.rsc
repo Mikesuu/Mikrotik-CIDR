@@ -710,6 +710,7 @@ add list="CN" address=81.173.28.0/24
 add list="CN" address=82.156.0.0/15
 add list="CN" address=87.76.221.0/24
 add list="CN" address=87.76.222.0/24
+add list="CN" address=93.95.117.0/24
 add list="CN" address=94.191.0.0/17
 add list="CN" address=101.1.0.0/22
 add list="CN" address=101.2.172.0/22
@@ -1119,6 +1120,7 @@ add list="CN" address=103.102.200.0/22
 add list="CN" address=103.102.213.0/24
 add list="CN" address=103.102.214.0/24
 add list="CN" address=103.103.12.0/24
+add list="CN" address=103.104.155.0/24
 add list="CN" address=103.104.252.0/22
 add list="CN" address=103.105.0.0/22
 add list="CN" address=103.105.12.0/22
@@ -2756,6 +2758,7 @@ add list="CN" address=140.246.0.0/16
 add list="CN" address=140.249.0.0/16
 add list="CN" address=140.250.0.0/16
 add list="CN" address=140.255.0.0/16
+add list="CN" address=143.20.246.0/24
 add list="CN" address=143.64.0.0/16
 add list="CN" address=144.0.0.0/16
 add list="CN" address=144.7.0.0/17
@@ -2766,10 +2769,10 @@ add list="CN" address=144.48.212.0/22
 add list="CN" address=144.52.0.0/16
 add list="CN" address=144.79.10.0/23
 add list="CN" address=144.79.54.0/23
+add list="CN" address=144.79.70.0/23
 add list="CN" address=144.123.0.0/16
 add list="CN" address=144.225.186.0/24
 add list="CN" address=144.255.0.0/16
-add list="CN" address=145.6.0.0/16
 add list="CN" address=145.14.71.0/24
 add list="CN" address=145.14.72.0/22
 add list="CN" address=145.14.81.0/24
@@ -2859,7 +2862,8 @@ add list="CN" address=160.25.194.0/23
 add list="CN" address=160.30.230.0/23
 add list="CN" address=160.83.110.0/24
 add list="CN" address=160.191.0.0/24
-add list="CN" address=160.202.152.0/22
+add list="CN" address=160.202.153.0/24
+add list="CN" address=160.202.154.0/23
 add list="CN" address=160.202.212.0/22
 add list="CN" address=160.202.224.0/19
 add list="CN" address=160.250.14.0/23
@@ -3091,6 +3095,7 @@ add list="CN" address=193.233.49.0/24
 add list="CN" address=194.127.229.0/24
 add list="CN" address=194.138.202.0/23
 add list="CN" address=194.138.245.0/24
+add list="CN" address=194.231.140.0/24
 add list="CN" address=198.208.17.0/24
 add list="CN" address=198.208.19.0/24
 add list="CN" address=198.208.30.0/24
