@@ -28,6 +28,7 @@ add list="China_Unicom6" address=2001:250:24f::/48
 add list="China_Unicom6" address=2001:250:251::/48
 add list="China_Unicom6" address=2001:250:803::/48
 add list="China_Unicom6" address=2001:250:101f::/48
+add list="China_Unicom6" address=2001:250:1e02::/48
 add list="China_Unicom6" address=2001:250:3000::/44
 add list="China_Unicom6" address=2001:250:3010::/48
 add list="China_Unicom6" address=2001:250:3012::/47

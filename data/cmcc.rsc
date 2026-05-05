@@ -524,8 +524,7 @@ add list="China_Mobile" address=117.132.0.0/15
 add list="China_Mobile" address=117.134.0.0/17
 add list="China_Mobile" address=117.134.128.0/18
 add list="China_Mobile" address=117.134.195.0/24
-add list="China_Mobile" address=117.134.201.0/24
-add list="China_Mobile" address=117.134.202.0/23
+add list="China_Mobile" address=117.134.203.0/24
 add list="China_Mobile" address=117.134.204.0/22
 add list="China_Mobile" address=117.134.208.0/20
 add list="China_Mobile" address=117.134.224.0/19
