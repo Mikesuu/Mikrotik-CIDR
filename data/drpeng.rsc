@@ -32,7 +32,8 @@ add list="DrPeng" address=123.196.112.0/20
 add list="DrPeng" address=124.202.128.0/19
 add list="DrPeng" address=210.74.0.0/22
 add list="DrPeng" address=211.147.4.0/22
-add list="DrPeng" address=211.154.160.0/20
+add list="DrPeng" address=211.154.160.0/22
+add list="DrPeng" address=211.154.168.0/21
 add list="DrPeng" address=211.155.128.0/19
 add list="DrPeng" address=218.241.16.0/22
 add list="DrPeng" address=218.241.24.0/22
