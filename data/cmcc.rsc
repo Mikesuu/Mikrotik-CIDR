@@ -195,6 +195,9 @@ add list="China_Mobile" address=61.28.49.0/24
 add list="China_Mobile" address=61.28.108.0/24
 add list="China_Mobile" address=61.29.161.0/24
 add list="China_Mobile" address=61.232.0.0/14
+add list="China_Mobile" address=61.236.80.0/20
+add list="China_Mobile" address=61.236.96.0/20
+add list="China_Mobile" address=61.236.112.0/21
 add list="China_Mobile" address=61.237.0.0/16
 add list="China_Mobile" address=69.235.184.0/21
 add list="China_Mobile" address=101.33.128.0/20
@@ -587,6 +590,7 @@ add list="China_Mobile" address=118.145.20.0/22
 add list="China_Mobile" address=118.145.24.0/22
 add list="China_Mobile" address=118.145.29.0/24
 add list="China_Mobile" address=118.145.32.0/20
+add list="China_Mobile" address=118.178.213.0/24
 add list="China_Mobile" address=118.184.152.0/24
 add list="China_Mobile" address=118.184.158.0/24
 add list="China_Mobile" address=118.184.168.0/21
@@ -732,10 +736,12 @@ add list="China_Mobile" address=122.11.32.0/19
 add list="China_Mobile" address=122.14.192.0/18
 add list="China_Mobile" address=122.49.16.0/20
 add list="China_Mobile" address=122.49.32.0/20
+add list="China_Mobile" address=122.64.0.0/16
 add list="China_Mobile" address=122.70.0.0/15
 add list="China_Mobile" address=122.72.3.0/24
 add list="China_Mobile" address=122.72.16.0/24
 add list="China_Mobile" address=122.72.38.0/24
+add list="China_Mobile" address=122.72.57.0/24
 add list="China_Mobile" address=122.72.112.0/24
 add list="China_Mobile" address=122.84.0.0/16
 add list="China_Mobile" address=122.90.0.0/16
@@ -760,6 +766,7 @@ add list="China_Mobile" address=123.64.0.0/15
 add list="China_Mobile" address=123.66.0.0/16
 add list="China_Mobile" address=123.77.0.0/16
 add list="China_Mobile" address=123.82.0.0/17
+add list="China_Mobile" address=123.83.128.0/17
 add list="China_Mobile" address=123.88.0.0/15
 add list="China_Mobile" address=123.90.0.0/16
 add list="China_Mobile" address=123.99.192.0/20
@@ -1005,6 +1012,7 @@ add list="China_Mobile" address=211.99.120.0/23
 add list="China_Mobile" address=211.99.122.0/24
 add list="China_Mobile" address=211.99.160.0/19
 add list="China_Mobile" address=211.99.192.0/19
+add list="China_Mobile" address=211.101.199.0/24
 add list="China_Mobile" address=211.102.208.0/20
 add list="China_Mobile" address=211.103.0.0/17
 add list="China_Mobile" address=211.136.0.0/13
@@ -1075,6 +1083,7 @@ add list="China_Mobile" address=218.97.5.0/24
 add list="China_Mobile" address=218.97.6.0/23
 add list="China_Mobile" address=218.97.8.0/22
 add list="China_Mobile" address=218.97.12.0/23
+add list="China_Mobile" address=218.97.15.0/24
 add list="China_Mobile" address=218.97.16.0/22
 add list="China_Mobile" address=218.97.20.0/24
 add list="China_Mobile" address=218.97.22.0/23
