@@ -1422,9 +1422,7 @@ add list="CN6" address=2a0f:2706::/32
 add list="CN6" address=2a0f:7803:e300::/40
 add list="CN6" address=2a0f:85c1:bfe::/48
 add list="CN6" address=2a0f:9400:6110::/48
-add list="CN6" address=2a12:cb41:200::/40
 add list="CN6" address=2a12:cb46::/36
-add list="CN6" address=2a12:cb46:6000::/44
 add list="CN6" address=2a12:cb47:ffff::/48
 add list="CN6" address=2a13:1800::/48
 add list="CN6" address=2a13:1800:10::/48
