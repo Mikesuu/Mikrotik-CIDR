@@ -1758,7 +1758,7 @@ add list="CN" address=114.64.0.0/16
 add list="CN" address=114.66.0.0/18
 add list="CN" address=114.66.64.0/24
 add list="CN" address=114.66.72.0/21
-add list="CN" address=114.66.80.0/23
+add list="CN" address=114.66.81.0/24
 add list="CN" address=114.66.236.0/22
 add list="CN" address=114.66.240.0/20
 add list="CN" address=114.67.16.0/21
