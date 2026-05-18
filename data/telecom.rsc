@@ -1046,8 +1046,7 @@ add list="China_Telecom" address=103.235.252.0/22
 add list="China_Telecom" address=103.236.52.0/22
 add list="China_Telecom" address=103.236.56.0/21
 add list="China_Telecom" address=103.236.64.0/19
-add list="China_Telecom" address=103.236.96.0/23
-add list="China_Telecom" address=103.236.98.0/24
+add list="China_Telecom" address=103.236.96.0/22
 add list="China_Telecom" address=103.236.244.0/22
 add list="China_Telecom" address=103.236.248.0/23
 add list="China_Telecom" address=103.236.250.0/24
