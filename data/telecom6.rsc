@@ -513,7 +513,6 @@ add list="China_Telecom6" address=2401:d0e0:3::/48
 add list="China_Telecom6" address=2401:d780::/32
 add list="China_Telecom6" address=2401:fa00:40::/47
 add list="China_Telecom6" address=2401:fa00:46::/47
-add list="China_Telecom6" address=2401:fa00:48::/48
 add list="China_Telecom6" address=2401:fa00:58::/48
 add list="China_Telecom6" address=2401:fa00:5f::/48
 add list="China_Telecom6" address=2402:840:d000::/48

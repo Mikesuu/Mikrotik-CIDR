@@ -154,7 +154,7 @@ add list="China_Unicom6" address=2001:250:6020::/45
 add list="China_Unicom6" address=2001:250:6028::/46
 add list="China_Unicom6" address=2001:250:602c::/47
 add list="China_Unicom6" address=2001:250:602e::/48
-add list="China_Unicom6" address=2001:250:6030::/47
+add list="China_Unicom6" address=2001:250:6030::/48
 add list="China_Unicom6" address=2001:250:6032::/48
 add list="China_Unicom6" address=2001:250:6034::/48
 add list="China_Unicom6" address=2001:250:6038::/48
