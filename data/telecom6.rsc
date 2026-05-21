@@ -654,7 +654,6 @@ add list="China_Telecom6" address=2407:c080:1730::/44
 add list="China_Telecom6" address=2407:c080:1800::/37
 add list="China_Telecom6" address=2407:d9c0::/32
 add list="China_Telecom6" address=2408:4005:fffe::/47
-add list="China_Telecom6" address=2408:4016:7::/48
 add list="China_Telecom6" address=2409:27fa::/48
 add list="China_Telecom6" address=2409:27fa:f000::/48
 add list="China_Telecom6" address=2409:27fb::/48

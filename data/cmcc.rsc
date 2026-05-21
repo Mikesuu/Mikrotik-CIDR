@@ -771,6 +771,8 @@ add list="China_Mobile" address=123.186.144.0/20
 add list="China_Mobile" address=123.196.112.0/20
 add list="China_Mobile" address=123.245.192.0/20
 add list="China_Mobile" address=123.246.96.0/20
+add list="China_Mobile" address=124.14.15.0/24
+add list="China_Mobile" address=124.14.22.0/24
 add list="China_Mobile" address=124.201.0.0/17
 add list="China_Mobile" address=124.202.128.0/24
 add list="China_Mobile" address=124.202.130.0/23
