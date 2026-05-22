@@ -3,7 +3,6 @@
 add list="CERNET6" address=2001:250::/30
 add list="CERNET6" address=2001:255::/32
 add list="CERNET6" address=2001:256:100::/48
-add list="CERNET6" address=2001:7fa:5::/48
 add list="CERNET6" address=2001:c68::/32
 add list="CERNET6" address=2001:da8::/32
 add list="CERNET6" address=2001:daa:1::/48
