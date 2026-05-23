@@ -1062,7 +1062,6 @@ add list="CN" address=103.78.126.0/23
 add list="CN" address=103.78.228.0/22
 add list="CN" address=103.79.24.0/22
 add list="CN" address=103.79.200.0/22
-add list="CN" address=103.79.228.0/24
 add list="CN" address=103.81.4.0/22
 add list="CN" address=103.81.48.0/22
 add list="CN" address=103.81.123.0/24
@@ -3210,6 +3209,7 @@ add list="CN" address=202.127.16.0/20
 add list="CN" address=202.127.40.0/21
 add list="CN" address=202.127.48.0/23
 add list="CN" address=202.127.144.0/20
+add list="CN" address=202.127.192.0/24
 add list="CN" address=202.127.200.0/21
 add list="CN" address=202.127.224.0/19
 add list="CN" address=202.130.0.0/19
