@@ -2,7 +2,6 @@
 /ip firewall address-list
 add list="China_Unicom" address=1.1.8.0/24
 add list="China_Unicom" address=1.24.0.0/13
-add list="China_Unicom" address=1.45.0.0/16
 add list="China_Unicom" address=1.51.16.0/20
 add list="China_Unicom" address=1.51.32.0/20
 add list="China_Unicom" address=1.51.48.0/21
@@ -229,7 +228,6 @@ add list="China_Unicom" address=45.125.56.0/22
 add list="China_Unicom" address=45.127.144.0/21
 add list="China_Unicom" address=45.249.212.0/22
 add list="China_Unicom" address=45.250.32.0/21
-add list="China_Unicom" address=45.250.152.0/23
 add list="China_Unicom" address=45.250.180.0/23
 add list="China_Unicom" address=45.250.188.0/24
 add list="China_Unicom" address=45.252.0.0/22

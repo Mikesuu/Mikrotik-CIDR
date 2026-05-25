@@ -105,10 +105,7 @@ add list="CERNET6" address=2403:9b00:6000::/48
 add list="CERNET6" address=2403:a200:9999::/48
 add list="CERNET6" address=2403:ac00::/32
 add list="CERNET6" address=2403:d400::/32
-add list="CERNET6" address=2404:f4c0:f000::/47
-add list="CERNET6" address=2404:f4c0:f003::/48
-add list="CERNET6" address=2404:f4c0:f004::/46
-add list="CERNET6" address=2404:f4c0:f008::/45
+add list="CERNET6" address=2404:f4c0:f000::/44
 add list="CERNET6" address=2405:d900::/32
 add list="CERNET6" address=2406:280::/32
 add list="CERNET6" address=2406:3340::/32

@@ -1426,6 +1426,7 @@ add list="CN" address=103.238.52.0/22
 add list="CN" address=103.238.96.0/23
 add list="CN" address=103.238.98.0/24
 add list="CN" address=103.238.132.0/22
+add list="CN" address=103.238.140.0/22
 add list="CN" address=103.238.144.0/22
 add list="CN" address=103.238.160.0/22
 add list="CN" address=103.238.180.0/22
