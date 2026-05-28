@@ -496,6 +496,7 @@ add list="CN6" address=2407:6c40:1100::/48
 add list="CN6" address=2407:6c40:1210::/48
 add list="CN6" address=2407:6c40:1500::/48
 add list="CN6" address=2407:6c40:1600::/40
+add list="CN6" address=2407:7d00:1::/48
 add list="CN6" address=2407:8f40:2::/48
 add list="CN6" address=2407:9f00::/32
 add list="CN6" address=2407:ad80::/32
