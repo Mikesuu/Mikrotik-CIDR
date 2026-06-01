@@ -740,7 +740,7 @@ add list="CN" address=101.52.68.0/22
 add list="CN" address=101.52.112.0/21
 add list="CN" address=101.52.124.0/22
 add list="CN" address=101.52.128.0/20
-add list="CN" address=101.52.204.0/22
+add list="CN" address=101.52.200.0/21
 add list="CN" address=101.52.212.0/22
 add list="CN" address=101.52.216.0/21
 add list="CN" address=101.52.232.0/23

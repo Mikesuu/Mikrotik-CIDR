@@ -257,7 +257,7 @@ add list="China_Telecom6" address=2001:da8:23d::/48
 add list="China_Telecom6" address=2001:da8:23e::/48
 add list="China_Telecom6" address=2001:da8:240::/46
 add list="China_Telecom6" address=2001:da8:244::/48
-add list="China_Telecom6" address=2001:da8:246::/47
+add list="China_Telecom6" address=2001:da8:247::/48
 add list="China_Telecom6" address=2001:da8:249::/48
 add list="China_Telecom6" address=2001:da8:24f::/48
 add list="China_Telecom6" address=2001:da8:250::/48

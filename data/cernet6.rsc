@@ -76,6 +76,7 @@ add list="CERNET6" address=2401:1d40:2f80::/41
 add list="CERNET6" address=2401:1d40:4000::/34
 add list="CERNET6" address=2401:1d40:8000::/33
 add list="CERNET6" address=2401:34a0::/31
+add list="CERNET6" address=2401:7e00::/32
 add list="CERNET6" address=2401:be00::/32
 add list="CERNET6" address=2401:cc00::/32
 add list="CERNET6" address=2401:ec00::/32
