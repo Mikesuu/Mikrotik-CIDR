@@ -516,7 +516,8 @@ add list="China_Unicom6" address=2401:cb80::/32
 add list="China_Unicom6" address=2401:cc00::/32
 add list="China_Unicom6" address=2401:ce00::/33
 add list="China_Unicom6" address=2401:ce00:8000::/35
-add list="China_Unicom6" address=2401:ce00:a000::/36
+add list="China_Unicom6" address=2401:ce00:a400::/38
+add list="China_Unicom6" address=2401:ce00:a800::/37
 add list="China_Unicom6" address=2401:ce00:b000::/37
 add list="China_Unicom6" address=2401:ce00:bc00::/38
 add list="China_Unicom6" address=2401:ce00:c800::/38
