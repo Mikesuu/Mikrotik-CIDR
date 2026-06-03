@@ -204,9 +204,7 @@ add list="China_Telecom6" address=2001:250:7430::/48
 add list="China_Telecom6" address=2001:250:7801::/48
 add list="China_Telecom6" address=2001:250:7802::/47
 add list="China_Telecom6" address=2001:250:7804::/46
-add list="China_Telecom6" address=2001:250:7808::/48
-add list="China_Telecom6" address=2001:250:780a::/47
-add list="China_Telecom6" address=2001:250:780c::/46
+add list="China_Telecom6" address=2001:250:7808::/45
 add list="China_Telecom6" address=2001:250:7810::/46
 add list="China_Telecom6" address=2001:250:7814::/47
 add list="China_Telecom6" address=2001:250:7817::/48
@@ -633,6 +631,7 @@ add list="China_Telecom6" address=2405:1480:3000::/48
 add list="China_Telecom6" address=2405:7040:6000::/48
 add list="China_Telecom6" address=2405:8280::/32
 add list="China_Telecom6" address=2405:8a40::/32
+add list="China_Telecom6" address=2405:e600:2::/48
 add list="China_Telecom6" address=2406:1080::/48
 add list="China_Telecom6" address=2406:1e40:f012::/47
 add list="China_Telecom6" address=2406:2700::/32
@@ -662,6 +661,7 @@ add list="China_Telecom6" address=2409:27fa::/48
 add list="China_Telecom6" address=2409:27fa:f000::/48
 add list="China_Telecom6" address=2409:27fb::/48
 add list="China_Telecom6" address=2409:27fc::/48
+add list="China_Telecom6" address=2409:6100::/44
 add list="China_Telecom6" address=240a:2001:1811::/48
 add list="China_Telecom6" address=240a:2001:1861::/48
 add list="China_Telecom6" address=240a:40c0:8200::/48
