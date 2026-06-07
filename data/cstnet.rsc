@@ -42,6 +42,6 @@ add list="CSTNET" address=223.0.12.0/23
 add list="CSTNET" address=223.0.15.0/24
 add list="CSTNET" address=223.0.16.0/24
 add list="CSTNET" address=223.0.30.0/24
-add list="CSTNET" address=223.0.40.0/23
+add list="CSTNET" address=223.0.41.0/24
 add list="CSTNET" address=223.0.126.0/24
 add list="CSTNET" address=223.192.0.0/15
