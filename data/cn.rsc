@@ -711,7 +711,9 @@ add list="CN" address=81.68.0.0/14
 add list="CN" address=81.173.18.0/23
 add list="CN" address=81.173.20.0/22
 add list="CN" address=81.173.28.0/24
+add list="CN" address=82.22.31.0/24
 add list="CN" address=82.108.198.0/23
+add list="CN" address=82.109.96.0/23
 add list="CN" address=82.110.234.0/23
 add list="CN" address=82.156.0.0/15
 add list="CN" address=87.76.221.0/24
