@@ -635,7 +635,7 @@ add list="China_Telecom6" address=2406:8880::/48
 add list="China_Telecom6" address=2406:cf00::/48
 add list="China_Telecom6" address=2406:cf00:1000::/43
 add list="China_Telecom6" address=2406:d440:100::/44
-add list="China_Telecom6" address=2406:d440:210::/44
+add list="China_Telecom6" address=2406:d440:200::/43
 add list="China_Telecom6" address=2406:d440:ff00::/48
 add list="China_Telecom6" address=2406:e3c0::/36
 add list="China_Telecom6" address=2406:e3c0:1000::/37
