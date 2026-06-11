@@ -10,9 +10,7 @@ add list="DrPeng" address=115.182.128.0/19
 add list="DrPeng" address=115.182.160.0/20
 add list="DrPeng" address=115.182.192.0/22
 add list="DrPeng" address=115.182.200.0/21
-add list="DrPeng" address=115.182.208.0/21
-add list="DrPeng" address=115.182.216.0/23
-add list="DrPeng" address=115.182.220.0/22
+add list="DrPeng" address=115.182.208.0/20
 add list="DrPeng" address=115.182.224.0/20
 add list="DrPeng" address=118.144.64.0/21
 add list="DrPeng" address=118.144.72.0/22
