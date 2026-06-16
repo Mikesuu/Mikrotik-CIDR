@@ -1,6 +1,7 @@
 /ipv6 firewall address-list remove [find list="CN6"]
 /ipv6 firewall address-list
-add list="CN6" address=2001:250::/30
+add list="CN6" address=2001:250::/31
+add list="CN6" address=2001:253::/32
 add list="CN6" address=2001:254::/33
 add list="CN6" address=2001:255::/32
 add list="CN6" address=2001:256:100::/48
@@ -426,6 +427,7 @@ add list="CN6" address=2406:840:fcb2::/48
 add list="CN6" address=2406:840:fcd0::/48
 add list="CN6" address=2406:840:fcf0::/46
 add list="CN6" address=2406:840:fcf4::/47
+add list="CN6" address=2406:840:fd30::/48
 add list="CN6" address=2406:840:fd40::/48
 add list="CN6" address=2406:840:fd46::/47
 add list="CN6" address=2406:840:fd48::/48
@@ -1409,6 +1411,8 @@ add list="CN6" address=2a0f:1cc5:2680::/42
 add list="CN6" address=2a0f:1cc5:2d01::/48
 add list="CN6" address=2a0f:1cc5:2d03::/48
 add list="CN6" address=2a0f:1cc5:3200::/46
+add list="CN6" address=2a0f:1cc5:3204::/47
+add list="CN6" address=2a0f:1cc5:3206::/48
 add list="CN6" address=2a0f:1cc5:3222::/48
 add list="CN6" address=2a0f:1cc6:b110::/47
 add list="CN6" address=2a0f:1cc6:b210::/47
@@ -1467,13 +1471,10 @@ add list="CN6" address=2a14:7580:740::/44
 add list="CN6" address=2a14:7580:fffa::/48
 add list="CN6" address=2a14:7581:ffb::/48
 add list="CN6" address=2a14:7581:30b6::/48
-add list="CN6" address=2a14:7583:f224::/47
-add list="CN6" address=2a14:7583:f228::/48
-add list="CN6" address=2a14:7583:f22c::/48
+add list="CN6" address=2a14:7583:f220::/43
 add list="CN6" address=2a14:7583:f244::/48
 add list="CN6" address=2a14:7583:f248::/48
-add list="CN6" address=2a14:7583:f264::/48
-add list="CN6" address=2a14:7583:f268::/48
+add list="CN6" address=2a14:7583:f260::/43
 add list="CN6" address=2a14:7583:f300::/46
 add list="CN6" address=2a14:7583:f304::/47
 add list="CN6" address=2a14:7583:f411::/48

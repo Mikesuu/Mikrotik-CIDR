@@ -1,6 +1,7 @@
 /ipv6 firewall address-list remove [find list="CERNET6"]
 /ipv6 firewall address-list
-add list="CERNET6" address=2001:250::/30
+add list="CERNET6" address=2001:250::/31
+add list="CERNET6" address=2001:253::/32
 add list="CERNET6" address=2001:255::/32
 add list="CERNET6" address=2001:256:100::/48
 add list="CERNET6" address=2001:c68::/32
