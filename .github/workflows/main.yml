@@ -32,9 +32,8 @@ jobs:
             {
               echo "/$proto firewall address-list remove [find list=\"$list_name\"]"
               echo "/$proto firewall address-list"
-              if [ "$file_name" = "cn.rsc" ]; then
-                echo "add list=\"$list_name\" address=10.10.10.0/25"
-              fi
+              echo "add list=\"$list_name\" address=10.10.10.0/25"
+              echo "add list=\"$list_name\" address=172.16.100.0/28"
               sort -u "$tmp_file" | grep -E '^[0-9]' | sed "s|^|add list=\"$list_name\" address=|g"
             } > "data/$file_name"
             rm "$tmp_file"
@@ -42,22 +41,27 @@ jobs:
 
           gen_rsc_combined "CN" "cn.rsc" "ip" \
             "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt" \
-            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt"
+            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt" \
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/aliyun.txt" \
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/tencent.txt" \
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/baidu.txt" \
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/huawei.txt" \
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/bytedance.txt" \
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/jd.txt" \
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/netease.txt" \
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/kingsoft.txt"
 
           gen_rsc_combined "CN6" "cn6.rsc" "ipv6" \
             "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt" \
             "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
 
           gen_rsc() {
-            local url=$1
-            local list_name=$2
-            local file_name=$3
-            local proto=$4
+            local url=$1; local list_name=$2; local file_name=$3; local proto=$4
             content=$(curl -sSL --retry 3 --connect-timeout 15 --fail "$url") || echo "Warning: Failed to fetch $url"
             {
               echo "/$proto firewall address-list remove [find list=\"$list_name\"]"
               echo "/$proto firewall address-list"
-              echo "$content" | grep -v '^#' | grep -v '^$' | sed "s|^|add list=\"$list_name\" address=|g"
+              echo "$content" | grep -E '^[0-9]' | sed "s|^|add list=\"$list_name\" address=|g"
             } > "data/$file_name"
           }
 
@@ -66,19 +70,14 @@ jobs:
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc.txt" "China_Mobile" "cmcc.rsc" "ip"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet.txt" "CERNET" "cernet.rsc" "ip"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet.txt" "CSTNET" "cstnet.rsc" "ip"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cietnet.txt" "CIETNET" "cietnet.rsc" "ip"
+          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cbnnet.txt" "CBNNET" "cbnnet.rsc" "ip"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng.txt" "DrPeng" "drpeng.rsc" "ip"
-
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet6.txt" "China_Telecom6" "telecom6.rsc" "ipv6"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom6.txt" "China_Unicom6" "unicom6.rsc" "ipv6"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc6.txt" "China_Mobile6" "cmcc6.rsc" "ipv6"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet6.txt" "CERNET6" "cernet6.rsc" "ipv6"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet6.txt" "CSTNET6" "cstnet6.rsc" "ipv6"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng6.txt" "DrPeng6" "drpeng6.rsc" "ipv6"
 
       - name: Commit and Push
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/*.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update IP lists $(date +%Y-%m-%d)"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update full IP lists $(date +%Y-%m-%d)"
           git push origin main
