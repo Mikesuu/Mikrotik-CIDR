@@ -27,7 +27,7 @@ jobs:
             shift 3
             local tmp_file=$(mktemp)
             for url in "$@"; do
-              curl -sSL --retry 3 --connect-timeout 10 --fail "$url" >> "$tmp_file" || echo "Warning: Failed to fetch $url"
+              curl -sSL --retry 3 --connect-timeout 15 --fail "$url" >> "$tmp_file" || echo "Warning: Failed to fetch $url, skipping..."
             done
             {
               echo "/$proto firewall address-list remove [find list=\"$list_name\"]"
@@ -42,18 +42,18 @@ jobs:
 
           gen_rsc_combined "CN" "cn.rsc" "ip" \
             "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt" \
-            "https://raw.githubusercontent.com/Hackl0us/GeoIP2-CN/release/CN-ip-mask.txt"
+            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt"
 
           gen_rsc_combined "CN6" "cn6.rsc" "ipv6" \
             "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt" \
-            "https://raw.githubusercontent.com/Hackl0us/GeoIP2-CN/release/CN-ipv6-mask.txt"
+            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
 
           gen_rsc() {
             local url=$1
             local list_name=$2
             local file_name=$3
             local proto=$4
-            content=$(curl -sSL --retry 3 --connect-timeout 10 --fail "$url")
+            content=$(curl -sSL --retry 3 --connect-timeout 15 --fail "$url") || echo "Warning: Failed to fetch $url"
             {
               echo "/$proto firewall address-list remove [find list=\"$list_name\"]"
               echo "/$proto firewall address-list"
