@@ -44,11 +44,11 @@ jobs:
 
           gen_rsc_combined "CN" "cn.rsc" "ip" \
             "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt" \
-            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn.txt"
+            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt"
 
           gen_rsc_combined "CN6" "cn6.rsc" "ipv6" \
             "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt" \
-            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn6.txt"
+            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
 
           gen_rsc() {
             local url=$1
