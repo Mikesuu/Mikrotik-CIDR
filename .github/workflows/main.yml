@@ -20,27 +20,49 @@ jobs:
           set -e
           mkdir -p data
           
+          gen_rsc_combined() {
+            local list_name=$1
+            local file_name=$2
+            local proto=$3
+            shift 3
+            
+            local tmp_file=$(mktemp)
+            for url in "$@"; do
+              curl -sSL --fail "$url" >> "$tmp_file"
+            done
+            
+            {
+              echo "/$proto firewall address-list remove [find list=\"$list_name\"]"
+              echo "/$proto firewall address-list"
+              if [ "$file_name" = "cn.rsc" ]; then
+                echo "add list=\"$list_name\" address=10.10.10.0/25"
+              fi
+              sort -u "$tmp_file" | grep -E '^[0-9]' | sed "s|^|add list=\"$list_name\" address=|g"
+            } > "data/$file_name"
+            rm "$tmp_file"
+          }
+
+          gen_rsc_combined "CN" "cn.rsc" "ip" \
+            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt" \
+            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn.txt"
+
+          gen_rsc_combined "CN6" "cn6.rsc" "ipv6" \
+            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt" \
+            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/text/cn6.txt"
+
           gen_rsc() {
             local url=$1
             local list_name=$2
             local file_name=$3
             local proto=$4
-            
             content=$(curl -sSL --fail "$url")
-            
             {
               echo "/$proto firewall address-list remove [find list=\"$list_name\"]"
               echo "/$proto firewall address-list"
-              
-              if [ "$file_name" = "cn.rsc" ]; then
-                echo "add list=\"$list_name\" address=10.10.10.0/25"
-              fi
-              
               echo "$content" | grep -v '^#' | grep -v '^$' | sed "s|^|add list=\"$list_name\" address=|g"
             } > "data/$file_name"
           }
 
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt" "CN" "cn.rsc" "ip"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet.txt" "China_Telecom" "telecom.rsc" "ip"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom.txt" "China_Unicom" "unicom.rsc" "ip"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc.txt" "China_Mobile" "cmcc.rsc" "ip"
@@ -48,7 +70,6 @@ jobs:
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet.txt" "CSTNET" "cstnet.rsc" "ip"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng.txt" "DrPeng" "drpeng.rsc" "ip"
 
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt" "CN6" "cn6.rsc" "ipv6"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet6.txt" "China_Telecom6" "telecom6.rsc" "ipv6"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom6.txt" "China_Unicom6" "unicom6.rsc" "ipv6"
           gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc6.txt" "China_Mobile6" "cmcc6.rsc" "ipv6"
