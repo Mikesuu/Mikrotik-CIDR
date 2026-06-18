@@ -25,12 +25,10 @@ jobs:
             local file_name=$2
             local proto=$3
             shift 3
-            
             local tmp_file=$(mktemp)
             for url in "$@"; do
-              curl -sSL --fail "$url" >> "$tmp_file"
+              curl -sSL --fail "$url" >> "$tmp_file" || echo "Warning: Failed to fetch $url"
             done
-            
             {
               echo "/$proto firewall address-list remove [find list=\"$list_name\"]"
               echo "/$proto firewall address-list"
@@ -43,12 +41,12 @@ jobs:
           }
 
           gen_rsc_combined "CN" "cn.rsc" "ip" \
-            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt" \
-            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt"
+            "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/china.txt" \
+            "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/cn.txt"
 
           gen_rsc_combined "CN6" "cn6.rsc" "ipv6" \
-            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt" \
-            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
+            "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/china6.txt" \
+            "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/cn6.txt"
 
           gen_rsc() {
             local url=$1
@@ -63,19 +61,19 @@ jobs:
             } > "data/$file_name"
           }
 
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet.txt" "China_Telecom" "telecom.rsc" "ip"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom.txt" "China_Unicom" "unicom.rsc" "ip"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc.txt" "China_Mobile" "cmcc.rsc" "ip"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet.txt" "CERNET" "cernet.rsc" "ip"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet.txt" "CSTNET" "cstnet.rsc" "ip"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng.txt" "DrPeng" "drpeng.rsc" "ip"
+          gen_rsc "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/chinanet.txt" "China_Telecom" "telecom.rsc" "ip"
+          gen_rsc "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/unicom.txt" "China_Unicom" "unicom.rsc" "ip"
+          gen_rsc "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/cmcc.txt" "China_Mobile" "cmcc.rsc" "ip"
+          gen_rsc "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/cernet.txt" "CERNET" "cernet.rsc" "ip"
+          gen_rsc "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/cstnet.txt" "CSTNET" "cstnet.rsc" "ip"
+          gen_rsc "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/drpeng.txt" "DrPeng" "drpeng.rsc" "ip"
 
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet6.txt" "China_Telecom6" "telecom6.rsc" "ipv6"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom6.txt" "China_Unicom6" "unicom6.rsc" "ipv6"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc6.txt" "China_Mobile6" "cmcc6.rsc" "ipv6"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet6.txt" "CERNET6" "cernet6.rsc" "ipv6"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet6.txt" "CSTNET6" "cstnet6.rsc" "ipv6"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng6.txt" "DrPeng6" "drpeng6.rsc" "ipv6"
+          gen_rsc "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/chinanet6.txt" "China_Telecom6" "telecom6.rsc" "ipv6"
+          gen_rsc "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/unicom6.txt" "China_Unicom6" "unicom6.rsc" "ipv6"
+          gen_rsc "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/cmcc6.txt" "China_Mobile6" "cmcc6.rsc" "ipv6"
+          gen_rsc "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/cernet6.txt" "CERNET6" "cernet6.rsc" "ipv6"
+          gen_rsc "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/cstnet6.txt" "CSTNET6" "cstnet6.rsc" "ipv6"
+          gen_rsc "https://cdn.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/drpeng6.txt" "DrPeng6" "drpeng6.rsc" "ipv6"
 
       - name: Commit and Push
         run: |
