@@ -1,6 +1,7 @@
 /ip firewall address-list remove [find list="CN"]
 /ip firewall address-list
 add list="CN" address=10.10.10.0/25
+add list="CN" address=172.16.100.0/28
 add list="CN" address=1.1.8.0/24
 add list="CN" address=1.116.0.0/15
 add list="CN" address=1.119.0.0/17
