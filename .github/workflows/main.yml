@@ -18,12 +18,20 @@ jobs:
       - name: Process IP Lists
         run: |
           mkdir -p data
-          TMP_FILE=$(mktemp)
           
-          echo "10.10.10.0/25" >> "$TMP_FILE"
-          echo "172.16.100.0/28" >> "$TMP_FILE"
+          fetch_data() {
+            local output_file=$1
+            shift
+            for url in "$@"; do
+              curl -sSL --retry 3 --connect-timeout 10 --max-time 60 --fail "$url" >> "$output_file" 2>/dev/null || true
+            done
+          }
 
-          CORE_URLS=(
+          CN_TMP=$(mktemp)
+          echo "10.10.10.0/25" >> "$CN_TMP"
+          echo "172.16.100.0/28" >> "$CN_TMP"
+          
+          V4_URLS=(
             "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
             "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt"
             "https://raw.githubusercontent.com/yarrp/cdn-lists/master/aliyun.txt"
@@ -34,30 +42,37 @@ jobs:
             "https://raw.githubusercontent.com/yarrp/cdn-lists/master/jd.txt"
             "https://raw.githubusercontent.com/yarrp/cdn-lists/master/netease.txt"
           )
-
           ASN_BASE="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
           ASN_IDS=("45090" "132203" "132591" "133478" "131285" "55990" "63835" "138152" "37963" "45102" "131477" "45609" "134552" "138699" "139070" "139242" "140978" "38365" "58519" "55967" "134238" "136907" "134756" "24429" "137319" "45062" "140726" "138915" "9812" "17421" "38283" "135269" "139341" "132225")
+          for id in "${ASN_IDS[@]}"; do V4_URLS+=("$ASN_BASE/$id/ipv4-aggregated.txt"); done
           
-          for id in "${ASN_IDS[@]}"; do
-            CORE_URLS+=("$ASN_BASE/$id/ipv4-aggregated.txt")
-          done
-
-          for url in "${CORE_URLS[@]}"; do
-            curl -sSL --retry 3 --connect-timeout 10 --max-time 60 --fail "$url" >> "$TMP_FILE" 2>/dev/null || true
-          done
-
+          fetch_data "$CN_TMP" "${V4_URLS[@]}"
           {
             echo "/ip firewall address-list remove [find list=\"CN\"]"
             echo "/ip firewall address-list"
-            sort -u "$TMP_FILE" | grep -E '^[0-9]' | sed "s|^|add list=\"CN\" address=|g"
+            sort -u "$CN_TMP" | grep -E '^[0-9]' | sed "s|^|add list=\"CN\" address=|g"
           } > data/cn.rsc
+          rm "$CN_TMP"
+
+          CN6_TMP=$(mktemp)
+          V6_URLS=(
+            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
+            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
+          )
+          for id in "${ASN_IDS[@]}"; do V6_URLS+=("$ASN_BASE/$id/ipv6-aggregated.txt"); done
           
-          rm "$TMP_FILE"
+          fetch_data "$CN6_TMP" "${V6_URLS[@]}"
+          {
+            echo "/ipv6 firewall address-list remove [find list=\"CN6\"]"
+            echo "/ipv6 firewall address-list"
+            sort -u "$CN6_TMP" | grep -E ':' | sed "s|^|add list=\"CN6\" address=|g"
+          } > data/cn6.rsc
+          rm "$CN6_TMP"
 
       - name: Commit and Push
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add data/cn.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update full IP list $(date +%Y-%m-%d)"
+          git add data/cn.rsc data/cn6.rsc
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update full IP lists $(date +%Y-%m-%d)"
           git push origin main
