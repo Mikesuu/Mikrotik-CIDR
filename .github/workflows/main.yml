@@ -17,119 +17,47 @@ jobs:
 
       - name: Process IP Lists
         run: |
-          set -e
           mkdir -p data
+          TMP_FILE=$(mktemp)
+          
+          echo "10.10.10.0/25" >> "$TMP_FILE"
+          echo "172.16.100.0/28" >> "$TMP_FILE"
 
-          gen_rsc_parallel() {
-            local list_name=$1
-            local file_name=$2
-            local proto=$3
-            shift 3
-            local tmp_dir=$(mktemp -d)
-            local pids=()
-            local i=0
-            for url in "$@"; do
-              curl -sSL --retry 3 --connect-timeout 15 --max-time 60 --fail \
-                "$url" > "$tmp_dir/$i.txt" 2>/dev/null &
-              pids+=($!)
-              ((i++))
-            done
-            for pid in "${pids[@]}"; do
-              wait "$pid" 2>/dev/null || true
-            done
-            {
-              echo "/$proto firewall address-list remove [find list=\"$list_name\"]"
-              echo "/$proto firewall address-list"
-              echo "add list=\"$list_name\" address=10.10.10.0/25"
-              echo "add list=\"$list_name\" address=172.16.100.0/28"
-              sort -u "$tmp_dir"/*.txt | grep -E '^[0-9]' | sed "s|^|add list=\"$list_name\" address=|g"
-            } > "data/$file_name"
-            rm -rf "$tmp_dir"
-          }
+          CORE_URLS=(
+            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
+            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/aliyun.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/tencent.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/baidu.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/huawei.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/bytedance.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/jd.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/netease.txt"
+          )
 
-          gen_rsc() {
-            local url=$1; local list_name=$2; local file_name=$3; local proto=$4
-            content=$(curl -sSL --retry 3 --connect-timeout 15 --max-time 60 --fail "$url") || {
-              echo "Warning: Failed to fetch $url"
-              content=""
-            }
-            {
-              echo "/$proto firewall address-list remove [find list=\"$list_name\"]"
-              echo "/$proto firewall address-list"
-              echo "$content" | grep -E '^[0-9]' | sed "s|^|add list=\"$list_name\" address=|g"
-            } > "data/$file_name"
-          }
+          ASN_BASE="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
+          ASN_IDS=("45090" "132203" "132591" "133478" "131285" "55990" "63835" "138152" "37963" "45102" "131477" "45609" "134552" "138699" "139070" "139242" "140978" "38365" "58519" "55967" "134238" "136907" "134756" "24429" "137319" "45062" "140726" "138915" "9812" "17421" "38283" "135269" "139341" "132225")
+          
+          for id in "${ASN_IDS[@]}"; do
+            CORE_URLS+=("$ASN_BASE/$id/ipv4-aggregated.txt")
+          done
 
-          ASN="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
+          for url in "${CORE_URLS[@]}"; do
+            curl -sSL --retry 3 --connect-timeout 10 --max-time 60 --fail "$url" >> "$TMP_FILE" 2>/dev/null || true
+          done
 
-          gen_rsc_parallel "CN" "cn.rsc" "ip" \
-            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt" \
-            "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt" \
-            "https://raw.githubusercontent.com/Hackl0us/GeoIP2-CN/release/CN-ip-cidr.txt" \
-            "$ASN/45090/ipv4-aggregated.txt" \
-            "$ASN/132203/ipv4-aggregated.txt" \
-            "$ASN/132591/ipv4-aggregated.txt" \
-            "$ASN/133478/ipv4-aggregated.txt" \
-            "$ASN/131285/ipv4-aggregated.txt" \
-            "$ASN/55990/ipv4-aggregated.txt" \
-            "$ASN/63835/ipv4-aggregated.txt" \
-            "$ASN/138152/ipv4-aggregated.txt" \
-            "$ASN/37963/ipv4-aggregated.txt" \
-            "$ASN/45102/ipv4-aggregated.txt" \
-            "$ASN/131477/ipv4-aggregated.txt" \
-            "$ASN/45609/ipv4-aggregated.txt" \
-            "$ASN/134552/ipv4-aggregated.txt" \
-            "$ASN/138699/ipv4-aggregated.txt" \
-            "$ASN/139070/ipv4-aggregated.txt" \
-            "$ASN/139242/ipv4-aggregated.txt" \
-            "$ASN/140978/ipv4-aggregated.txt" \
-            "$ASN/38365/ipv4-aggregated.txt" \
-            "$ASN/58519/ipv4-aggregated.txt" \
-            "$ASN/55967/ipv4-aggregated.txt" \
-            "$ASN/134238/ipv4-aggregated.txt" \
-            "$ASN/136907/ipv4-aggregated.txt" \
-            "$ASN/134756/ipv4-aggregated.txt" \
-            "$ASN/24429/ipv4-aggregated.txt" \
-            "$ASN/137319/ipv4-aggregated.txt" \
-            "$ASN/45062/ipv4-aggregated.txt" \
-            "$ASN/140726/ipv4-aggregated.txt" \
-            "$ASN/138915/ipv4-aggregated.txt" \
-            "$ASN/9812/ipv4-aggregated.txt" \
-            "$ASN/17421/ipv4-aggregated.txt" \
-            "$ASN/38283/ipv4-aggregated.txt" \
-            "$ASN/135269/ipv4-aggregated.txt" \
-            "$ASN/139341/ipv4-aggregated.txt" \
-            "$ASN/132225/ipv4-aggregated.txt"
-
-          gen_rsc_parallel "CN6" "cn6.rsc" "ipv6" \
-            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt" \
-            "https://raw.githubusercontent.com/Hackl0us/GeoIP2-CN/release/CN-ip-cidr.txt" \
-            "$ASN/45090/ipv6-aggregated.txt" \
-            "$ASN/132203/ipv6-aggregated.txt" \
-            "$ASN/37963/ipv6-aggregated.txt" \
-            "$ASN/45102/ipv6-aggregated.txt" \
-            "$ASN/138699/ipv6-aggregated.txt" \
-            "$ASN/38365/ipv6-aggregated.txt" \
-            "$ASN/136907/ipv6-aggregated.txt" \
-            "$ASN/4134/ipv6-aggregated.txt" \
-            "$ASN/9808/ipv6-aggregated.txt" \
-            "$ASN/4837/ipv6-aggregated.txt" \
-            "$ASN/4812/ipv6-aggregated.txt" \
-            "$ASN/9929/ipv6-aggregated.txt"
-
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet.txt" "China_Telecom" "telecom.rsc" "ip"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom.txt" "China_Unicom" "unicom.rsc" "ip"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc.txt" "China_Mobile" "cmcc.rsc" "ip"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet.txt" "CERNET" "cernet.rsc" "ip"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet.txt" "CSTNET" "cstnet.rsc" "ip"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cietnet.txt" "CIETNET" "cietnet.rsc" "ip"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cbnnet.txt" "CBNNET" "cbnnet.rsc" "ip"
-          gen_rsc "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng.txt" "DrPeng" "drpeng.rsc" "ip"
+          {
+            echo "/ip firewall address-list remove [find list=\"CN\"]"
+            echo "/ip firewall address-list"
+            sort -u "$TMP_FILE" | grep -E '^[0-9]' | sed "s|^|add list=\"CN\" address=|g"
+          } > data/cn.rsc
+          
+          rm "$TMP_FILE"
 
       - name: Commit and Push
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add data/*.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update full IP lists $(date +%Y-%m-%d)"
+          git add data/cn.rsc
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update full IP list $(date +%Y-%m-%d)"
           git push origin main
