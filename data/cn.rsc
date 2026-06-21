@@ -3518,6 +3518,7 @@ add list="CN" address=189.73.18.0/24
 add list="CN" address=189.75.185.0/24
 add list="CN" address=189.75.186.0/24
 add list="CN" address=190.92.192.0/18
+add list="CN" address=191.217.175.0/24
 add list="CN" address=191.219.18.0/24
 add list="CN" address=191.222.242.0/24
 add list="CN" address=191.222.244.0/24
