@@ -27,7 +27,6 @@ add list="CN6" address=2400:3200::/48
 add list="CN6" address=2400:3200:baba::/48
 add list="CN6" address=2400:5280:f803::/48
 add list="CN6" address=2400:5a00::/32
-add list="CN6" address=2400:5a60:2::/48
 add list="CN6" address=2400:6000::/32
 add list="CN6" address=2400:6600::/32
 add list="CN6" address=2400:6e60:1301::/48
@@ -427,7 +426,7 @@ add list="CN6" address=2401:4900:61c0::/44
 add list="CN6" address=2401:4900:6270::/44
 add list="CN6" address=2401:4900:6280::/43
 add list="CN6" address=2401:4900:62a0::/44
-add list="CN6" address=2401:4900:62c0::/42
+add list="CN6" address=2401:4900:62f0::/44
 add list="CN6" address=2401:4900:6300::/42
 add list="CN6" address=2401:4900:6340::/44
 add list="CN6" address=2401:4900:63e0::/43
@@ -1360,7 +1359,7 @@ add list="CN6" address=2406:840:e10f::/48
 add list="CN6" address=2406:840:e14f::/48
 add list="CN6" address=2406:840:e330::/44
 add list="CN6" address=2406:840:e600::/44
-add list="CN6" address=2406:840:e621::/48
+add list="CN6" address=2406:840:e620::/47
 add list="CN6" address=2406:840:e80f::/48
 add list="CN6" address=2406:840:eb01::/48
 add list="CN6" address=2406:840:eb02::/47
@@ -1380,6 +1379,7 @@ add list="CN6" address=2406:840:f868::/47
 add list="CN6" address=2406:840:f86c::/48
 add list="CN6" address=2406:840:f889::/48
 add list="CN6" address=2406:840:fa01::/48
+add list="CN6" address=2406:840:fa40::/48
 add list="CN6" address=2406:840:fa60::/44
 add list="CN6" address=2406:840:fc10::/44
 add list="CN6" address=2406:840:fc20::/43
@@ -1494,7 +1494,6 @@ add list="CN6" address=2408:4014::/31
 add list="CN6" address=2408:4016:1000::/36
 add list="CN6" address=2408:4016:100::/40
 add list="CN6" address=2408:4016:10::/44
-add list="CN6" address=2408:4016:1::/48
 add list="CN6" address=2408:4016:2000::/35
 add list="CN6" address=2408:4016:200::/39
 add list="CN6" address=2408:4016:20::/43
@@ -1508,7 +1507,7 @@ add list="CN6" address=2408:4016:8000::/33
 add list="CN6" address=2408:4016:800::/37
 add list="CN6" address=2408:4016:80::/41
 add list="CN6" address=2408:4016:8::/45
-add list="CN6" address=2408:4016::/48
+add list="CN6" address=2408:4016::/47
 add list="CN6" address=2408:4017::/32
 add list="CN6" address=2408:4018::/29
 add list="CN6" address=2408:4020::/27
@@ -2659,7 +2658,8 @@ add list="CN6" address=2a04:f580:9290::/48
 add list="CN6" address=2a05:1087::/32
 add list="CN6" address=2a06:3600:e000::/40
 add list="CN6" address=2a06:3600:fb00::/40
-add list="CN6" address=2a06:3600:fc00::/38
+add list="CN6" address=2a06:3600:fc00::/40
+add list="CN6" address=2a06:3600:fe00::/39
 add list="CN6" address=2a06:3605::/32
 add list="CN6" address=2a06:3606::/31
 add list="CN6" address=2a06:a005:260::/43
@@ -2669,7 +2669,8 @@ add list="CN6" address=2a07:54c1:2200::/46
 add list="CN6" address=2a07:54c1:2205::/48
 add list="CN6" address=2a0a:d681:e000::/40
 add list="CN6" address=2a0a:d681:fb00::/40
-add list="CN6" address=2a0a:d681:fc00::/38
+add list="CN6" address=2a0a:d681:fc00::/40
+add list="CN6" address=2a0a:d681:fe00::/39
 add list="CN6" address=2a0a:d685:1ff::/48
 add list="CN6" address=2a0a:d685:200::/47
 add list="CN6" address=2a0a:d687:f001::/48
@@ -2677,6 +2678,8 @@ add list="CN6" address=2a0a:d687:f004::/47
 add list="CN6" address=2a0a:d687:f007::/48
 add list="CN6" address=2a0a:d687:f008::/48
 add list="CN6" address=2a0c:b641:571::/48
+add list="CN6" address=2a0e:4005:ff13::/48
+add list="CN6" address=2a0e:4005:ff20::/48
 add list="CN6" address=2a0e:aa06:440::/48
 add list="CN6" address=2a0e:aa06:450::/44
 add list="CN6" address=2a0e:aa06:490::/44
@@ -2720,8 +2723,6 @@ add list="CN6" address=2a0f:1cc5:2680::/42
 add list="CN6" address=2a0f:1cc5:2d01::/48
 add list="CN6" address=2a0f:1cc5:2d03::/48
 add list="CN6" address=2a0f:1cc5:3200::/46
-add list="CN6" address=2a0f:1cc5:3204::/47
-add list="CN6" address=2a0f:1cc5:3206::/48
 add list="CN6" address=2a0f:1cc5:3222::/48
 add list="CN6" address=2a0f:1cc5:40::/48
 add list="CN6" address=2a0f:1cc5:600::/47
@@ -2729,7 +2730,7 @@ add list="CN6" address=2a0f:1cc5:603::/48
 add list="CN6" address=2a0f:1cc5:642::/48
 add list="CN6" address=2a0f:1cc5:661::/48
 add list="CN6" address=2a0f:1cc5:662::/48
-add list="CN6" address=2a0f:1cc5:6a0::/48
+add list="CN6" address=2a0f:1cc5:6a0::/47
 add list="CN6" address=2a0f:1cc5:f00::/45
 add list="CN6" address=2a0f:1cc5:f08::/47
 add list="CN6" address=2a0f:1cc5:fff::/48
@@ -2785,6 +2786,7 @@ add list="CN6" address=2a14:67c3:c0::/48
 add list="CN6" address=2a14:7580:740::/44
 add list="CN6" address=2a14:7580:fffa::/48
 add list="CN6" address=2a14:7581:ffb::/48
+add list="CN6" address=2a14:7583:efff::/48
 add list="CN6" address=2a14:7583:f220::/43
 add list="CN6" address=2a14:7583:f240::/42
 add list="CN6" address=2a14:7583:f411::/48
