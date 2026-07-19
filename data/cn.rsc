@@ -1344,6 +1344,7 @@ add list="CN" address=113.47.64.0/19
 add list="CN" address=113.47.96.0/21
 add list="CN" address=113.48.127.0/24
 add list="CN" address=113.48.224.0/20
+add list="CN" address=113.48.48.0/20
 add list="CN" address=113.49.0.0/19
 add list="CN" address=113.50.0.0/20
 add list="CN" address=113.50.32.0/24
