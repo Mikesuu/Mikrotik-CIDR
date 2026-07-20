@@ -2892,6 +2892,7 @@ add list="CN6" address=2a14:67c2:a90::/48
 add list="CN6" address=2a14:67c2:aa1::/48
 add list="CN6" address=2a14:67c3:190::/47
 add list="CN6" address=2a14:67c3:30::/44
+add list="CN6" address=2a14:67c3:360::/48
 add list="CN6" address=2a14:67c3:c0::/48
 add list="CN6" address=2a14:67c3:caf0::/45
 add list="CN6" address=2a14:67c3:caf8::/46
