@@ -128,7 +128,7 @@ add list="China_Unicom6" address=2404:c300::/32
 add list="China_Unicom6" address=2404:c940::/48
 add list="China_Unicom6" address=2405:1480:1000::/48
 add list="China_Unicom6" address=2405:1480:2000::/48
-add list="China_Unicom6" address=2405:1480:3001::/48
+add list="China_Unicom6" address=2405:1480:3000::/47
 add list="China_Unicom6" address=2405:6f00:c101::/48
 add list="China_Unicom6" address=2405:6f00:c170::/48
 add list="China_Unicom6" address=2405:7040:6001::/48

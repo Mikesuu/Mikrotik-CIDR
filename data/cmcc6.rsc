@@ -25,6 +25,7 @@ add list="China_Mobile6" address=2402:1440:1000::/36
 add list="China_Mobile6" address=2402:1440:2000::/35
 add list="China_Mobile6" address=2402:1440:4000::/34
 add list="China_Mobile6" address=2402:1440:8000::/33
+add list="China_Mobile6" address=2402:4f00::/32
 add list="China_Mobile6" address=2402:5ec0::/36
 add list="China_Mobile6" address=2402:5ec0:1f00::/40
 add list="China_Mobile6" address=2402:5ec0:2000::/35

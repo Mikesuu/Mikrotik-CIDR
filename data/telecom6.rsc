@@ -1,1 +1,31 @@
-# Empty list, skipped
+/ipv6 firewall address-list remove [find list="China_Telecom6"]
+/ipv6 firewall address-list
+add list="China_Telecom6" address=2400:9380:8001::/48
+add list="China_Telecom6" address=2400:9380:8003::/48
+add list="China_Telecom6" address=2400:9380:8021::/48
+add list="China_Telecom6" address=2400:9380:8040::/48
+add list="China_Telecom6" address=2400:9380:8140::/48
+add list="China_Telecom6" address=2400:9380:8201::/48
+add list="China_Telecom6" address=2400:9380:8301::/48
+add list="China_Telecom6" address=2400:9380:9001::/48
+add list="China_Telecom6" address=2400:9380:9009::/48
+add list="China_Telecom6" address=2400:9380:9020::/47
+add list="China_Telecom6" address=2400:9380:9050::/47
+add list="China_Telecom6" address=2400:9380:9060::/48
+add list="China_Telecom6" address=2400:9380:9071::/48
+add list="China_Telecom6" address=2400:9380:9080::/47
+add list="China_Telecom6" address=2400:9380:90b1::/48
+add list="China_Telecom6" address=2400:9380:90b2::/47
+add list="China_Telecom6" address=2400:9380:90b4::/46
+add list="China_Telecom6" address=2400:9380:9109::/48
+add list="China_Telecom6" address=2400:9380:9121::/48
+add list="China_Telecom6" address=2400:9380:9220::/47
+add list="China_Telecom6" address=2400:9380:9250::/47
+add list="China_Telecom6" address=2400:9380:9260::/48
+add list="China_Telecom6" address=2400:9380:9271::/48
+add list="China_Telecom6" address=2400:9380:9280::/47
+add list="China_Telecom6" address=2400:9380:9282::/48
+add list="China_Telecom6" address=2400:9380:92b1::/48
+add list="China_Telecom6" address=2400:9380:92b2::/47
+add list="China_Telecom6" address=2400:9380:92b4::/46
+add list="China_Telecom6" address=240e::/20
