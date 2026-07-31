@@ -29,7 +29,27 @@ jobs:
           import sys
           from netaddr import IPNetwork, cidr_merge
 
-          def merge_and_export(input_files, output_file, ip_version):
+          DOMESTIC_V6_MAP = {
+              'telecom': [IPNetwork('240e::/16')],
+              'unicom':  [IPNetwork('2408::/13')],
+              'cmcc':    [IPNetwork('2409::/16'), IPNetwork('240c::/14')],
+              'cbnnet':  [IPNetwork('2401:b600::/29')],
+              'cernet':  [IPNetwork('2001:250::/32'), IPNetwork('2001:da8::/32')],
+              'cstnet':  [IPNetwork('2001:cc0::/32')]
+          }
+
+          def is_valid_net(net, ip_version, operator=None):
+              if ip_version == 4:
+                  return True
+              if operator and operator in DOMESTIC_V6_MAP:
+                  allowed_blocks = DOMESTIC_V6_MAP[operator]
+                  for block in allowed_blocks:
+                      if net in block or block in net or net.overlaps(block):
+                          return True
+                  return False
+              return True
+
+          def merge_and_export(input_files, output_file, ip_version, operator=None):
               networks = []
               for infile in input_files.split(','):
                   try:
@@ -40,7 +60,7 @@ jobs:
                                   continue
                               try:
                                   net = IPNetwork(line)
-                                  if net.version == ip_version:
+                                  if net.version == ip_version and is_valid_net(net, ip_version, operator):
                                       networks.append(net)
                               except Exception:
                                   continue
@@ -57,7 +77,8 @@ jobs:
               version = int(sys.argv[1])
               in_files = sys.argv[2]
               out_file = sys.argv[3]
-              merge_and_export(in_files, out_file, version)
+              operator = sys.argv[4] if len(sys.argv) > 4 else None
+              merge_and_export(in_files, out_file, version, operator)
           EOF
 
           fetch_asn() {
@@ -94,56 +115,48 @@ jobs:
             } > "$out_file"
           }
 
-          # 1. 中国电信 (China Telecom: AS4134, AS4809)
-          fetch_asn telecom 4134 4809
+          fetch_asn telecom 4134 4809 23764
           python3 process_asn.py 4 telecom_v4.txt telecom4_clean.txt
           export_ros "China_Telecom" telecom4_clean.txt false "data/telecom.rsc"
-          python3 process_asn.py 6 telecom_v6.txt telecom6_clean.txt
+          python3 process_asn.py 6 telecom_v6.txt telecom6_clean.txt telecom
           export_ros "China_Telecom6" telecom6_clean.txt true "data/telecom6.rsc"
 
-          # 2. 中国联通 (China Unicom: AS4837, AS9929)
-          fetch_asn unicom 4837 9929
+          fetch_asn unicom 4837 9929 17622 10099
           python3 process_asn.py 4 unicom_v4.txt unicom4_clean.txt
           export_ros "China_Unicom" unicom4_clean.txt false "data/unicom.rsc"
-          python3 process_asn.py 6 unicom_v6.txt unicom6_clean.txt
+          python3 process_asn.py 6 unicom_v6.txt unicom6_clean.txt unicom
           export_ros "China_Unicom6" unicom6_clean.txt true "data/unicom6.rsc"
 
-          # 3. 中国移动 (China Mobile: AS9808, AS58453)
-          fetch_asn cmcc 9808 58453
+          fetch_asn cmcc 9808 58453 9394
           python3 process_asn.py 4 cmcc_v4.txt cmcc4_clean.txt
           export_ros "China_Mobile" cmcc4_clean.txt false "data/cmcc.rsc"
-          python3 process_asn.py 6 cmcc_v6.txt cmcc6_clean.txt
+          python3 process_asn.py 6 cmcc_v6.txt cmcc6_clean.txt cmcc
           export_ros "China_Mobile6" cmcc6_clean.txt true "data/cmcc6.rsc"
 
-          # 4. 教育网 (CERNET: AS23910, AS4538)
-          fetch_asn cernet 23910 4538
-          python3 process_asn.py 4 cernet_v4.txt cernet4_clean.txt
-          export_ros "CERNET" cernet4_clean.txt false "data/cernet.rsc"
-          python3 process_asn.py 6 cernet_v6.txt cernet6_clean.txt
-          export_ros "CERNET6" cernet6_clean.txt true "data/cernet6.rsc"
-
-          # 5. 科技网 (CSTNET: AS7497)
-          fetch_asn cstnet 7497
-          python3 process_asn.py 4 cstnet_v4.txt cstnet4_clean.txt
-          export_ros "CSTNET" cstnet4_clean.txt false "data/cstnet.rsc"
-          python3 process_asn.py 6 cstnet_v6.txt cstnet6_clean.txt
-          export_ros "CSTNET6" cstnet6_clean.txt true "data/cstnet6.rsc"
-
-          # 6. 广电网络 (CBNNET: AS137872, AS138421)
           fetch_asn cbnnet 137872 138421
           python3 process_asn.py 4 cbnnet_v4.txt cbnnet4_clean.txt
           export_ros "CBNNET" cbnnet4_clean.txt false "data/cbnnet.rsc"
-          python3 process_asn.py 6 cbnnet_v6.txt cbnnet6_clean.txt
+          python3 process_asn.py 6 cbnnet_v6.txt cbnnet6_clean.txt cbnnet
           export_ros "CBNNET6" cbnnet6_clean.txt true "data/cbnnet6.rsc"
 
-          # 7. 鹏博士 (DRPENG: AS17962)
-          fetch_asn drpeng 17962
+          fetch_asn cernet 23910 4538
+          python3 process_asn.py 4 cernet_v4.txt cernet4_clean.txt
+          export_ros "CERNET" cernet4_clean.txt false "data/cernet.rsc"
+          python3 process_asn.py 6 cernet_v6.txt cernet6_clean.txt cernet
+          export_ros "CERNET6" cernet6_clean.txt true "data/cernet6.rsc"
+
+          fetch_asn cstnet 7497
+          python3 process_asn.py 4 cstnet_v4.txt cstnet4_clean.txt
+          export_ros "CSTNET" cstnet4_clean.txt false "data/cstnet.rsc"
+          python3 process_asn.py 6 cstnet_v6.txt cstnet6_clean.txt cstnet
+          export_ros "CSTNET6" cstnet6_clean.txt true "data/cstnet6.rsc"
+
+          fetch_asn drpeng 17962 9308
           python3 process_asn.py 4 drpeng_v4.txt drpeng4_clean.txt
           export_ros "DRPENG" drpeng4_clean.txt false "data/drpeng.rsc"
           python3 process_asn.py 6 drpeng_v6.txt drpeng6_clean.txt
           export_ros "DRPENG6" drpeng6_clean.txt true "data/drpeng6.rsc"
 
-          # 8. 全国汇总 CN / CN6 列表（直接拉取标准 GeoIP 权威汇总）
           curl -sSL --retry 3 "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt" > cn4_raw.txt
           python3 process_asn.py 4 cn4_raw.txt cn4_clean.txt
           export_ros "CN" cn4_clean.txt false "data/cn.rsc"
