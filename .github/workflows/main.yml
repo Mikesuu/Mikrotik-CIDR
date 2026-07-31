@@ -27,7 +27,28 @@ jobs:
 
           cat << 'EOF' > process_ips.py
           import sys
-          from netaddr import IPNetwork, cidr_merge
+          from netaddr import IPNetwork, IPSet, cidr_merge
+
+          PREFIXES = {
+              'telecom': [IPNetwork('240e::/16')],
+              'unicom':  [IPNetwork('2408::/16')],
+              'cmcc':    [IPNetwork('2409::/16')],
+              'cernet':  [IPNetwork('2001:da8::/32')],
+              'cn6':     [
+                  IPNetwork('2400::/12'),
+                  IPNetwork('2408::/13'),
+                  IPNetwork('2400:3200::/28'),
+                  IPNetwork('2001:da8::/32')
+              ]
+          }
+
+          def is_valid_v6(net, op_type):
+              if op_type not in PREFIXES:
+                  return True
+              for valid_block in PREFIXES[op_type]:
+                  if net in valid_block or valid_block in net or net.overlaps(valid_block):
+                      return True
+              return False
 
           def clean_and_merge(input_files, output_file, ip_version, operator_type):
               networks = []
@@ -42,12 +63,7 @@ jobs:
                                   net = IPNetwork(line)
                                   if net.version == ip_version:
                                       if ip_version == 6:
-                                          s_addr = str(net.network)
-                                          if operator_type == 'unicom' and not s_addr.startswith('2408:'):
-                                              continue
-                                          elif operator_type == 'telecom' and not s_addr.startswith('240e:'):
-                                              continue
-                                          elif operator_type == 'cmcc' and not s_addr.startswith('2409:'):
+                                          if not is_valid_v6(net, operator_type):
                                               continue
                                       networks.append(net)
                               except Exception:
@@ -161,7 +177,7 @@ jobs:
           fetch_data cn6_all_raw.txt \
             "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt" \
             "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
-          python3 process_ips.py 6 cn6_all_raw.txt cn6_clean.txt all
+          python3 process_ips.py 6 cn6_all_raw.txt cn6_clean.txt cn6
           export_ros "CN6" cn6_clean.txt true data/cn6.rsc
 
       - name: Commit and Push
