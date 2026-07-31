@@ -164,12 +164,10 @@ jobs:
           python3 process_asn.py 6 drpeng_v6.txt drpeng6_clean.txt isp
           export_ros "DRPENG6" drpeng6_clean.txt true "data/drpeng6.rsc"
 
-          curl -sSL --retry 3 "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt" > cn4_raw.txt
-          python3 process_asn.py 4 cn4_raw.txt cn4_clean.txt all
+          python3 process_asn.py 4 "telecom_v4.txt,unicom_v4.txt,cmcc_v4.txt,cbnnet_v4.txt,cernet_v4.txt,cstnet_v4.txt,drpeng_v4.txt" cn4_clean.txt all
           export_ros "CN" cn4_clean.txt false "data/cn.rsc"
 
-          curl -sSL --retry 3 "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt" > cn6_raw.txt
-          python3 process_asn.py 6 cn6_raw.txt cn6_clean.txt all
+          python3 process_asn.py 6 "telecom_v6.txt,unicom_v6.txt,cmcc_v6.txt,cbnnet_v6.txt,cernet_v6.txt,cstnet_v6.txt,drpeng_v6.txt" cn6_clean.txt all
           export_ros "CN6" cn6_clean.txt true "data/cn6.rsc"
 
       - name: Commit and Push
@@ -177,5 +175,5 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/*.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update RouterOS IP lists"
+          git commit -m "Update ROS IP lists purely based on ASN aggregation" || true
           git push origin main
