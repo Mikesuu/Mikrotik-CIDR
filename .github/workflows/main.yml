@@ -1,4 +1,4 @@
-name: Generate MikroTik v7 IP Lists
+name: Generate Accurate MikroTik v7 IP Lists
 
 on:
   schedule:
@@ -15,64 +15,150 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Process IP Lists
+      - name: Install Network Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          pip3 install netaddr
+
+      - name: Process Accurate IP Lists
         run: |
           mkdir -p data
-          
+
+          cat << 'EOF' > process_ips.py
+          import sys
+          from netaddr import IPNetwork, cidr_merge
+
+          def clean_and_merge(input_files, output_file, ip_version):
+              networks = []
+              for infile in input_files.split(','):
+                  try:
+                      with open(infile, 'r') as f:
+                          for line in f:
+                              line = line.strip()
+                              if not line or line.startswith('#'):
+                                  continue
+                              try:
+                                  net = IPNetwork(line)
+                                  if net.version == ip_version:
+                                      networks.append(net)
+                              except Exception:
+                                  continue
+                  except Exception:
+                      continue
+
+              merged = cidr_merge(networks)
+
+              with open(output_file, 'w') as f:
+                  for net in merged:
+                      f.write(f"{net}\n")
+
+          if __name__ == "__main__":
+              version = int(sys.argv[1])
+              in_files = sys.argv[2]
+              out_file = sys.argv[3]
+              clean_and_merge(in_files, out_file, version)
+          EOF
+
           fetch_data() {
-            local output_file=$1
+            local out=$1
             shift
             for url in "$@"; do
-              curl -sSL --retry 3 --connect-timeout 10 --max-time 60 --fail "$url" >> "$output_file" 2>/dev/null || true
+              curl -sSL --retry 3 --connect-timeout 10 --max-time 60 "$url" >> "$out" 2>/dev/null || true
             done
           }
 
-          CN_TMP=$(mktemp)
-          echo "10.10.10.0/25" >> "$CN_TMP"
-          echo "172.16.100.0/28" >> "$CN_TMP"
-          
-          V4_URLS=(
-            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
-            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/aliyun.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/tencent.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/baidu.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/huawei.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/bytedance.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/jd.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/netease.txt"
-          )
-          ASN_BASE="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
-          ASN_IDS=("45090" "132203" "132591" "133478" "131285" "55990" "63835" "138152" "37963" "45102" "131477" "45609" "134552" "138699" "139070" "139242" "140978" "38365" "58519" "55967" "134238" "136907" "134756" "24429" "137319" "45062" "140726" "138915" "9812" "17421" "38283" "135269" "139341" "132225")
-          for id in "${ASN_IDS[@]}"; do V4_URLS+=("$ASN_BASE/$id/ipv4-aggregated.txt"); done
-          
-          fetch_data "$CN_TMP" "${V4_URLS[@]}"
-          {
-            echo "/ip firewall address-list remove [find list=\"CN\"]"
-            echo "/ip firewall address-list"
-            sort -u "$CN_TMP" | grep -E '^[0-9]' | sed "s|^|add list=\"CN\" address=|g"
-          } > data/cn.rsc
-          rm "$CN_TMP"
+          export_ros() {
+            local list_name=$1
+            local clean_file=$2
+            local is_v6=$3
+            local out_file=$4
 
-          CN6_TMP=$(mktemp)
-          V6_URLS=(
-            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
+            local cmd_path="/ip firewall address-list"
+            if [ "$is_v6" = "true" ]; then
+              cmd_path="/ipv6 firewall address-list"
+            fi
+
+            if [ ! -s "$clean_file" ]; then
+              echo "# Empty list, skipped" > "$out_file"
+              return
+            fi
+
+            {
+              echo "$cmd_path remove [find list=\"$list_name\"]"
+              echo "$cmd_path"
+              sed "s|^|add list=\"$list_name\" address=|g" "$clean_file"
+            } > "$out_file"
+          }
+
+          fetch_data u4_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom.txt" "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/4837/ipv4-aggregated.txt"
+          fetch_data u6_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom6.txt" "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/4837/ipv6-aggregated.txt"
+          python3 process_ips.py 4 u4_raw.txt u4_clean.txt
+          python3 process_ips.py 6 u6_raw.txt u6_clean.txt
+          export_ros "China_Unicom"  u4_clean.txt false data/unicom.rsc
+          export_ros "China_Unicom6" u6_clean.txt true  data/unicom6.rsc
+
+          fetch_data t4_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/telecom.txt" "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/4134/ipv4-aggregated.txt" "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/4809/ipv4-aggregated.txt"
+          fetch_data t6_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/telecom6.txt" "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/4134/ipv6-aggregated.txt" "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/4809/ipv6-aggregated.txt"
+          python3 process_ips.py 4 t4_raw.txt t4_clean.txt
+          python3 process_ips.py 6 t6_raw.txt t6_clean.txt
+          export_ros "China_Telecom"  t4_clean.txt false data/telecom.rsc
+          export_ros "China_Telecom6" t6_clean.txt true  data/telecom6.rsc
+
+          fetch_data c4_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc.txt" "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/9808/ipv4-aggregated.txt"
+          fetch_data c6_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc6.txt" "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/9808/ipv6-aggregated.txt"
+          python3 process_ips.py 4 c4_raw.txt c4_clean.txt
+          python3 process_ips.py 6 c6_raw.txt c6_clean.txt
+          export_ros "China_Mobile"  c4_clean.txt false data/cmcc.rsc
+          export_ros "China_Mobile6" c6_clean.txt true  data/cmcc6.rsc
+
+          fetch_data cer4_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet.txt" "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/23910/ipv4-aggregated.txt"
+          fetch_data cer6_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet6.txt" "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/23910/ipv6-aggregated.txt"
+          python3 process_ips.py 4 cer4_raw.txt cer4_clean.txt
+          python3 process_ips.py 6 cer6_raw.txt cer6_clean.txt
+          export_ros "CERNET"  cer4_clean.txt false data/cernet.rsc
+          export_ros "CERNET6" cer6_clean.txt true  data/cernet6.rsc
+
+          fetch_data cst4_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet.txt" "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/7497/ipv4-aggregated.txt"
+          fetch_data cst6_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet6.txt" "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/7497/ipv6-aggregated.txt"
+          python3 process_ips.py 4 cst4_raw.txt cst4_clean.txt
+          python3 process_ips.py 6 cst6_raw.txt cst6_clean.txt
+          export_ros "CSTNET"  cst4_clean.txt false data/cstnet.rsc
+          export_ros "CSTNET6" cst6_clean.txt true  data/cstnet6.rsc
+
+          fetch_data cbn4_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cbnnet.txt"
+          python3 process_ips.py 4 cbn4_raw.txt cbn4_clean.txt
+          export_ros "CBNNET" cbn4_clean.txt false data/cbnnet.rsc
+
+          fetch_data drp4_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng.txt"
+          fetch_data drp6_raw.txt "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng6.txt"
+          python3 process_ips.py 4 drp4_raw.txt drp4_clean.txt
+          python3 process_ips.py 6 drp6_raw.txt drp6_clean.txt
+          export_ros "DRPENG"  drp4_clean.txt false data/drpeng.rsc
+          export_ros "DRPENG6" drp6_clean.txt true  data/drpeng6.rsc
+
+          cat u4_clean.txt t4_clean.txt c4_clean.txt cer4_clean.txt cst4_clean.txt cbn4_clean.txt drp4_clean.txt > cn4_all_raw.txt
+          echo -e "10.10.10.0/25\n172.16.100.0/28" >> cn4_all_raw.txt
+          fetch_data cn4_all_raw.txt \
+            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt" \
+            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt" \
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/aliyun.txt" \
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/tencent.txt" \
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/baidu.txt"
+          python3 process_ips.py 4 cn4_all_raw.txt cn4_clean.txt
+          export_ros "CN" cn4_clean.txt false data/cn.rsc
+
+          cat u6_clean.txt t6_clean.txt c6_clean.txt cer6_clean.txt cst6_clean.txt drp6_clean.txt > cn6_all_raw.txt
+          fetch_data cn6_all_raw.txt \
+            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt" \
             "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
-          )
-          for id in "${ASN_IDS[@]}"; do V6_URLS+=("$ASN_BASE/$id/ipv6-aggregated.txt"); done
-          
-          fetch_data "$CN6_TMP" "${V6_URLS[@]}"
-          {
-            echo "/ipv6 firewall address-list remove [find list=\"CN6\"]"
-            echo "/ipv6 firewall address-list"
-            sort -u "$CN6_TMP" | grep -E ':' | sed "s|^|add list=\"CN6\" address=|g"
-          } > data/cn6.rsc
-          rm "$CN6_TMP"
+          python3 process_ips.py 6 cn6_all_raw.txt cn6_clean.txt
+          export_ros "CN6" cn6_clean.txt true data/cn6.rsc
 
       - name: Commit and Push
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add data/cn.rsc data/cn6.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update full IP lists $(date +%Y-%m-%d)"
+          git add data/*.rsc
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update precise IP lists $(date +%Y-%m-%d)"
           git push origin main
