@@ -319,10 +319,7 @@ add list="CN6" address=2404:c940::/48
 add list="CN6" address=2404:e280::/47
 add list="CN6" address=2404:e8c0::/32
 add list="CN6" address=2404:eb80::/48
-add list="CN6" address=2404:f4c0:f000::/48
-add list="CN6" address=2404:f4c0:f003::/48
-add list="CN6" address=2404:f4c0:f004::/46
-add list="CN6" address=2404:f4c0:f008::/45
+add list="CN6" address=2404:f4c0:f000::/44
 add list="CN6" address=2405:80:10::/48
 add list="CN6" address=2405:80:13::/48
 add list="CN6" address=2405:6c0:2::/48
