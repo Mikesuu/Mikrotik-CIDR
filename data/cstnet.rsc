@@ -6,6 +6,7 @@ add list="CSTNET" address=42.247.33.0/24
 add list="CSTNET" address=42.247.94.0/24
 add list="CSTNET" address=49.210.0.0/15
 add list="CSTNET" address=60.245.128.0/17
+add list="CSTNET" address=64.96.4.0/24
 add list="CSTNET" address=101.252.0.0/15
 add list="CSTNET" address=103.2.208.0/22
 add list="CSTNET" address=113.130.96.0/20
@@ -26,8 +27,7 @@ add list="CSTNET" address=203.83.56.0/21
 add list="CSTNET" address=203.99.30.0/23
 add list="CSTNET" address=203.119.80.0/24
 add list="CSTNET" address=203.119.83.0/24
-add list="CSTNET" address=210.72.0.0/19
-add list="CSTNET" address=210.72.64.0/18
+add list="CSTNET" address=210.72.0.0/17
 add list="CSTNET" address=210.72.128.0/19
 add list="CSTNET" address=210.73.0.0/18
 add list="CSTNET" address=210.75.224.0/19
