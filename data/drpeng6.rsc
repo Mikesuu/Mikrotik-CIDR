@@ -1,1 +1,1 @@
-# Empty list, skipped
+# Empty or file not found, skipped
