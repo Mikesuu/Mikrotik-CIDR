@@ -1,5 +1,18 @@
 /ipv6 firewall address-list remove [find list="China_Unicom6"]
 /ipv6 firewall address-list
+add list="China_Unicom6" address=2001:4510:1480::/41
+add list="China_Unicom6" address=2001:4511:1480::/41
+add list="China_Unicom6" address=2401:8a00::/32
+add list="China_Unicom6" address=2402:18a0::/32
+add list="China_Unicom6" address=2402:f140:ff13::/48
+add list="China_Unicom6" address=2402:f140:ff14::/48
+add list="China_Unicom6" address=2404:6500:dcb3::/48
+add list="China_Unicom6" address=2405:1480:3000::/47
+add list="China_Unicom6" address=2406:1e40:f012::/47
+add list="China_Unicom6" address=2406:cac0::/40
+add list="China_Unicom6" address=2406:cac0:200::/40
+add list="China_Unicom6" address=2407:6c40:1500::/48
+add list="China_Unicom6" address=2407:6c40:1600::/40
 add list="China_Unicom6" address=2408:8000::/48
 add list="China_Unicom6" address=2408:8000:2::/47
 add list="China_Unicom6" address=2408:8000:10fe::/47
