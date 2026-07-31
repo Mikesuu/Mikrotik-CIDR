@@ -1,4 +1,4 @@
-name: Generate MikroTik v7 IP Lists
+name: Generate Accurate MikroTik v7 IP Lists
 
 on:
   schedule:
@@ -33,8 +33,8 @@ jobs:
             tmp_file=$(mktemp)
             curl -sSL --retry 3 --connect-timeout 10 "$url" > "$tmp_file"
 
-            if [ ! -s "$tmp_file" ]; then
-              echo "# Empty or download failed, skipped" > "$out_file"
+            if [ ! -s "$tmp_file" ] || grep -q "404: Not Found" "$tmp_file"; then
+              echo "# Empty or file not found, skipped" > "$out_file"
               rm -f "$tmp_file"
               return
             fi
@@ -48,27 +48,28 @@ jobs:
             rm -f "$tmp_file"
           }
 
-          convert_to_ros "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/telecom.txt" "China_Telecom" false "data/telecom.rsc"
-          convert_to_ros "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/telecom6.txt" "China_Telecom6" true "data/telecom6.rsc"
+          RAW_BASE="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
 
-          convert_to_ros "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom.txt" "China_Unicom" false "data/unicom.rsc"
-          convert_to_ros "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom6.txt" "China_Unicom6" true "data/unicom6.rsc"
+          convert_to_ros "$RAW_BASE/chinanet.txt"  "China_Telecom"  false "data/telecom.rsc"
+          convert_to_ros "$RAW_BASE/chinanet6.txt" "China_Telecom6" true  "data/telecom6.rsc"
 
-          convert_to_ros "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc.txt" "China_Mobile" false "data/cmcc.rsc"
-          convert_to_ros "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc6.txt" "China_Mobile6" true "data/cmcc6.rsc"
+          convert_to_ros "$RAW_BASE/unicom.txt"    "China_Unicom"   false "data/unicom.rsc"
+          convert_to_ros "$RAW_BASE/unicom6.txt"   "China_Unicom6"  true  "data/unicom6.rsc"
 
-          convert_to_ros "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet.txt" "CERNET" false "data/cernet.rsc"
-          convert_to_ros "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet6.txt" "CERNET6" true "data/cernet6.rsc"
+          convert_to_ros "$RAW_BASE/cmcc.txt"      "China_Mobile"   false "data/cmcc.rsc"
+          convert_to_ros "$RAW_BASE/cmcc6.txt"     "China_Mobile6"  true  "data/cmcc6.rsc"
 
-          convert_to_ros "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet.txt" "CSTNET" false "data/cstnet.rsc"
-          convert_to_ros "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet6.txt" "CSTNET6" true "data/cstnet6.rsc"
+          convert_to_ros "$RAW_BASE/cernet.txt"    "CERNET"         false "data/cernet.rsc"
+          convert_to_ros "$RAW_BASE/cernet6.txt"   "CERNET6"        true  "data/cernet6.rsc"
 
-          convert_to_ros "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cbnnet.txt" "CBNNET" false "data/cbnnet.rsc"
-          convert_to_ros "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/drpeng.txt" "DRPENG" false "data/drpeng.rsc"
-          echo "# Empty list, skipped" > data/drpeng6.rsc
+          convert_to_ros "$RAW_BASE/cstnet.txt"    "CSTNET"         false "data/cstnet.rsc"
+          convert_to_ros "$RAW_BASE/cstnet6.txt"   "CSTNET6"        true  "data/cstnet6.rsc"
 
-          convert_to_ros "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt" "CN" false "data/cn.rsc"
-          convert_to_ros "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt" "CN6" true "data/cn6.rsc"
+          convert_to_ros "$RAW_BASE/drpeng.txt"    "DRPENG"         false "data/drpeng.rsc"
+          convert_to_ros "$RAW_BASE/drpeng6.txt"   "DRPENG6"        true  "data/drpeng6.rsc"
+
+          convert_to_ros "$RAW_BASE/china.txt"     "CN"             false "data/cn.rsc"
+          convert_to_ros "$RAW_BASE/china6.txt"    "CN6"            true  "data/cn6.rsc"
 
       - name: Commit and Push
         run: |
