@@ -26,57 +26,82 @@ jobs:
       - name: Process IP Lists
         run: |
           mkdir -p data
-          METO_BASE="https://raw.githubusercontent.com/metowolf/iplist/master/data/isp"
+          METO_URL="https://raw.githubusercontent.com/metowolf/iplist/master/data/isp"
+          ASN_URL="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
+          
+          CN_V4_RAW=$(mktemp)
+          CN_V6_RAW=$(mktemp)
+          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv4 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, 32-log($5)/log(2)}' > "$CN_V4_RAW"
+          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' > "$CN_V6_RAW"
 
-          process_metowolf() {
+          gen_isp_v4() {
             local list_name=$1
             local meto_file=$2
-            local out_v4="data/${3}.rsc"
-            local out_v6="data/${3}6.rsc"
-            local tmp_raw=$(mktemp)
-
-            curl -sSLf "${METO_BASE}/${meto_file}.txt" > "$tmp_raw" || true
-
+            local out_file="data/${3}.rsc"
+            local tmp=$(mktemp)
+            curl -sSLf "${METO_URL}/${meto_file}.txt" > "$tmp" || true
             {
               echo "/ip firewall address-list remove [find list=\"$list_name\"]"
               echo "/ip firewall address-list"
-              grep '\.' "$tmp_raw" | sort -u | aggregate6 | sed "s|^|add list=\"$list_name\" address=|g"
-            } > "$out_v4"
+              sort -u "$tmp" | grep '\.' | aggregate6 | sed "s|^|add list=\"$list_name\" address=|g"
+            } > "$out_file"
+            rm "$tmp"
+          }
 
+          gen_isp_v6() {
+            local list_name=$1
+            local out_file="data/${2}6.rsc"
+            shift 2
+            local asns=("$@")
+            local tmp=$(mktemp)
+            local tmp_filtered=$(mktemp)
+            for id in "${asns[@]}"; do
+              curl -sSLf "${ASN_URL}/${id}/ipv6-aggregated.txt" >> "$tmp" || true
+            done
+            grep -Fxf "$CN_V6_RAW" "$tmp" > "$tmp_filtered" || cat "$tmp" > "$tmp_filtered"
             {
               echo "/ipv6 firewall address-list remove [find list=\"${list_name}6\"]"
               echo "/ipv6 firewall address-list"
-              grep ':' "$tmp_raw" | sort -u | aggregate6 | sed "s|^|add list=\"${list_name}6\" address=|g"
-            } > "$out_v6"
-            rm "$tmp_raw"
+              sort -u "$tmp_filtered" | grep ':' | aggregate6 | sed "s|^|add list=\"${list_name}6\" address=|g"
+            } > "$out_file"
+            rm "$tmp" "$tmp_filtered"
           }
 
-          process_metowolf "China_Telecom" "chinatelecom" "telecom"
-          process_metowolf "China_Unicom" "chinaunicom" "unicom"
-          process_metowolf "China_Mobile" "chinamobile" "cmcc"
-          process_metowolf "CERNET" "cernet" "cernet"
-          process_metowolf "CSTNET" "cstnet" "cstnet"
-          process_metowolf "DRPENG" "drpeng" "drpeng"
+          gen_isp_v4 "China_Telecom" "chinatelecom" "telecom"
+          gen_isp_v6 "China_Telecom" "telecom" "4134" "4809" "23764"
 
-          CN_V4_TMP=$(mktemp)
-          echo "10.10.10.0/25" >> "$CN_V4_TMP"
-          echo "172.16.100.0/28" >> "$CN_V4_TMP"
-          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv4 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, 32-log($5)/log(2)}' >> "$CN_V4_TMP"
+          gen_isp_v4 "China_Unicom" "chinaunicom" "unicom"
+          gen_isp_v6 "China_Unicom" "unicom" "4837" "9929" "17622" "10099"
+
+          gen_isp_v4 "China_Mobile" "chinamobile" "cmcc"
+          gen_isp_v6 "China_Mobile" "cmcc" "9808" "58453" "9394"
+
+          gen_isp_v4 "CERNET" "cernet" "cernet"
+          gen_isp_v6 "CERNET" "cernet" "23910" "4538"
+
+          gen_isp_v4 "CSTNET" "cstnet" "cstnet"
+          gen_isp_v6 "CSTNET" "cstnet" "7497"
+
+          gen_isp_v4 "DRPENG" "drpeng" "drpeng"
+          gen_isp_v6 "DRPENG" "drpeng" "17962"
+
+          CN_V4_FINAL=$(mktemp)
+          echo "10.10.10.0/25" >> "$CN_V4_FINAL"
+          echo "172.16.100.0/28" >> "$CN_V4_FINAL"
+          cat "$CN_V4_RAW" >> "$CN_V4_FINAL"
           {
             echo "/ip firewall address-list remove [find list=\"CN\"]"
             echo "/ip firewall address-list"
-            sort -u "$CN_V4_TMP" | grep '\.' | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
+            sort -u "$CN_V4_FINAL" | grep '\.' | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
           } > data/cn.rsc
 
-          CN_V6_TMP=$(mktemp)
-          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' >> "$CN_V6_TMP"
           {
             echo "/ipv6 firewall address-list remove [find list=\"CN6\"]"
             echo "/ipv6 firewall address-list"
-            sort -u "$CN_V6_TMP" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
+            sort -u "$CN_V6_RAW" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
           } > data/cn6.rsc
 
-          rm "$CN_V4_TMP" "$CN_V6_TMP"
+          rm "$CN_V4_RAW" "$CN_V6_RAW" "$CN_V4_FINAL" "$CN_V6_FINAL"
 
       - name: Commit and Push
         run: |
