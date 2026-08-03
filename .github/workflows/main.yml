@@ -26,88 +26,62 @@ jobs:
       - name: Process IP Lists
         run: |
           mkdir -p data
-          
-          ASN_BASE="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
-          GAO_URL="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
-          
-          TELECOM_ASNS=("4134" "4809" "23764")
-          UNICOM_ASNS=("4837" "9929" "17622" "10099")
-          CMCC_ASNS=("9808" "58453" "9394")
-          CERNET_ASNS=("23910" "4538")
-          CSTNET_ASNS=("7497")
-          CIETNET_ASNS=("9308")
-          CBNNET_ASNS=("137872" "138421")
-          DRPENG_ASNS=("17962")
+          METO_BASE="https://raw.githubusercontent.com/metowolf/iplist/master/data/isp"
 
-          process_isp() {
+          process_metowolf() {
             local list_name=$1
-            local is_v6=$2
-            local out_file=$3
-            shift 3
-            local asns=("$@")
+            local meto_file=$2
+            local out_v4="data/${3}.rsc"
+            local out_v6="data/${3}6.rsc"
             local tmp_raw=$(mktemp)
-            local suffix="ipv4-aggregated.txt"
-            local cmd_path="/ip firewall address-list"
-            local pattern='\.'
-            if [ "$is_v6" = "true" ]; then
-              suffix="ipv6-aggregated.txt"
-              cmd_path="/ipv6 firewall address-list"
-              pattern=':'
-            fi
-            for id in "${asns[@]}"; do
-              curl -sSLf --retry 3 "${ASN_BASE}/${id}/${suffix}" >> "$tmp_raw" || true
-            done
+
+            curl -sSLf "${METO_BASE}/${meto_file}.txt" > "$tmp_raw" || true
+
             {
-              echo "$cmd_path remove [find list=\"$list_name\"]"
-              echo "$cmd_path"
-              sort -u "$tmp_raw" | grep "$pattern" | aggregate6 | sed "s|^|add list=\"$list_name\" address=|g"
-            } > "$out_file"
+              echo "/ip firewall address-list remove [find list=\"$list_name\"]"
+              echo "/ip firewall address-list"
+              grep '\.' "$tmp_raw" | sort -u | aggregate6 | sed "s|^|add list=\"$list_name\" address=|g"
+            } > "$out_v4"
+
+            {
+              echo "/ipv6 firewall address-list remove [find list=\"${list_name}6\"]"
+              echo "/ipv6 firewall address-list"
+              grep ':' "$tmp_raw" | sort -u | aggregate6 | sed "s|^|add list=\"${list_name}6\" address=|g"
+            } > "$out_v6"
             rm "$tmp_raw"
           }
 
-          process_isp "China_Telecom" false "data/telecom.rsc" "${TELECOM_ASNS[@]}"
-          process_isp "China_Telecom6" true "data/telecom6.rsc" "${TELECOM_ASNS[@]}"
-          process_isp "China_Unicom" false "data/unicom.rsc" "${UNICOM_ASNS[@]}"
-          process_isp "China_Unicom6" true "data/unicom6.rsc" "${UNICOM_ASNS[@]}"
-          process_isp "China_Mobile" false "data/cmcc.rsc" "${CMCC_ASNS[@]}"
-          process_isp "China_Mobile6" true "data/cmcc6.rsc" "${CMCC_ASNS[@]}"
-          process_isp "CERNET" false "data/cernet.rsc" "${CERNET_ASNS[@]}"
-          process_isp "CERNET6" true "data/cernet6.rsc" "${CERNET_ASNS[@]}"
-          process_isp "CSTNET" false "data/cstnet.rsc" "${CSTNET_ASNS[@]}"
-          process_isp "CSTNET6" true "data/cstnet6.rsc" "${CSTNET_ASNS[@]}"
-          process_isp "CIETNET" false "data/cietnet.rsc" "${CIETNET_ASNS[@]}"
-          process_isp "CIETNET6" true "data/cietnet6.rsc" "${CIETNET_ASNS[@]}"
-          process_isp "CBNNET" false "data/cbnnet.rsc" "${CBNNET_ASNS[@]}"
-          process_isp "CBNNET6" true "data/cbnnet6.rsc" "${CBNNET_ASNS[@]}"
-          process_isp "DRPENG" false "data/drpeng.rsc" "${DRPENG_ASNS[@]}"
-          process_isp "DRPENG6" true "data/drpeng6.rsc" "${DRPENG_ASNS[@]}"
+          process_metowolf "China_Telecom" "chinatelecom" "telecom"
+          process_metowolf "China_Unicom" "chinaunicom" "unicom"
+          process_metowolf "China_Mobile" "chinamobile" "cmcc"
+          process_metowolf "CERNET" "cernet" "cernet"
+          process_metowolf "CSTNET" "cstnet" "cstnet"
+          process_metowolf "DRPENG" "drpeng" "drpeng"
 
-          CN_V4_FINAL=$(mktemp)
-          echo "10.10.10.0/25" >> "$CN_V4_FINAL"
-          echo "172.16.100.0/28" >> "$CN_V4_FINAL"
-          curl -sSLf http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv4 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, 32-log($5)/log(2)}' >> "$CN_V4_FINAL"
-          curl -sSLf "${GAO_URL}/china.txt" >> "$CN_V4_FINAL"
+          CN_V4_TMP=$(mktemp)
+          echo "10.10.10.0/25" >> "$CN_V4_TMP"
+          echo "172.16.100.0/28" >> "$CN_V4_TMP"
+          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv4 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, 32-log($5)/log(2)}' >> "$CN_V4_TMP"
           {
             echo "/ip firewall address-list remove [find list=\"CN\"]"
             echo "/ip firewall address-list"
-            sort -u "$CN_V4_FINAL" | grep '\.' | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
+            sort -u "$CN_V4_TMP" | grep '\.' | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
           } > data/cn.rsc
 
-          CN_V6_FINAL=$(mktemp)
-          curl -sSLf http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' >> "$CN_V6_FINAL"
-          curl -sSLf "${GAO_URL}/china6.txt" >> "$CN_V6_FINAL"
+          CN_V6_TMP=$(mktemp)
+          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' >> "$CN_V6_TMP"
           {
             echo "/ipv6 firewall address-list remove [find list=\"CN6\"]"
             echo "/ipv6 firewall address-list"
-            sort -u "$CN_V6_FINAL" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
+            sort -u "$CN_V6_TMP" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
           } > data/cn6.rsc
 
-          rm "$CN_V4_FINAL" "$CN_V6_FINAL"
+          rm "$CN_V4_TMP" "$CN_V6_TMP"
 
       - name: Commit and Push
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/*.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update Targeted IP lists $(date +%Y-%m-%d)"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update IP lists $(date +%Y-%m-%d)"
           git push origin main
