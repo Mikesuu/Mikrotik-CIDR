@@ -27,22 +27,19 @@ jobs:
         run: |
           mkdir -p data
           
-          ASN_BASE="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
+          BASE_URL="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
           
-          process_isp() {
+          process_isp_clean() {
             local list_name=$1
-            local is_v6=$2
-            local out_file=$3
-            shift 3
-            local asns=("$@")
+            local file_key=$2
+            local is_v6=$3
+            local out_file=$4
             local tmp_raw=$(mktemp)
-            local suffix="ipv4-aggregated.txt"
             local cmd_path="/ip firewall address-list"
-            [ "$is_v6" = "true" ] && suffix="ipv6-aggregated.txt" && cmd_path="/ipv6 firewall address-list"
+            local suffix=".txt"
+            [ "$is_v6" = "true" ] && cmd_path="/ipv6 firewall address-list" && suffix="6.txt"
 
-            for id in "${asns[@]}"; do
-              curl -sSL --retry 3 "${ASN_BASE}/${id}/${suffix}" >> "$tmp_raw" || true
-            done
+            curl -sSL --retry 3 "${BASE_URL}/${file_key}${suffix}" >> "$tmp_raw" || true
 
             {
               echo "$cmd_path remove [find list=\"$list_name\"]"
@@ -52,32 +49,29 @@ jobs:
             rm "$tmp_raw"
           }
 
-          process_isp "China_Telecom" false "data/telecom.rsc" "4134" "4809" "23764"
-          process_isp "China_Telecom6" true "data/telecom6.rsc" "4134" "4809" "23764"
+          process_isp_clean "China_Telecom" "ct" false "data/telecom.rsc"
+          process_isp_clean "China_Telecom6" "ct" true "data/telecom6.rsc"
           
-          process_isp "China_Unicom" false "data/unicom.rsc" "4837" "9929" "17622" "10099"
-          process_isp "China_Unicom6" true "data/unicom6.rsc" "4837" "9929" "17622" "10099"
+          process_isp_clean "China_Unicom" "cu" false "data/unicom.rsc"
+          process_isp_clean "China_Unicom6" "cu" true "data/unicom6.rsc"
           
-          process_isp "China_Mobile" false "data/cmcc.rsc" "9808" "58453" "9394"
-          process_isp "China_Mobile6" true "data/cmcc6.rsc" "9808" "58453" "9394"
+          process_isp_clean "China_Mobile" "cm" false "data/cmcc.rsc"
+          process_isp_clean "China_Mobile6" "cm" true "data/cmcc6.rsc"
 
-          process_isp "CERNET" false "data/cernet.rsc" "23910" "4538"
-          process_isp "CERNET6" true "data/cernet6.rsc" "23910" "4538"
+          process_isp_clean "CERNET" "cernet" false "data/cernet.rsc"
+          process_isp_clean "CERNET6" "cernet" true "data/cernet6.rsc"
 
-          process_isp "CSTNET" false "data/cstnet.rsc" "7497"
-          process_isp "CSTNET6" true "data/cstnet6.rsc" "7497"
+          process_isp_clean "CSTNET" "cstnet" false "data/cstnet.rsc"
+          process_isp_clean "CSTNET6" "cstnet" true "data/cstnet6.rsc"
 
-          process_isp "CBNNET" false "data/cbnnet.rsc" "137872" "138421"
-          process_isp "CBNNET6" true "data/cbnnet6.rsc" "137872" "138421"
-
-          process_isp "DRPENG" false "data/drpeng.rsc" "17962"
-          process_isp "DRPENG6" true "data/drpeng6.rsc" "17962"
+          process_isp_clean "DRPENG" "drpeng" false "data/drpeng.rsc"
+          process_isp_clean "DRPENG6" "drpeng" true "data/drpeng6.rsc"
 
           CN_V4_RAW=$(mktemp)
           echo "10.10.10.0/25" >> "$CN_V4_RAW"
           echo "172.16.100.0/28" >> "$CN_V4_RAW"
           curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv4 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, 32-log($5)/log(2)}' >> "$CN_V4_RAW"
-          curl -sSL https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt >> "$CN_V4_RAW"
+          curl -sSL "${BASE_URL}/china.txt" >> "$CN_V4_RAW"
           {
             echo "/ip firewall address-list remove [find list=\"CN\"]"
             echo "/ip firewall address-list"
@@ -86,7 +80,7 @@ jobs:
 
           CN_V6_RAW=$(mktemp)
           curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' >> "$CN_V6_RAW"
-          curl -sSL https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt >> "$CN_V6_RAW"
+          curl -sSL "${BASE_URL}/china6.txt" >> "$CN_V6_RAW"
           {
             echo "/ipv6 firewall address-list remove [find list=\"CN6\"]"
             echo "/ipv6 firewall address-list"
@@ -100,5 +94,5 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/*.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update IP lists $(date +%Y-%m-%d)"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update Clean IP lists $(date +%Y-%m-%d)"
           git push origin main
