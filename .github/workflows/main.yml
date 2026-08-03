@@ -15,137 +15,90 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Tools
+        run: pip install aggregate6
+
       - name: Process IP Lists
         run: |
           mkdir -p data
-
-          fetch_data() {
-            local output_file=$1
-            shift
-            for url in "$@"; do
-              curl -sSL --retry 3 --connect-timeout 10 --max-time 60 --fail "$url" >> "$output_file" 2>/dev/null || true
-            done
-          }
-
-          export_ros() {
-            local list_name=$1
-            local tmp_file=$2
-            local is_v6=$3
-            local out_file=$4
-
-            local cmd_path="/ip firewall address-list"
-            local pattern='^[0-9]'
-            if [ "$is_v6" = "true" ]; then
-              cmd_path="/ipv6 firewall address-list"
-              pattern=':'
-            fi
-
-            {
-              echo "$cmd_path remove [find list=\"$list_name\"]"
-              echo "$cmd_path"
-              sort -u "$tmp_file" | grep -E "$pattern" | sed "s|^|add list=\"$list_name\" address=|g"
-            } > "$out_file"
-          }
-
-          CN_TMP=$(mktemp)
-          CN6_TMP=$(mktemp)
-          echo "10.10.10.0/25" >> "$CN_TMP"
-          echo "172.16.100.0/28" >> "$CN_TMP"
-
+          
           ASN_BASE="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
-
-          TELECOM_ASNS=("4134" "4809" "23764")
-          UNICOM_ASNS=("4837" "9929" "17622" "10099")
-          CMCC_ASNS=("9808" "58453" "9394")
-          CERNET_ASNS=("23910" "4538")
-          CSTNET_ASNS=("7497")
-          CIETNET_ASNS=("9308")
-          CBNNET_ASNS=("137872" "138421")
-          DRPENG_ASNS=("17962")
-          OTHER_ASNS=("45090" "132203" "132591" "133478" "131285" "55990" "63835" "138152" "37963" "45102" "131477" "45609" "134552" "138699" "139070" "139242" "140978" "38365" "58519" "55967" "134238" "136907" "134756" "24429" "137319" "45062" "140726" "138915" "9812" "17421" "38283" "135269" "139341" "132225")
-
+          
           process_isp() {
             local list_name=$1
             local is_v6=$2
             local out_file=$3
             shift 3
             local asns=("$@")
-
-            local isp_tmp=$(mktemp)
-            local urls=()
+            local tmp_raw=$(mktemp)
             local suffix="ipv4-aggregated.txt"
-            if [ "$is_v6" = "true" ]; then
-              suffix="ipv6-aggregated.txt"
-            fi
+            local cmd_path="/ip firewall address-list"
+            [ "$is_v6" = "true" ] && suffix="ipv6-aggregated.txt" && cmd_path="/ipv6 firewall address-list"
 
             for id in "${asns[@]}"; do
-              urls+=("$ASN_BASE/$id/$suffix")
+              curl -sSL --retry 3 "${ASN_BASE}/${id}/${suffix}" >> "$tmp_raw" || true
             done
 
-            fetch_data "$isp_tmp" "${urls[@]}"
-            export_ros "$list_name" "$isp_tmp" "$is_v6" "$out_file"
-
-            if [ "$is_v6" = "true" ]; then
-              cat "$isp_tmp" >> "$CN6_TMP"
-            else
-              cat "$isp_tmp" >> "$CN_TMP"
-            fi
-            rm "$isp_tmp"
+            {
+              echo "$cmd_path remove [find list=\"$list_name\"]"
+              echo "$cmd_path"
+              sort -u "$tmp_raw" | grep -E '(\.|:)' | aggregate6 | sed "s|^|add list=\"$list_name\" address=|g"
+            } > "$out_file"
+            rm "$tmp_raw"
           }
 
-          process_isp "China_Telecom" false "data/telecom.rsc" "${TELECOM_ASNS[@]}"
-          process_isp "China_Telecom6" true "data/telecom6.rsc" "${TELECOM_ASNS[@]}"
+          process_isp "China_Telecom" false "data/telecom.rsc" "4134" "4809" "23764"
+          process_isp "China_Telecom6" true "data/telecom6.rsc" "4134" "4809" "23764"
+          
+          process_isp "China_Unicom" false "data/unicom.rsc" "4837" "9929" "17622" "10099"
+          process_isp "China_Unicom6" true "data/unicom6.rsc" "4837" "9929" "17622" "10099"
+          
+          process_isp "China_Mobile" false "data/cmcc.rsc" "9808" "58453" "9394"
+          process_isp "China_Mobile6" true "data/cmcc6.rsc" "9808" "58453" "9394"
 
-          process_isp "China_Unicom" false "data/unicom.rsc" "${UNICOM_ASNS[@]}"
-          process_isp "China_Unicom6" true "data/unicom6.rsc" "${UNICOM_ASNS[@]}"
+          process_isp "CERNET" false "data/cernet.rsc" "23910" "4538"
+          process_isp "CERNET6" true "data/cernet6.rsc" "23910" "4538"
 
-          process_isp "China_Mobile" false "data/cmcc.rsc" "${CMCC_ASNS[@]}"
-          process_isp "China_Mobile6" true "data/cmcc6.rsc" "${CMCC_ASNS[@]}"
+          process_isp "CSTNET" false "data/cstnet.rsc" "7497"
+          process_isp "CSTNET6" true "data/cstnet6.rsc" "7497"
 
-          process_isp "CERNET" false "data/cernet.rsc" "${CERNET_ASNS[@]}"
-          process_isp "CERNET6" true "data/cernet6.rsc" "${CERNET_ASNS[@]}"
+          process_isp "CBNNET" false "data/cbnnet.rsc" "137872" "138421"
+          process_isp "CBNNET6" true "data/cbnnet6.rsc" "137872" "138421"
 
-          process_isp "CSTNET" false "data/cstnet.rsc" "${CSTNET_ASNS[@]}"
-          process_isp "CSTNET6" true "data/cstnet6.rsc" "${CSTNET_ASNS[@]}"
+          process_isp "DRPENG" false "data/drpeng.rsc" "17962"
+          process_isp "DRPENG6" true "data/drpeng6.rsc" "17962"
 
-          process_isp "CIETNET" false "data/cietnet.rsc" "${CIETNET_ASNS[@]}"
-          process_isp "CIETNET6" true "data/cietnet6.rsc" "${CIETNET_ASNS[@]}"
+          CN_V4_RAW=$(mktemp)
+          echo "10.10.10.0/25" >> "$CN_V4_RAW"
+          echo "172.16.100.0/28" >> "$CN_V4_RAW"
+          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv4 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, 32-log($5)/log(2)}' >> "$CN_V4_RAW"
+          curl -sSL https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt >> "$CN_V4_RAW"
+          {
+            echo "/ip firewall address-list remove [find list=\"CN\"]"
+            echo "/ip firewall address-list"
+            sort -u "$CN_V4_RAW" | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
+          } > data/cn.rsc
 
-          process_isp "CBNNET" false "data/cbnnet.rsc" "${CBNNET_ASNS[@]}"
-          process_isp "CBNNET6" true "data/cbnnet6.rsc" "${CBNNET_ASNS[@]}"
+          CN_V6_RAW=$(mktemp)
+          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' >> "$CN_V6_RAW"
+          curl -sSL https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt >> "$CN_V6_RAW"
+          {
+            echo "/ipv6 firewall address-list remove [find list=\"CN6\"]"
+            echo "/ipv6 firewall address-list"
+            sort -u "$CN_V6_RAW" | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
+          } > data/cn6.rsc
 
-          process_isp "DRPENG" false "data/drpeng.rsc" "${DRPENG_ASNS[@]}"
-          process_isp "DRPENG6" true "data/drpeng6.rsc" "${DRPENG_ASNS[@]}"
-
-          V4_URLS=(
-            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
-            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/aliyun.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/tencent.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/baidu.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/huawei.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/bytedance.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/jd.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/netease.txt"
-          )
-          for id in "${OTHER_ASNS[@]}"; do V4_URLS+=("$ASN_BASE/$id/ipv4-aggregated.txt"); done
-          fetch_data "$CN_TMP" "${V4_URLS[@]}"
-          export_ros "CN" "$CN_TMP" false "data/cn.rsc"
-          rm "$CN_TMP"
-
-          V6_URLS=(
-            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
-            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
-          )
-          for id in "${OTHER_ASNS[@]}"; do V6_URLS+=("$ASN_BASE/$id/ipv6-aggregated.txt"); done
-          fetch_data "$CN6_TMP" "${V6_URLS[@]}"
-          export_ros "CN6" "$CN6_TMP" true "data/cn6.rsc"
-          rm "$CN6_TMP"
+          rm "$CN_V4_RAW" "$CN_V6_RAW"
 
       - name: Commit and Push
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/*.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update full IP lists $(date +%Y-%m-%d)"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update IP lists $(date +%Y-%m-%d)"
           git push origin main
