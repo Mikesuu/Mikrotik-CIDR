@@ -29,10 +29,8 @@ jobs:
           METO_URL="https://raw.githubusercontent.com/metowolf/iplist/master/data/isp"
           ASN_URL="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
           
-          CN_V4_RAW=$(mktemp)
-          CN_V6_RAW=$(mktemp)
-          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv4 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, 32-log($5)/log(2)}' > "$CN_V4_RAW"
-          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' > "$CN_V6_RAW"
+          CN_V6_BASE=$(mktemp)
+          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' > "$CN_V6_BASE"
 
           gen_isp_v4() {
             local list_name=$1
@@ -54,17 +52,15 @@ jobs:
             shift 2
             local asns=("$@")
             local tmp=$(mktemp)
-            local tmp_filtered=$(mktemp)
             for id in "${asns[@]}"; do
               curl -sSLf "${ASN_URL}/${id}/ipv6-aggregated.txt" >> "$tmp" || true
             done
-            grep -Fxf "$CN_V6_RAW" "$tmp" > "$tmp_filtered" || cat "$tmp" > "$tmp_filtered"
             {
               echo "/ipv6 firewall address-list remove [find list=\"${list_name}6\"]"
               echo "/ipv6 firewall address-list"
-              sort -u "$tmp_filtered" | grep ':' | aggregate6 | sed "s|^|add list=\"${list_name}6\" address=|g"
+              sort -u "$tmp" | grep ':' | aggregate6 | sed "s|^|add list=\"${list_name}6\" address=|g"
             } > "$out_file"
-            rm "$tmp" "$tmp_filtered"
+            rm "$tmp"
           }
 
           gen_isp_v4 "China_Telecom" "chinatelecom" "telecom"
@@ -88,7 +84,7 @@ jobs:
           CN_V4_FINAL=$(mktemp)
           echo "10.10.10.0/25" >> "$CN_V4_FINAL"
           echo "172.16.100.0/28" >> "$CN_V4_FINAL"
-          cat "$CN_V4_RAW" >> "$CN_V4_FINAL"
+          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv4 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, 32-log($5)/log(2)}' >> "$CN_V4_FINAL"
           {
             echo "/ip firewall address-list remove [find list=\"CN\"]"
             echo "/ip firewall address-list"
@@ -98,10 +94,10 @@ jobs:
           {
             echo "/ipv6 firewall address-list remove [find list=\"CN6\"]"
             echo "/ipv6 firewall address-list"
-            sort -u "$CN_V6_RAW" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
+            sort -u "$CN_V6_BASE" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
           } > data/cn6.rsc
 
-          rm "$CN_V4_RAW" "$CN_V6_RAW" "$CN_V4_FINAL" "$CN_V6_FINAL"
+          rm "$CN_V6_BASE" "$CN_V4_FINAL"
 
       - name: Commit and Push
         run: |
