@@ -2,7 +2,6 @@
 /ipv6 firewall address-list
 add list="China_Mobile6" address=2401:1320::/32
 add list="China_Mobile6" address=2401:8be0::/48
-add list="China_Mobile6" address=2402:4f00::/32
 add list="China_Mobile6" address=2407:8f40:2::/48
 add list="China_Mobile6" address=2409:8000::/20
 add list="China_Mobile6" address=240a:4021:883a::/48

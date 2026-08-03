@@ -2,7 +2,6 @@
 /ipv6 firewall address-list
 add list="China_Unicom6" address=2001:4510:1480::/41
 add list="China_Unicom6" address=2001:4511:1480::/41
-add list="China_Unicom6" address=2401:8a00::/32
 add list="China_Unicom6" address=2402:18a0::/32
 add list="China_Unicom6" address=2402:f140:ff13::/48
 add list="China_Unicom6" address=2402:f140:ff14::/48
