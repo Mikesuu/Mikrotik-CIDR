@@ -46,40 +46,54 @@ jobs:
             rm "$tmp"
           }
 
-          gen_isp_v6() {
+          gen_isp_v6_refined() {
             local list_name=$1
             local out_file="data/${2}6.rsc"
             shift 2
             local asns=("$@")
-            local tmp=$(mktemp)
+            local tmp_asn=$(mktemp)
+            local tmp_final=$(mktemp)
+            
             for id in "${asns[@]}"; do
-              curl -sSLf "${ASN_URL}/${id}/ipv6-aggregated.txt" >> "$tmp" || true
+              curl -sSLf "${ASN_URL}/${id}/ipv6-aggregated.txt" >> "$tmp_asn" || true
             done
+
+            python3 -c "
+            import ipaddress
+            with open('$CN_V6_BASE') as f:
+                cn_nets = [ipaddress.ip_network(line.strip()) for line in f if line.strip()]
+            with open('$tmp_asn') as f:
+                asn_nets = [ipaddress.ip_network(line.strip()) for line in f if line.strip()]
+            for a in asn_nets:
+                if any(a.overlaps(c) for c in cn_nets):
+                    print(a)
+            " > "$tmp_final"
+
             {
               echo "/ipv6 firewall address-list remove [find list=\"${list_name}6\"]"
               echo "/ipv6 firewall address-list"
-              sort -u "$tmp" | grep ':' | aggregate6 | sed "s|^|add list=\"${list_name}6\" address=|g"
+              sort -u "$tmp_final" | aggregate6 | sed "s|^|add list=\"${list_name}6\" address=|g"
             } > "$out_file"
-            rm "$tmp"
+            rm "$tmp_asn" "$tmp_final"
           }
 
           gen_isp_v4 "China_Telecom" "chinatelecom" "telecom"
-          gen_isp_v6 "China_Telecom" "telecom" "4134" "4809" "23764"
+          gen_isp_v6_refined "China_Telecom" "telecom" "4134" "4809" "23764"
 
           gen_isp_v4 "China_Unicom" "chinaunicom" "unicom"
-          gen_isp_v6 "China_Unicom" "unicom" "4837" "9929" "17622" "10099"
+          gen_isp_v6_refined "China_Unicom" "unicom" "4837" "9929" "17622" "10099"
 
           gen_isp_v4 "China_Mobile" "chinamobile" "cmcc"
-          gen_isp_v6 "China_Mobile" "cmcc" "9808" "58453" "9394"
+          gen_isp_v6_refined "China_Mobile" "cmcc" "9808" "58453" "9394"
 
           gen_isp_v4 "CERNET" "cernet" "cernet"
-          gen_isp_v6 "CERNET" "cernet" "23910" "4538"
+          gen_isp_v6_refined "CERNET" "cernet" "23910" "4538"
 
           gen_isp_v4 "CSTNET" "cstnet" "cstnet"
-          gen_isp_v6 "CSTNET" "cstnet" "7497"
+          gen_isp_v6_refined "CSTNET" "cstnet" "7497"
 
           gen_isp_v4 "DRPENG" "drpeng" "drpeng"
-          gen_isp_v6 "DRPENG" "drpeng" "17962"
+          gen_isp_v6_refined "DRPENG" "drpeng" "17962"
 
           CN_V4_FINAL=$(mktemp)
           echo "10.10.10.0/25" >> "$CN_V4_FINAL"
@@ -104,5 +118,5 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/*.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update IP lists $(date +%Y-%m-%d)"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update Refined IP lists $(date +%Y-%m-%d)"
           git push origin main
