@@ -28,6 +28,7 @@ jobs:
           mkdir -p data
           
           ASN_BASE="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
+          GAO_URL="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
           
           TELECOM_ASNS=("4134" "4809" "23764")
           UNICOM_ASNS=("4837" "9929" "17622" "10099")
@@ -37,7 +38,6 @@ jobs:
           CIETNET_ASNS=("9308")
           CBNNET_ASNS=("137872" "138421")
           DRPENG_ASNS=("17962")
-          OTHER_ASNS=("45090" "132203" "132591" "133478" "131285" "55990" "63835" "138152" "37963" "45102" "131477" "45609" "134552" "138699" "139070" "139242" "140978" "38365" "58519" "55967" "134238" "136907" "134756" "24429" "137319" "45062" "140726" "138915" "9812" "17421" "38283" "135269" "139341" "132225")
 
           process_isp() {
             local list_name=$1
@@ -54,57 +54,39 @@ jobs:
               cmd_path="/ipv6 firewall address-list"
               pattern=':'
             fi
-
             for id in "${asns[@]}"; do
               curl -sSLf --retry 3 "${ASN_BASE}/${id}/${suffix}" >> "$tmp_raw" || true
             done
-
             {
               echo "$cmd_path remove [find list=\"$list_name\"]"
               echo "$cmd_path"
               sort -u "$tmp_raw" | grep "$pattern" | aggregate6 | sed "s|^|add list=\"$list_name\" address=|g"
             } > "$out_file"
-            
-            [ "$is_v6" = "true" ] && cat "$tmp_raw" >> all_v6_raw.txt || cat "$tmp_raw" >> all_v4_raw.txt
             rm "$tmp_raw"
           }
 
-          touch all_v4_raw.txt all_v6_raw.txt
-
           process_isp "China_Telecom" false "data/telecom.rsc" "${TELECOM_ASNS[@]}"
           process_isp "China_Telecom6" true "data/telecom6.rsc" "${TELECOM_ASNS[@]}"
-          
           process_isp "China_Unicom" false "data/unicom.rsc" "${UNICOM_ASNS[@]}"
           process_isp "China_Unicom6" true "data/unicom6.rsc" "${UNICOM_ASNS[@]}"
-          
           process_isp "China_Mobile" false "data/cmcc.rsc" "${CMCC_ASNS[@]}"
           process_isp "China_Mobile6" true "data/cmcc6.rsc" "${CMCC_ASNS[@]}"
-
           process_isp "CERNET" false "data/cernet.rsc" "${CERNET_ASNS[@]}"
           process_isp "CERNET6" true "data/cernet6.rsc" "${CERNET_ASNS[@]}"
-
           process_isp "CSTNET" false "data/cstnet.rsc" "${CSTNET_ASNS[@]}"
           process_isp "CSTNET6" true "data/cstnet6.rsc" "${CSTNET_ASNS[@]}"
-
           process_isp "CIETNET" false "data/cietnet.rsc" "${CIETNET_ASNS[@]}"
           process_isp "CIETNET6" true "data/cietnet6.rsc" "${CIETNET_ASNS[@]}"
-
           process_isp "CBNNET" false "data/cbnnet.rsc" "${CBNNET_ASNS[@]}"
           process_isp "CBNNET6" true "data/cbnnet6.rsc" "${CBNNET_ASNS[@]}"
-
           process_isp "DRPENG" false "data/drpeng.rsc" "${DRPENG_ASNS[@]}"
           process_isp "DRPENG6" true "data/drpeng6.rsc" "${DRPENG_ASNS[@]}"
-
-          for id in "${OTHER_ASNS[@]}"; do
-            curl -sSLf --retry 3 "${ASN_BASE}/${id}/ipv4-aggregated.txt" >> all_v4_raw.txt || true
-            curl -sSLf --retry 3 "${ASN_BASE}/${id}/ipv6-aggregated.txt" >> all_v6_raw.txt || true
-          done
 
           CN_V4_FINAL=$(mktemp)
           echo "10.10.10.0/25" >> "$CN_V4_FINAL"
           echo "172.16.100.0/28" >> "$CN_V4_FINAL"
           curl -sSLf http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv4 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, 32-log($5)/log(2)}' >> "$CN_V4_FINAL"
-          cat all_v4_raw.txt >> "$CN_V4_FINAL"
+          curl -sSLf "${GAO_URL}/china.txt" >> "$CN_V4_FINAL"
           {
             echo "/ip firewall address-list remove [find list=\"CN\"]"
             echo "/ip firewall address-list"
@@ -113,17 +95,19 @@ jobs:
 
           CN_V6_FINAL=$(mktemp)
           curl -sSLf http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' >> "$CN_V6_FINAL"
-          cat all_v6_raw.txt >> "$CN_V6_FINAL"
+          curl -sSLf "${GAO_URL}/china6.txt" >> "$CN_V6_FINAL"
           {
             echo "/ipv6 firewall address-list remove [find list=\"CN6\"]"
             echo "/ipv6 firewall address-list"
             sort -u "$CN_V6_FINAL" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
           } > data/cn6.rsc
 
+          rm "$CN_V4_FINAL" "$CN_V6_FINAL"
+
       - name: Commit and Push
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/*.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update All ISP and CN lists $(date +%Y-%m-%d)"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update Targeted IP lists $(date +%Y-%m-%d)"
           git push origin main
