@@ -1,9 +1,5 @@
 /ip firewall address-list remove [find list="CIETNET"]
 /ip firewall address-list
-add list="CIETNET" address=58.83.128.0/18
-add list="CIETNET" address=58.83.252.0/24
-add list="CIETNET" address=59.151.32.0/19
-add list="CIETNET" address=59.151.70.0/23
 add list="CIETNET" address=120.132.128.0/24
 add list="CIETNET" address=120.132.132.0/24
 add list="CIETNET" address=120.132.154.0/24
@@ -17,14 +13,18 @@ add list="CIETNET" address=182.174.0.0/15
 add list="CIETNET" address=183.84.2.0/23
 add list="CIETNET" address=203.196.0.0/22
 add list="CIETNET" address=210.77.144.0/20
-add list="CIETNET" address=211.99.160.0/22
-add list="CIETNET" address=211.99.188.0/23
 add list="CIETNET" address=211.151.0.0/19
-add list="CIETNET" address=211.151.46.0/23
-add list="CIETNET" address=211.151.84.0/23
 add list="CIETNET" address=211.151.180.0/23
 add list="CIETNET" address=211.151.207.0/24
 add list="CIETNET" address=211.151.218.0/24
 add list="CIETNET" address=211.151.226.0/23
-add list="CIETNET" address=211.152.96.0/23
+add list="CIETNET" address=211.151.46.0/23
+add list="CIETNET" address=211.151.84.0/23
 add list="CIETNET" address=211.152.127.0/24
+add list="CIETNET" address=211.152.96.0/23
+add list="CIETNET" address=211.99.160.0/22
+add list="CIETNET" address=211.99.188.0/23
+add list="CIETNET" address=58.83.128.0/18
+add list="CIETNET" address=58.83.252.0/24
+add list="CIETNET" address=59.151.32.0/19
+add list="CIETNET" address=59.151.70.0/23
