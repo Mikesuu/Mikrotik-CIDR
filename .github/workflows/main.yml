@@ -28,6 +28,7 @@ jobs:
           mkdir -p data
           METO_URL="https://raw.githubusercontent.com/metowolf/iplist/master/data/isp"
           ASN_URL="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
+          GAO_URL="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
           
           CN_V4_BASE=$(mktemp)
           CN_V6_BASE=$(mktemp)
@@ -108,6 +109,7 @@ jobs:
           echo "10.10.10.0/25" >> "$CN_V4_FINAL"
           echo "172.16.100.0/28" >> "$CN_V4_FINAL"
           cat "$CN_V4_BASE" >> "$CN_V4_FINAL"
+          curl -sSLf "${GAO_URL}/china.txt" >> "$CN_V4_FINAL" || true
           cat all_v4_isp.txt >> "$CN_V4_FINAL"
           python3 filter_ip.py "$CN_V4_BASE" "$TMP_TECH_V4" >> "$CN_V4_FINAL"
           
@@ -119,6 +121,7 @@ jobs:
 
           CN_V6_FINAL=$(mktemp)
           cat "$CN_V6_BASE" >> "$CN_V6_FINAL"
+          curl -sSLf "${GAO_URL}/china6.txt" >> "$CN_V6_FINAL" || true
           cat all_v6_isp.txt >> "$CN_V6_FINAL"
           python3 filter_ip.py "$CN_V6_BASE" "$TMP_TECH_V6" >> "$CN_V6_FINAL"
 
