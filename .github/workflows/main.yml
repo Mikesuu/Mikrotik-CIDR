@@ -29,29 +29,28 @@ jobs:
           METO_URL="https://raw.githubusercontent.com/metowolf/iplist/master/data/isp"
           ASN_URL="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
           
+          CN_V4_BASE=$(mktemp)
           CN_V6_BASE=$(mktemp)
+          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv4 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, 32-log($5)/log(2)}' > "$CN_V4_BASE"
           curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' > "$CN_V6_BASE"
 
-          cat << 'EOF' > filter_v6.py
+          cat << 'EOF' > filter_ip.py
           import ipaddress, sys
           def run():
-              cn_nets = []
+              base_nets = []
               with open(sys.argv[1]) as f:
                   for l in f:
-                      l = l.strip()
-                      if l and not l.startswith('#'):
-                          try: cn_nets.append(ipaddress.ip_network(l))
-                          except: pass
-              
+                      try: base_nets.append(ipaddress.ip_network(l.strip()))
+                      except: pass
               with open(sys.argv[2]) as f:
                   for l in f:
                       l = l.strip()
-                      if l and not l.startswith('#'):
-                          try:
-                              asn_net = ipaddress.ip_network(l)
-                              if any(asn_net.overlaps(cn) for cn in cn_nets):
-                                  print(asn_net)
-                          except: pass
+                      if not l: continue
+                      try:
+                          target_net = ipaddress.ip_network(l)
+                          if any(target_net.overlaps(base) for base in base_nets):
+                              print(target_net)
+                      except: pass
           if __name__ == "__main__":
               run()
           EOF
@@ -80,7 +79,7 @@ jobs:
             for id in "${asns[@]}"; do
               curl -sSLf "${ASN_URL}/${id}/ipv6-aggregated.txt" >> "$tmp_asn" || true
             done
-            python3 filter_v6.py "$CN_V6_BASE" "$tmp_asn" > "$tmp_final"
+            python3 filter_ip.py "$CN_V6_BASE" "$tmp_asn" > "$tmp_final"
             {
               echo "/ipv6 firewall address-list remove [find list=\"${list_name}6\"]"
               echo "/ipv6 firewall address-list"
@@ -91,39 +90,43 @@ jobs:
 
           gen_isp_v4 "China_Telecom" "chinatelecom" "telecom"
           gen_isp_v6_refined "China_Telecom" "telecom" "4134" "4809" "23764"
-
           gen_isp_v4 "China_Unicom" "chinaunicom" "unicom"
           gen_isp_v6_refined "China_Unicom" "unicom" "4837" "9929" "17622" "10099"
-
           gen_isp_v4 "China_Mobile" "chinamobile" "cmcc"
           gen_isp_v6_refined "China_Mobile" "cmcc" "9808" "58453" "9394"
 
-          gen_isp_v4 "CERNET" "cernet" "cernet"
-          gen_isp_v6_refined "CERNET" "cernet" "23910" "4538"
+          TECH_ASNS=("45090" "37963" "132203" "138699" "38365" "133478" "132591" "55990" "131477" "134552" "139070" "140978" "58519" "136907" "137319")
+          
+          TMP_TECH_V4=$(mktemp)
+          TMP_TECH_V6=$(mktemp)
+          for id in "${TECH_ASNS[@]}"; do
+            curl -sSLf "${ASN_URL}/${id}/ipv4-aggregated.txt" >> "$TMP_TECH_V4" || true
+            curl -sSLf "${ASN_URL}/${id}/ipv6-aggregated.txt" >> "$TMP_TECH_V6" || true
+          done
 
-          gen_isp_v4 "CSTNET" "cstnet" "cstnet"
-          gen_isp_v6_refined "CSTNET" "cstnet" "7497"
-
-          gen_isp_v4 "DRPENG" "drpeng" "drpeng"
-          gen_isp_v6_refined "DRPENG" "drpeng" "17962"
-
-          CN_V4_FINAL=$(mktemp)
-          echo "10.10.10.0/25" >> "$CN_V4_FINAL"
-          echo "172.16.100.0/28" >> "$CN_V4_FINAL"
-          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv4 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, 32-log($5)/log(2)}' >> "$CN_V4_FINAL"
+          CN_V4_ALL=$(mktemp)
+          echo "10.10.10.0/25" >> "$CN_V4_ALL"
+          echo "172.16.100.0/28" >> "$CN_V4_ALL"
+          cat "$CN_V4_BASE" >> "$CN_V4_ALL"
+          python3 filter_ip.py "$CN_V4_BASE" "$TMP_TECH_V4" >> "$CN_V4_ALL"
+          
           {
             echo "/ip firewall address-list remove [find list=\"CN\"]"
             echo "/ip firewall address-list"
-            sort -u "$CN_V4_FINAL" | grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}' | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
+            sort -u "$CN_V4_ALL" | grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}' | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
           } > data/cn.rsc
+
+          CN_V6_ALL=$(mktemp)
+          cat "$CN_V6_BASE" >> "$CN_V6_ALL"
+          python3 filter_ip.py "$CN_V6_BASE" "$TMP_TECH_V6" >> "$CN_V6_ALL"
 
           {
             echo "/ipv6 firewall address-list remove [find list=\"CN6\"]"
             echo "/ipv6 firewall address-list"
-            sort -u "$CN_V6_BASE" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
+            sort -u "$CN_V6_ALL" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
           } > data/cn6.rsc
 
-          rm "$CN_V6_BASE" "$CN_V4_FINAL" filter_v6.py
+          rm "$CN_V4_BASE" "$CN_V6_BASE" "$CN_V4_ALL" "$CN_V6_ALL" "$TMP_TECH_V4" "$TMP_TECH_V6" filter_ip.py
 
       - name: Commit and Push
         run: |
