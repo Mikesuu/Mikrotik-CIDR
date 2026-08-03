@@ -32,6 +32,21 @@ jobs:
           CN_V6_BASE=$(mktemp)
           curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' > "$CN_V6_BASE"
 
+          cat << 'EOF' > filter_v6.py
+          import ipaddress
+          import sys
+          def run():
+              with open(sys.argv[1]) as f:
+                  cn_nets = [ipaddress.ip_network(l.strip()) for l in f if l.strip()]
+              with open(sys.argv[2]) as f:
+                  asn_nets = [ipaddress.ip_network(l.strip()) for l in f if l.strip()]
+              for a in asn_nets:
+                  if any(a.overlaps(c) for c in cn_nets):
+                      print(a)
+          if __name__ == "__main__":
+              run()
+          EOF
+
           gen_isp_v4() {
             local list_name=$1
             local meto_file=$2
@@ -53,22 +68,10 @@ jobs:
             local asns=("$@")
             local tmp_asn=$(mktemp)
             local tmp_final=$(mktemp)
-            
             for id in "${asns[@]}"; do
               curl -sSLf "${ASN_URL}/${id}/ipv6-aggregated.txt" >> "$tmp_asn" || true
             done
-
-            python3 -c "
-            import ipaddress
-            with open('$CN_V6_BASE') as f:
-                cn_nets = [ipaddress.ip_network(line.strip()) for line in f if line.strip()]
-            with open('$tmp_asn') as f:
-                asn_nets = [ipaddress.ip_network(line.strip()) for line in f if line.strip()]
-            for a in asn_nets:
-                if any(a.overlaps(c) for c in cn_nets):
-                    print(a)
-            " > "$tmp_final"
-
+            python3 filter_v6.py "$CN_V6_BASE" "$tmp_asn" > "$tmp_final"
             {
               echo "/ipv6 firewall address-list remove [find list=\"${list_name}6\"]"
               echo "/ipv6 firewall address-list"
@@ -111,7 +114,7 @@ jobs:
             sort -u "$CN_V6_BASE" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
           } > data/cn6.rsc
 
-          rm "$CN_V6_BASE" "$CN_V4_FINAL"
+          rm "$CN_V6_BASE" "$CN_V4_FINAL" filter_v6.py
 
       - name: Commit and Push
         run: |
