@@ -26,45 +26,54 @@ jobs:
       - name: Process IP Lists
         run: |
           mkdir -p data
-          METO_URL="https://raw.githubusercontent.com/metowolf/v2ray-rules-dat/release"
+          METO_URL="https://raw.githubusercontent.com/metowolf/iplist/master/data/isp"
           GAO_URL="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
 
-          gen_rsc() {
+          gen_isp_v4() {
             local list_name=$1
-            local source_url=$2
-            local is_v6=$3
-            local out_file=$4
+            local meto_file=$2
+            local out_file=$3
             local tmp_raw=$(mktemp)
-            local cmd_path="/ip firewall address-list"
-            [ "$is_v6" = "true" ] && cmd_path="/ipv6 firewall address-list"
-
-            if [[ "$list_name" == "CN" && "$is_v6" == "false" ]]; then
-              echo "10.10.10.0/25" >> "$tmp_raw"
-              echo "172.16.100.0/28" >> "$tmp_raw"
-            fi
-
-            curl -sSLf "$source_url" >> "$tmp_raw" || true
-
+            curl -sSLf "${METO_URL}/${meto_file}.txt" > "$tmp_raw" || true
             {
-              echo "$cmd_path remove [find list=\"$list_name\"]"
-              echo "$cmd_path"
-              sort -u "$tmp_raw" | grep -E '(\.|:)' | aggregate6 | sed "s|^|add list=\"$list_name\" address=|g"
+              echo "/ip firewall address-list remove [find list=\"$list_name\"]"
+              echo "/ip firewall address-list"
+              sort -u "$tmp_raw" | grep '\.' | aggregate6 | sed "s|^|add list=\"$list_name\" address=|g"
             } > "$out_file"
             rm "$tmp_raw"
           }
 
-          gen_rsc "China_Telecom" "${METO_URL}/telecom_ipv4.txt" "false" "data/telecom.rsc"
-          gen_rsc "China_Unicom" "${METO_URL}/unicom_ipv4.txt" "false" "data/unicom.rsc"
-          gen_rsc "China_Mobile" "${METO_URL}/mobile_ipv4.txt" "false" "data/cmcc.rsc"
-          
-          gen_rsc "China_Telecom6" "${METO_URL}/telecom_ipv6.txt" "true" "data/telecom6.rsc"
-          gen_rsc "China_Unicom6" "${METO_URL}/unicom_ipv6.txt" "true" "data/unicom6.rsc"
-          gen_rsc "China_Mobile6" "${METO_URL}/mobile_ipv6.txt" "true" "data/cmcc6.rsc"
+          gen_isp_v6() {
+            local list_name=$1
+            local gao_file=$2
+            local out_file=$3
+            local tmp_raw=$(mktemp)
+            curl -sSLf "${GAO_URL}/${gao_file}.txt" > "$tmp_raw" || true
+            {
+              echo "/ipv6 firewall address-list remove [find list=\"$list_name\"]"
+              echo "/ipv6 firewall address-list"
+              grep -i '^240' "$tmp_raw" | sort -u | aggregate6 | sed "s|^|add list=\"$list_name\" address=|g"
+            } > "$out_file"
+            rm "$tmp_raw"
+          }
 
-          gen_rsc "CERNET" "${GAO_URL}/cernet.txt" "false" "data/cernet.rsc"
-          gen_rsc "CERNET6" "${GAO_URL}/cernet6.txt" "true" "data/cernet6.rsc"
-          gen_rsc "CSTNET" "${GAO_URL}/cstnet.txt" "false" "data/cstnet.rsc"
-          gen_rsc "CSTNET6" "${GAO_URL}/cstnet6.txt" "true" "data/cstnet6.rsc"
+          gen_isp_v4 "China_Telecom" "chinatelecom" "data/telecom.rsc"
+          gen_isp_v6 "China_Telecom6" "ct6" "data/telecom6.rsc"
+
+          gen_isp_v4 "China_Unicom" "chinaunicom" "data/unicom.rsc"
+          gen_isp_v6 "China_Unicom6" "cu6" "data/unicom6.rsc"
+
+          gen_isp_v4 "China_Mobile" "chinamobile" "data/cmcc.rsc"
+          gen_isp_v6 "China_Mobile6" "cm6" "data/cmcc6.rsc"
+
+          gen_isp_v4 "CERNET" "cernet" "data/cernet.rsc"
+          gen_isp_v6 "CERNET6" "cernet6" "data/cernet6.rsc"
+
+          gen_isp_v4 "CSTNET" "cstnet" "data/cstnet.rsc"
+          gen_isp_v6 "CSTNET6" "cstnet6" "data/cstnet6.rsc"
+
+          gen_isp_v4 "DRPENG" "drpeng" "data/drpeng.rsc"
+          gen_isp_v6 "DRPENG6" "drpeng6" "data/drpeng6.rsc"
 
           CN_V4_TMP=$(mktemp)
           echo "10.10.10.0/25" >> "$CN_V4_TMP"
@@ -74,7 +83,7 @@ jobs:
           {
             echo "/ip firewall address-list remove [find list=\"CN\"]"
             echo "/ip firewall address-list"
-            sort -u "$CN_V4_TMP" | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
+            sort -u "$CN_V4_TMP" | grep '\.' | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
           } > data/cn.rsc
 
           CN_V6_TMP=$(mktemp)
@@ -83,7 +92,7 @@ jobs:
           {
             echo "/ipv6 firewall address-list remove [find list=\"CN6\"]"
             echo "/ipv6 firewall address-list"
-            sort -u "$CN_V6_TMP" | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
+            sort -u "$CN_V6_TMP" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
           } > data/cn6.rsc
 
           rm "$CN_V4_TMP" "$CN_V6_TMP"
@@ -93,5 +102,5 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/*.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update Pure IP lists $(date +%Y-%m-%d)"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update Mixed Source IP lists $(date +%Y-%m-%d)"
           git push origin main
