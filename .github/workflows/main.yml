@@ -26,20 +26,23 @@ jobs:
       - name: Process IP Lists
         run: |
           mkdir -p data
-          
           BASE_URL="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
-          
-          process_isp_clean() {
+
+          gen_rsc() {
             local list_name=$1
-            local file_key=$2
+            local source_file=$2
             local is_v6=$3
             local out_file=$4
             local tmp_raw=$(mktemp)
             local cmd_path="/ip firewall address-list"
-            local suffix=".txt"
-            [ "$is_v6" = "true" ] && cmd_path="/ipv6 firewall address-list" && suffix="6.txt"
+            [ "$is_v6" = "true" ] && cmd_path="/ipv6 firewall address-list"
 
-            curl -sSL --retry 3 "${BASE_URL}/${file_key}${suffix}" >> "$tmp_raw" || true
+            if [[ "$list_name" == "CN" && "$is_v6" == "false" ]]; then
+              echo "10.10.10.0/25" >> "$tmp_raw"
+              echo "172.16.100.0/28" >> "$tmp_raw"
+            fi
+
+            curl -sSLf "${BASE_URL}/${source_file}" >> "$tmp_raw" || true
 
             {
               echo "$cmd_path remove [find list=\"$list_name\"]"
@@ -49,50 +52,31 @@ jobs:
             rm "$tmp_raw"
           }
 
-          process_isp_clean "China_Telecom" "ct" false "data/telecom.rsc"
-          process_isp_clean "China_Telecom6" "ct" true "data/telecom6.rsc"
-          
-          process_isp_clean "China_Unicom" "cu" false "data/unicom.rsc"
-          process_isp_clean "China_Unicom6" "cu" true "data/unicom6.rsc"
-          
-          process_isp_clean "China_Mobile" "cm" false "data/cmcc.rsc"
-          process_isp_clean "China_Mobile6" "cm" true "data/cmcc6.rsc"
+          gen_rsc "China_Telecom" "chinanet.txt" "false" "data/telecom.rsc"
+          gen_rsc "China_Telecom6" "chinanet6.txt" "true" "data/telecom6.rsc"
 
-          process_isp_clean "CERNET" "cernet" false "data/cernet.rsc"
-          process_isp_clean "CERNET6" "cernet" true "data/cernet6.rsc"
+          gen_rsc "China_Unicom" "unicom.txt" "false" "data/unicom.rsc"
+          gen_rsc "China_Unicom6" "unicom6.txt" "true" "data/unicom6.rsc"
 
-          process_isp_clean "CSTNET" "cstnet" false "data/cstnet.rsc"
-          process_isp_clean "CSTNET6" "cstnet" true "data/cstnet6.rsc"
+          gen_rsc "China_Mobile" "cmcc.txt" "false" "data/cmcc.rsc"
+          gen_rsc "China_Mobile6" "cmcc6.txt" "true" "data/cmcc6.rsc"
 
-          process_isp_clean "DRPENG" "drpeng" false "data/drpeng.rsc"
-          process_isp_clean "DRPENG6" "drpeng" true "data/drpeng6.rsc"
+          gen_rsc "CERNET" "cernet.txt" "false" "data/cernet.rsc"
+          gen_rsc "CERNET6" "cernet6.txt" "true" "data/cernet6.rsc"
 
-          CN_V4_RAW=$(mktemp)
-          echo "10.10.10.0/25" >> "$CN_V4_RAW"
-          echo "172.16.100.0/28" >> "$CN_V4_RAW"
-          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv4 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, 32-log($5)/log(2)}' >> "$CN_V4_RAW"
-          curl -sSL "${BASE_URL}/china.txt" >> "$CN_V4_RAW"
-          {
-            echo "/ip firewall address-list remove [find list=\"CN\"]"
-            echo "/ip firewall address-list"
-            sort -u "$CN_V4_RAW" | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
-          } > data/cn.rsc
+          gen_rsc "CSTNET" "cstnet.txt" "false" "data/cstnet.rsc"
+          gen_rsc "CSTNET6" "cstnet6.txt" "true" "data/cstnet6.rsc"
 
-          CN_V6_RAW=$(mktemp)
-          curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' >> "$CN_V6_RAW"
-          curl -sSL "${BASE_URL}/china6.txt" >> "$CN_V6_RAW"
-          {
-            echo "/ipv6 firewall address-list remove [find list=\"CN6\"]"
-            echo "/ipv6 firewall address-list"
-            sort -u "$CN_V6_RAW" | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
-          } > data/cn6.rsc
+          gen_rsc "DRPENG" "drpeng.txt" "false" "data/drpeng.rsc"
+          gen_rsc "DRPENG6" "drpeng6.txt" "true" "data/drpeng6.rsc"
 
-          rm "$CN_V4_RAW" "$CN_V6_RAW"
+          gen_rsc "CN" "china.txt" "false" "data/cn.rsc"
+          gen_rsc "CN6" "china6.txt" "true" "data/cn6.rsc"
 
       - name: Commit and Push
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/*.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update Clean IP lists $(date +%Y-%m-%d)"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update IP lists $(date +%Y-%m-%d)"
           git push origin main
