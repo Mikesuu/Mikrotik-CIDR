@@ -37,19 +37,16 @@ jobs:
           cat << 'EOF' > filter_ip.py
           import ipaddress, sys
           def run():
-              base_nets = []
               with open(sys.argv[1]) as f:
-                  for l in f:
-                      try: base_nets.append(ipaddress.ip_network(l.strip()))
-                      except: pass
+                  base_nets = [ipaddress.ip_network(l.strip()) for l in f if l.strip()]
               with open(sys.argv[2]) as f:
                   for l in f:
                       l = l.strip()
                       if not l: continue
                       try:
-                          target_net = ipaddress.ip_network(l)
-                          if any(target_net.overlaps(base) for base in base_nets):
-                              print(target_net)
+                          target = ipaddress.ip_network(l)
+                          if any(target.overlaps(base) for base in base_nets):
+                              print(target)
                       except: pass
           if __name__ == "__main__":
               run()
@@ -66,6 +63,7 @@ jobs:
               echo "/ip firewall address-list"
               grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}' "$tmp" | sort -u | aggregate6 | sed "s|^|add list=\"$list_name\" address=|g"
             } > "$out_file"
+            cat "$tmp" >> all_v4_isp.txt
             rm "$tmp"
           }
 
@@ -85,8 +83,11 @@ jobs:
               echo "/ipv6 firewall address-list"
               sort -u "$tmp_final" | aggregate6 | sed "s|^|add list=\"${list_name}6\" address=|g"
             } > "$out_file"
+            cat "$tmp_final" >> all_v6_isp.txt
             rm "$tmp_asn" "$tmp_final"
           }
+
+          touch all_v4_isp.txt all_v6_isp.txt
 
           gen_isp_v4 "China_Telecom" "chinatelecom" "telecom"
           gen_isp_v6_refined "China_Telecom" "telecom" "4134" "4809" "23764"
@@ -96,7 +97,6 @@ jobs:
           gen_isp_v6_refined "China_Mobile" "cmcc" "9808" "58453" "9394"
 
           TECH_ASNS=("45090" "37963" "132203" "138699" "38365" "133478" "132591" "55990" "131477" "134552" "139070" "140978" "58519" "136907" "137319")
-          
           TMP_TECH_V4=$(mktemp)
           TMP_TECH_V6=$(mktemp)
           for id in "${TECH_ASNS[@]}"; do
@@ -104,29 +104,31 @@ jobs:
             curl -sSLf "${ASN_URL}/${id}/ipv6-aggregated.txt" >> "$TMP_TECH_V6" || true
           done
 
-          CN_V4_ALL=$(mktemp)
-          echo "10.10.10.0/25" >> "$CN_V4_ALL"
-          echo "172.16.100.0/28" >> "$CN_V4_ALL"
-          cat "$CN_V4_BASE" >> "$CN_V4_ALL"
-          python3 filter_ip.py "$CN_V4_BASE" "$TMP_TECH_V4" >> "$CN_V4_ALL"
+          CN_V4_FINAL=$(mktemp)
+          echo "10.10.10.0/25" >> "$CN_V4_FINAL"
+          echo "172.16.100.0/28" >> "$CN_V4_FINAL"
+          cat "$CN_V4_BASE" >> "$CN_V4_FINAL"
+          cat all_v4_isp.txt >> "$CN_V4_FINAL"
+          python3 filter_ip.py "$CN_V4_BASE" "$TMP_TECH_V4" >> "$CN_V4_FINAL"
           
           {
             echo "/ip firewall address-list remove [find list=\"CN\"]"
             echo "/ip firewall address-list"
-            sort -u "$CN_V4_ALL" | grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}' | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
+            sort -u "$CN_V4_FINAL" | grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}' | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
           } > data/cn.rsc
 
-          CN_V6_ALL=$(mktemp)
-          cat "$CN_V6_BASE" >> "$CN_V6_ALL"
-          python3 filter_ip.py "$CN_V6_BASE" "$TMP_TECH_V6" >> "$CN_V6_ALL"
+          CN_V6_FINAL=$(mktemp)
+          cat "$CN_V6_BASE" >> "$CN_V6_FINAL"
+          cat all_v6_isp.txt >> "$CN_V6_FINAL"
+          python3 filter_ip.py "$CN_V6_BASE" "$TMP_TECH_V6" >> "$CN_V6_FINAL"
 
           {
             echo "/ipv6 firewall address-list remove [find list=\"CN6\"]"
             echo "/ipv6 firewall address-list"
-            sort -u "$CN_V6_ALL" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
+            sort -u "$CN_V6_FINAL" | grep ':' | aggregate6 | sed "s|^|add list=\"CN6\" address=|g"
           } > data/cn6.rsc
 
-          rm "$CN_V4_BASE" "$CN_V6_BASE" "$CN_V4_ALL" "$CN_V6_ALL" "$TMP_TECH_V4" "$TMP_TECH_V6" filter_ip.py
+          rm "$CN_V4_BASE" "$CN_V6_BASE" "$CN_V4_FINAL" "$CN_V6_FINAL" "$TMP_TECH_V4" "$TMP_TECH_V6" all_v4_isp.txt all_v6_isp.txt filter_ip.py
 
       - name: Commit and Push
         run: |
