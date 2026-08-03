@@ -33,16 +33,25 @@ jobs:
           curl -sSL http://ftp.apnic.net/stats/apnic/delegated-apnic-latest | grep ipv6 | grep CN | awk -F'|' '{printf "%s/%d\n", $4, $5}' > "$CN_V6_BASE"
 
           cat << 'EOF' > filter_v6.py
-          import ipaddress
-          import sys
+          import ipaddress, sys
           def run():
+              cn_nets = []
               with open(sys.argv[1]) as f:
-                  cn_nets = [ipaddress.ip_network(l.strip()) for l in f if l.strip()]
+                  for l in f:
+                      l = l.strip()
+                      if l and not l.startswith('#'):
+                          try: cn_nets.append(ipaddress.ip_network(l))
+                          except: pass
+              
               with open(sys.argv[2]) as f:
-                  asn_nets = [ipaddress.ip_network(l.strip()) for l in f if l.strip()]
-              for a in asn_nets:
-                  if any(a.overlaps(c) for c in cn_nets):
-                      print(a)
+                  for l in f:
+                      l = l.strip()
+                      if l and not l.startswith('#'):
+                          try:
+                              asn_net = ipaddress.ip_network(l)
+                              if any(asn_net.overlaps(cn) for cn in cn_nets):
+                                  print(asn_net)
+                          except: pass
           if __name__ == "__main__":
               run()
           EOF
@@ -56,7 +65,7 @@ jobs:
             {
               echo "/ip firewall address-list remove [find list=\"$list_name\"]"
               echo "/ip firewall address-list"
-              sort -u "$tmp" | grep '\.' | aggregate6 | sed "s|^|add list=\"$list_name\" address=|g"
+              grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}' "$tmp" | sort -u | aggregate6 | sed "s|^|add list=\"$list_name\" address=|g"
             } > "$out_file"
             rm "$tmp"
           }
@@ -105,7 +114,7 @@ jobs:
           {
             echo "/ip firewall address-list remove [find list=\"CN\"]"
             echo "/ip firewall address-list"
-            sort -u "$CN_V4_FINAL" | grep '\.' | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
+            sort -u "$CN_V4_FINAL" | grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}' | aggregate6 | sed "s|^|add list=\"CN\" address=|g"
           } > data/cn.rsc
 
           {
@@ -121,5 +130,5 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/*.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update Refined IP lists $(date +%Y-%m-%d)"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update refined IP lists $(date +%Y-%m-%d)"
           git push origin main
