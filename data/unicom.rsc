@@ -367,7 +367,6 @@ add list="China_Unicom" address=162.245.124.0/22
 add list="China_Unicom" address=162.247.4.0/22
 add list="China_Unicom" address=162.255.48.0/22
 add list="China_Unicom" address=163.177.136.0/21
-add list="China_Unicom" address=165.101.208.0/23
 add list="China_Unicom" address=165.101.70.0/24
 add list="China_Unicom" address=171.116.0.0/14
 add list="China_Unicom" address=171.120.0.0/13
