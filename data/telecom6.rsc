@@ -78,6 +78,7 @@ add list="China_Telecom6" address=240e:628:10::/45
 add list="China_Telecom6" address=240e:62c:1f0::/44
 add list="China_Telecom6" address=240e:62f::/48
 add list="China_Telecom6" address=240e:638:c301::/48
+add list="China_Telecom6" address=240e:638:c303::/48
 add list="China_Telecom6" address=240e:638:f::/48
 add list="China_Telecom6" address=240e:63c:3f00::/44
 add list="China_Telecom6" address=240e:640:178::/46
@@ -116,6 +117,7 @@ add list="China_Telecom6" address=240e:679:1001::/48
 add list="China_Telecom6" address=240e:688:ed00::/48
 add list="China_Telecom6" address=240e:699:7a00::/47
 add list="China_Telecom6" address=240e:699:7b00::/48
+add list="China_Telecom6" address=240e:699:7b03::/48
 add list="China_Telecom6" address=240e:699:7b06::/47
 add list="China_Telecom6" address=240e:699:7b08::/48
 add list="China_Telecom6" address=240e:699:7b0a::/48
