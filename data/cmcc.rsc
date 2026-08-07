@@ -104,7 +104,6 @@ add list="China_Mobile" address=203.212.12.0/22
 add list="China_Mobile" address=211.101.199.0/24
 add list="China_Mobile" address=211.103.0.0/17
 add list="China_Mobile" address=211.136.0.0/13
-add list="China_Mobile" address=211.148.224.0/19
 add list="China_Mobile" address=211.98.0.0/16
 add list="China_Mobile" address=218.200.0.0/13
 add list="China_Mobile" address=218.98.100.0/24

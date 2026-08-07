@@ -675,6 +675,7 @@ add list="China_Unicom6" address=2408:8650::/30
 add list="China_Unicom6" address=2408:8651:ff00::/48
 add list="China_Unicom6" address=2408:8652:ff00::/48
 add list="China_Unicom6" address=2408:8656:1000::/37
+add list="China_Unicom6" address=2408:8656:22cf::/48
 add list="China_Unicom6" address=2408:8656::/36
 add list="China_Unicom6" address=2408:8656:a52::/48
 add list="China_Unicom6" address=2408:865c::/31
