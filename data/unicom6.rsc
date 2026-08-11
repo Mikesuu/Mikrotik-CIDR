@@ -48,6 +48,7 @@ add list="China_Unicom6" address=2408:8001:3152::/48
 add list="China_Unicom6" address=2408:8001:4000::/34
 add list="China_Unicom6" address=2408:8001:8000::/33
 add list="China_Unicom6" address=2408:8001::/35
+add list="China_Unicom6" address=2408:8026:480::/48
 add list="China_Unicom6" address=2408:802a:8000::/33
 add list="China_Unicom6" address=2408:802c::/32
 add list="China_Unicom6" address=2408:803e::/32
