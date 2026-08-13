@@ -259,7 +259,6 @@ add list="China_Telecom" address=153.118.0.0/15
 add list="China_Telecom" address=154.209.21.0/24
 add list="China_Telecom" address=154.209.23.0/24
 add list="China_Telecom" address=154.72.40.0/22
-add list="China_Telecom" address=154.72.42.0/24
 add list="China_Telecom" address=154.72.44.0/24
 add list="China_Telecom" address=154.72.45.0/24
 add list="China_Telecom" address=154.72.46.0/24
