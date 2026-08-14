@@ -153,7 +153,6 @@ add list="China_Telecom6" address=240e:ff:c020::/48
 add list="China_Telecom6" address=240e:ff:c022::/48
 add list="China_Telecom6" address=240e:ff:c024::/48
 add list="China_Telecom6" address=240e:ff:c027::/48
-add list="China_Telecom6" address=240e:ff:c029::/48
 add list="China_Telecom6" address=240e:ff:c032::/48
 add list="China_Telecom6" address=240e:ff:c034::/48
 add list="China_Telecom6" address=2605:9d80:8001::/48
