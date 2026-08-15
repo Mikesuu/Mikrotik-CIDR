@@ -23,7 +23,8 @@ jobs:
             local output_file=$1
             shift
             for url in "$@"; do
-              curl -sSL --retry 2 --connect-timeout 10 --max-time 30 "$url" >> "$output_file" 2>/dev/null || true
+              local mirror_url="https://ghproxy.com/$url"
+              curl -sSL -f --retry 3 --connect-timeout 10 --max-time 60 "$mirror_url" >> "$output_file" 2>/dev/null || true
             done
           }
 
@@ -33,6 +34,10 @@ jobs:
             local is_v6=$3
             local out_file=$4
 
+            if [ ! -s "$tmp_file" ] || [ $(wc -c < "$tmp_file") -lt 100 ]; then
+              return 1
+            fi
+
             local cmd_path="/ip firewall address-list"
             if [ "$is_v6" = "true" ]; then
               cmd_path="/ipv6 firewall address-list"
@@ -40,8 +45,8 @@ jobs:
 
             {
               echo "$cmd_path remove [find list=\"$list_name\"]"
-              echo "$cmd_path"
               sed 's/#.*//g; s/^[ \t]*//; s/[ \t]*$//' "$tmp_file" \
+
                 | grep -E '^[0-9a-fA-F:\.]+' \
                 | sort -u \
                 | sed "s|^|add list=\"$list_name\" address=|g"
@@ -50,8 +55,9 @@ jobs:
 
           CN_TMP=$(mktemp)
           CN6_TMP=$(mktemp)
-          echo "10.10.10.0/25" >> "$CN_TMP"
-          echo "172.16.100.0/28" >> "$CN_TMP"
+
+          fetch_data "$CN_TMP" "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt"
+          fetch_data "$CN6_TMP" "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
 
           ASN_BASE="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
 
@@ -96,50 +102,28 @@ jobs:
 
           process_isp "China_Telecom" false "data/telecom.rsc" "${TELECOM_ASNS[@]}"
           process_isp "China_Telecom6" true "data/telecom6.rsc" "${TELECOM_ASNS[@]}"
-
           process_isp "China_Unicom" false "data/unicom.rsc" "${UNICOM_ASNS[@]}"
           process_isp "China_Unicom6" true "data/unicom6.rsc" "${UNICOM_ASNS[@]}"
-
           process_isp "China_Mobile" false "data/cmcc.rsc" "${CMCC_ASNS[@]}"
           process_isp "China_Mobile6" true "data/cmcc6.rsc" "${CMCC_ASNS[@]}"
-
           process_isp "CERNET" false "data/cernet.rsc" "${CERNET_ASNS[@]}"
           process_isp "CERNET6" true "data/cernet6.rsc" "${CERNET_ASNS[@]}"
-
           process_isp "CSTNET" false "data/cstnet.rsc" "${CSTNET_ASNS[@]}"
           process_isp "CSTNET6" true "data/cstnet6.rsc" "${CSTNET_ASNS[@]}"
-
           process_isp "CIETNET" false "data/cietnet.rsc" "${CIETNET_ASNS[@]}"
           process_isp "CIETNET6" true "data/cietnet6.rsc" "${CIETNET_ASNS[@]}"
-
           process_isp "CBNNET" false "data/cbnnet.rsc" "${CBNNET_ASNS[@]}"
           process_isp "CBNNET6" true "data/cbnnet6.rsc" "${CBNNET_ASNS[@]}"
-
           process_isp "DRPENG" false "data/drpeng.rsc" "${DRPENG_ASNS[@]}"
           process_isp "DRPENG6" true "data/drpeng6.rsc" "${DRPENG_ASNS[@]}"
 
-          V4_URLS=(
-            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
-            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/aliyun.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/tencent.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/baidu.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/huawei.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/bytedance.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/jd.txt"
-            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/netease.txt"
-          )
-          for id in "${OTHER_ASNS[@]}"; do V4_URLS+=("$ASN_BASE/$id/ipv4-aggregated.txt"); done
-          fetch_data "$CN_TMP" "${V4_URLS[@]}"
+          for id in "${OTHER_ASNS[@]}"; do 
+            fetch_data "$CN_TMP" "$ASN_BASE/$id/ipv4-aggregated.txt"
+          done
+
           export_ros "CN" "$CN_TMP" false "data/cn.rsc"
           rm -f "$CN_TMP"
 
-          V6_URLS=(
-            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
-            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
-          )
-          for id in "${OTHER_ASNS[@]}"; do V6_URLS+=("$ASN_BASE/$id/ipv6-aggregated.txt"); done
-          fetch_data "$CN6_TMP" "${V6_URLS[@]}"
           export_ros "CN6" "$CN6_TMP" true "data/cn6.rsc"
           rm -f "$CN6_TMP"
 
