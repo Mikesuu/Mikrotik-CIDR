@@ -19,12 +19,10 @@ jobs:
         run: |
           mkdir -p data
 
-          fetch_data() {
+          fetch_data_parallel() {
             local output_file=$1
             shift
-            for url in "$@"; do
-              curl -sSL --retry 3 --connect-timeout 10 --max-time 60 --fail "$url" >> "$output_file" 2>/dev/null || true
-            done
+            printf "%s\n" "$@" | xargs -P 8 -I {} curl -sSL --retry 2 --connect-timeout 5 --max-time 30 --fail "{}" >> "$output_file" 2>/dev/null || true
           }
 
           export_ros() {
@@ -34,16 +32,20 @@ jobs:
             local out_file=$4
 
             local cmd_path="/ip firewall address-list"
-            local pattern='^[0-9]'
+            local pattern='^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'
             if [ "$is_v6" = "true" ]; then
               cmd_path="/ipv6 firewall address-list"
-              pattern=':'
+              pattern='^[0-9a-fA-F:]\+'
             fi
 
             {
               echo "$cmd_path remove [find list=\"$list_name\"]"
               echo "$cmd_path"
-              sort -u "$tmp_file" | grep -E "$pattern" | sed "s|^|add list=\"$list_name\" address=|g"
+              sed 's/#.*//g; s/^[ \t]*//; s/[ \t]*$//' "$tmp_file" \
+                | grep -v '^$' \
+                | grep -E "$pattern" \
+                | sort -u \
+                | sed "s|^|add list=\"$list_name\" address=|g"
             } > "$out_file"
           }
 
@@ -82,7 +84,7 @@ jobs:
               urls+=("$ASN_BASE/$id/$suffix")
             done
 
-            fetch_data "$isp_tmp" "${urls[@]}"
+            fetch_data_parallel "$isp_tmp" "${urls[@]}"
             export_ros "$list_name" "$isp_tmp" "$is_v6" "$out_file"
 
             if [ "$is_v6" = "true" ]; then
@@ -90,7 +92,7 @@ jobs:
             else
               cat "$isp_tmp" >> "$CN_TMP"
             fi
-            rm "$isp_tmp"
+            rm -f "$isp_tmp"
           }
 
           process_isp "China_Telecom" false "data/telecom.rsc" "${TELECOM_ASNS[@]}"
@@ -129,23 +131,25 @@ jobs:
             "https://raw.githubusercontent.com/yarrp/cdn-lists/master/netease.txt"
           )
           for id in "${OTHER_ASNS[@]}"; do V4_URLS+=("$ASN_BASE/$id/ipv4-aggregated.txt"); done
-          fetch_data "$CN_TMP" "${V4_URLS[@]}"
+          fetch_data_parallel "$CN_TMP" "${V4_URLS[@]}"
           export_ros "CN" "$CN_TMP" false "data/cn.rsc"
-          rm "$CN_TMP"
+          rm -f "$CN_TMP"
 
           V6_URLS=(
             "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
             "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
           )
           for id in "${OTHER_ASNS[@]}"; do V6_URLS+=("$ASN_BASE/$id/ipv6-aggregated.txt"); done
-          fetch_data "$CN6_TMP" "${V6_URLS[@]}"
+          fetch_data_parallel "$CN6_TMP" "${V6_URLS[@]}"
           export_ros "CN6" "$CN6_TMP" true "data/cn6.rsc"
-          rm "$CN6_TMP"
+          rm -f "$CN6_TMP"
 
       - name: Commit and Push
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/*.rsc
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update full IP lists $(date +%Y-%m-%d)"
-          git push origin main
+          if ! git diff --staged --quiet; then
+            git commit -m "Update full IP lists $(date +%Y-%m-%d)"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
