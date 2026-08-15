@@ -18,23 +18,25 @@ jobs:
       - name: Process IP Lists
         run: |
           mkdir -p data
+          mkdir -p tmp_work
 
           fetch_data() {
             local output_file=$1
             shift
             for url in "$@"; do
-              local mirror_url="https://ghproxy.com/$url"
+              local mirror_url="https://ghfast.top/https://raw.githubusercontent.com/$url"
               curl -sSL -f --retry 3 --connect-timeout 10 --max-time 60 "$mirror_url" >> "$output_file" 2>/dev/null || true
             done
           }
 
           export_ros() {
             local list_name=$1
-            local tmp_file=$2
+            local input_file=$2
             local is_v6=$3
             local out_file=$4
 
-            if [ ! -s "$tmp_file" ] || [ $(wc -c < "$tmp_file") -lt 100 ]; then
+            if [ ! -s "$input_file" ] || [ $(wc -c < "$input_file") -lt 50 ]; then
+              echo "Warning: $input_file is too small. Skipping."
               return 1
             fi
 
@@ -45,19 +47,16 @@ jobs:
 
             {
               echo "$cmd_path remove [find list=\"$list_name\"]"
-              sed 's/#.*//g; s/^[ \t]*//; s/[ \t]*$//' "$tmp_file" \
-
-                | grep -E '^[0-9a-fA-F:\.]+' \
-                | sort -u \
-                | sed "s|^|add list=\"$list_name\" address=|g"
+              grep -Eo '^[0-9a-fA-F.:\/]+' "$input_file" | sort -u | while read -r ip; do
+                echo "$cmd_path add list=\"$list_name\" address=$ip"
+              done
             } > "$out_file"
           }
 
-          CN_TMP=$(mktemp)
-          CN6_TMP=$(mktemp)
-
-          fetch_data "$CN_TMP" "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt"
-          fetch_data "$CN6_TMP" "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
+          CN_TMP="tmp_work/cn_v4_raw.txt"
+          CN6_TMP="tmp_work/cn_v6_raw.txt"
+          > "$CN_TMP"
+          > "$CN6_TMP"
 
           ASN_BASE="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
 
@@ -78,7 +77,8 @@ jobs:
             shift 3
             local asns=("$@")
 
-            local isp_tmp=$(mktemp)
+            local isp_tmp="tmp_work/${list_name}_tmp.txt"
+            > "$isp_tmp"
             local urls=()
             local suffix="ipv4-aggregated.txt"
             if [ "$is_v6" = "true" ]; then
@@ -86,7 +86,7 @@ jobs:
             fi
 
             for id in "${asns[@]}"; do
-              urls+=("$ASN_BASE/$id/$suffix")
+              urls+=("ipverse/asn-ip/master/as/$id/$suffix")
             done
 
             fetch_data "$isp_tmp" "${urls[@]}"
@@ -97,7 +97,6 @@ jobs:
             else
               cat "$isp_tmp" >> "$CN_TMP"
             fi
-            rm -f "$isp_tmp"
           }
 
           process_isp "China_Telecom" false "data/telecom.rsc" "${TELECOM_ASNS[@]}"
@@ -117,15 +116,11 @@ jobs:
           process_isp "DRPENG" false "data/drpeng.rsc" "${DRPENG_ASNS[@]}"
           process_isp "DRPENG6" true "data/drpeng6.rsc" "${DRPENG_ASNS[@]}"
 
-          for id in "${OTHER_ASNS[@]}"; do 
-            fetch_data "$CN_TMP" "$ASN_BASE/$id/ipv4-aggregated.txt"
-          done
+          fetch_data "$CN_TMP" "17mon/china_ip_list/master/china_ip_list.txt"
+          fetch_data "$CN6_TMP" "Loyalsoldier/v2ray-rules-dat/release/geoip-only-cn-private.txt"
 
           export_ros "CN" "$CN_TMP" false "data/cn.rsc"
-          rm -f "$CN_TMP"
-
           export_ros "CN6" "$CN6_TMP" true "data/cn6.rsc"
-          rm -f "$CN6_TMP"
 
       - name: Commit and Push
         run: |
@@ -135,4 +130,6 @@ jobs:
           if ! git diff --staged --quiet; then
             git commit -m "Update full IP lists $(date +%Y-%m-%d)"
             git push origin HEAD:${{ github.ref_name }}
+          else
+            echo "No changes detected."
           fi
