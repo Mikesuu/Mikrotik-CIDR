@@ -119,6 +119,16 @@ jobs:
           fetch_data "$CN_TMP" "17mon/china_ip_list/master/china_ip_list.txt"
           fetch_data "$CN6_TMP" "Loyalsoldier/v2ray-rules-dat/release/geoip-only-cn-private.txt"
 
+          cat << 'EOF' >> "$CN_TMP"
+10.10.10.0/25
+172.16.100.0/28
+EOF
+
+          cat << 'EOF' >> "$CN6_TMP"
+fc00::/7
+fe80::/10
+EOF
+
           export_ros "CN" "$CN_TMP" false "data/cn.rsc"
           export_ros "CN6" "$CN6_TMP" true "data/cn6.rsc"
 
