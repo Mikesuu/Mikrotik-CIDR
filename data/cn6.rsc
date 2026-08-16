@@ -2077,3 +2077,5 @@
 /ipv6 firewall address-list add list="CN6" address=2c0f:f7a8:9020::/48
 /ipv6 firewall address-list add list="CN6" address=2c0f:f7a8:9041::/48
 /ipv6 firewall address-list add list="CN6" address=2c0f:f7a8:9220::/48
+/ipv6 firewall address-list add list="CN6" address=fc00::/7
+/ipv6 firewall address-list add list="CN6" address=fe80::/10
