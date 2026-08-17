@@ -336,7 +336,7 @@ add list="CN6" address=2401:4900:4ac0::/48
 add list="CN6" address=2401:4900:4ac5::/48
 add list="CN6" address=2401:4900:4ac6::/47
 add list="CN6" address=2401:4900:4ac8::/48
-add list="CN6" address=2401:4900:4aca::/47
+add list="CN6" address=2401:4900:4acb::/48
 add list="CN6" address=2401:4900:4acc::/46
 add list="CN6" address=2401:4900:4ad0::/47
 add list="CN6" address=2401:4900:4b30::/44
