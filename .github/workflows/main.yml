@@ -18,45 +18,39 @@ jobs:
       - name: Process IP Lists
         run: |
           mkdir -p data
-          mkdir -p tmp_work
 
           fetch_data() {
             local output_file=$1
             shift
             for url in "$@"; do
-              local mirror_url="https://ghfast.top/https://raw.githubusercontent.com/$url"
-              curl -sSL -f --retry 3 --connect-timeout 10 --max-time 60 "$mirror_url" >> "$output_file" 2>/dev/null || true
+              curl -sSL --retry 3 --connect-timeout 10 --max-time 60 --fail "$url" >> "$output_file" 2>/dev/null || true
             done
           }
 
           export_ros() {
             local list_name=$1
-            local input_file=$2
+            local tmp_file=$2
             local is_v6=$3
             local out_file=$4
 
-            if [ ! -s "$input_file" ] || [ $(wc -c < "$input_file") -lt 50 ]; then
-              echo "Warning: $input_file is too small. Skipping."
-              return 1
-            fi
-
             local cmd_path="/ip firewall address-list"
+            local pattern='^[0-9]'
             if [ "$is_v6" = "true" ]; then
               cmd_path="/ipv6 firewall address-list"
+              pattern=':'
             fi
 
             {
               echo "$cmd_path remove [find list=\"$list_name\"]"
-              grep -Eo '^[0-9a-fA-F.:\/]+' "$input_file" | sort -u | while read -r ip; do
-                echo "$cmd_path add list=\"$list_name\" address=$ip"
-              done
+              echo "$cmd_path"
+              sort -u "$tmp_file" | grep -E "$pattern" | sed "s|^|add list=\"$list_name\" address=|g"
             } > "$out_file"
           }
 
-          CN_TMP="tmp_work/cn_v4_raw.txt"
-          CN6_TMP="tmp_work/cn_v6_raw.txt"
-          > "$CN_TMP"
-          > "$CN6_TMP"
+          CN_TMP=$(mktemp)
+          CN6_TMP=$(mktemp)
+          echo "10.10.10.0/25" >> "$CN_TMP"
+          echo "172.16.100.0/28" >> "$CN_TMP"
 
           ASN_BASE="https://raw.githubusercontent.com/ipverse/asn-ip/master/as"
 
@@ -77,8 +71,7 @@ jobs:
             shift 3
             local asns=("$@")
 
-            local isp_tmp="tmp_work/${list_name}_tmp.txt"
-            > "$isp_tmp"
+            local isp_tmp=$(mktemp)
             local urls=()
             local suffix="ipv4-aggregated.txt"
             if [ "$is_v6" = "true" ]; then
@@ -86,7 +79,7 @@ jobs:
             fi
 
             for id in "${asns[@]}"; do
-              urls+=("ipverse/asn-ip/master/as/$id/$suffix")
+              urls+=("$ASN_BASE/$id/$suffix")
             done
 
             fetch_data "$isp_tmp" "${urls[@]}"
@@ -97,42 +90,62 @@ jobs:
             else
               cat "$isp_tmp" >> "$CN_TMP"
             fi
+            rm "$isp_tmp"
           }
 
           process_isp "China_Telecom" false "data/telecom.rsc" "${TELECOM_ASNS[@]}"
           process_isp "China_Telecom6" true "data/telecom6.rsc" "${TELECOM_ASNS[@]}"
+
           process_isp "China_Unicom" false "data/unicom.rsc" "${UNICOM_ASNS[@]}"
           process_isp "China_Unicom6" true "data/unicom6.rsc" "${UNICOM_ASNS[@]}"
+
           process_isp "China_Mobile" false "data/cmcc.rsc" "${CMCC_ASNS[@]}"
           process_isp "China_Mobile6" true "data/cmcc6.rsc" "${CMCC_ASNS[@]}"
+
           process_isp "CERNET" false "data/cernet.rsc" "${CERNET_ASNS[@]}"
           process_isp "CERNET6" true "data/cernet6.rsc" "${CERNET_ASNS[@]}"
+
           process_isp "CSTNET" false "data/cstnet.rsc" "${CSTNET_ASNS[@]}"
           process_isp "CSTNET6" true "data/cstnet6.rsc" "${CSTNET_ASNS[@]}"
+
           process_isp "CIETNET" false "data/cietnet.rsc" "${CIETNET_ASNS[@]}"
           process_isp "CIETNET6" true "data/cietnet6.rsc" "${CIETNET_ASNS[@]}"
+
           process_isp "CBNNET" false "data/cbnnet.rsc" "${CBNNET_ASNS[@]}"
           process_isp "CBNNET6" true "data/cbnnet6.rsc" "${CBNNET_ASNS[@]}"
+
           process_isp "DRPENG" false "data/drpeng.rsc" "${DRPENG_ASNS[@]}"
           process_isp "DRPENG6" true "data/drpeng6.rsc" "${DRPENG_ASNS[@]}"
 
-          fetch_data "$CN_TMP" "17mon/china_ip_list/master/china_ip_list.txt"
-          fetch_data "$CN6_TMP" "Loyalsoldier/v2ray-rules-dat/release/geoip-only-cn-private.txt"
-
-          printf "%s\n" "10.10.10.0/25" "172.16.100.0/28" >> "$CN_TMP"
-          printf "%s\n" "fc00::/7" "fe80::/10" >> "$CN6_TMP"
-
+          V4_URLS=(
+            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
+            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/aliyun.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/tencent.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/baidu.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/huawei.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/bytedance.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/jd.txt"
+            "https://raw.githubusercontent.com/yarrp/cdn-lists/master/netease.txt"
+          )
+          for id in "${OTHER_ASNS[@]}"; do V4_URLS+=("$ASN_BASE/$id/ipv4-aggregated.txt"); done
+          fetch_data "$CN_TMP" "${V4_URLS[@]}"
           export_ros "CN" "$CN_TMP" false "data/cn.rsc"
+          rm "$CN_TMP"
+
+          V6_URLS=(
+            "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
+            "https://raw.githubusercontent.com/Loyalsoldier/geoip/release/cn6.txt"
+          )
+          for id in "${OTHER_ASNS[@]}"; do V6_URLS+=("$ASN_BASE/$id/ipv6-aggregated.txt"); done
+          fetch_data "$CN6_TMP" "${V6_URLS[@]}"
           export_ros "CN6" "$CN6_TMP" true "data/cn6.rsc"
+          rm "$CN6_TMP"
 
       - name: Commit and Push
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/*.rsc
-          if ! git diff --staged --quiet; then
-            git commit -m "Update full IP lists $(date +%Y-%m-%d)"
-            git push origin HEAD:${{ github.ref_name }}
-          else
-            echo "No changes detected."
-          fi
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update full IP lists $(date +%Y-%m-%d)"
+          git push origin main
