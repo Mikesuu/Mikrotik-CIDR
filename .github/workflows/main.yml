@@ -39,30 +39,30 @@ jobs:
             fi
 
             python3 - "$tmp_file" "$is_v6" "$list_name" "$cmd_path" > "$out_file" << 'EOF'
-import sys, ipaddress
+          import sys, ipaddress
 
-tmp_file, is_v6, list_name, cmd_path = sys.argv[1], sys.argv[2] == 'true', sys.argv[3], sys.argv[4]
-ip_set = []
+          tmp_file, is_v6, list_name, cmd_path = sys.argv[1], sys.argv[2] == 'true', sys.argv[3], sys.argv[4]
+          ip_set = []
 
-with open(tmp_file, 'r', encoding='utf-8', errors='ignore') as f:
-    for line in f:
-        line = line.strip()
-        if not line or line.startswith('#'): continue
-        if is_v6 and ':' not in line: continue
-        if not is_v6 and '.' not in line: continue
-        try:
-            net = ipaddress.ip_network(line, strict=False)
-            ip_set.append(net)
-        except ValueError:
-            pass
+          with open(tmp_file, 'r', encoding='utf-8', errors='ignore') as f:
+              for line in f:
+                  line = line.strip()
+                  if not line or line.startswith('#'): continue
+                  if is_v6 and ':' not in line: continue
+                  if not is_v6 and '.' not in line: continue
+                  try:
+                      net = ipaddress.ip_network(line, strict=False)
+                      ip_set.append(net)
+                  except ValueError:
+                      pass
 
-collapsed = ipaddress.collapse_addresses(ip_set)
+          collapsed = ipaddress.collapse_addresses(ip_set)
 
-print(f'{cmd_path} remove [find list="{list_name}"]')
-print(f'{cmd_path}')
-for ip in collapsed:
-    print(f'add list="{list_name}" address={ip}')
-EOF
+          print(f'{cmd_path} remove [find list="{list_name}"]')
+          print(f'{cmd_path}')
+          for ip in collapsed:
+              print(f'add list="{list_name}" address={ip}')
+          EOF
           }
 
           CN_TMP=$(mktemp)
