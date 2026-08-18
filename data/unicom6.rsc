@@ -15,6 +15,7 @@ add list="China_Unicom6" address=2407:6c40:1500::/48
 add list="China_Unicom6" address=2407:6c40:1600::/40
 add list="China_Unicom6" address=2408:8000::/48
 add list="China_Unicom6" address=2408:8000:2::/47
+add list="China_Unicom6" address=2408:8000:1010::/48
 add list="China_Unicom6" address=2408:8000:10fe::/47
 add list="China_Unicom6" address=2408:8000:2000::/35
 add list="China_Unicom6" address=2408:8000:4000::/34
