@@ -7,5 +7,4 @@ add list="CERNET6" address=2001:daa:2::/47
 add list="CERNET6" address=2001:daa:4::/47
 add list="CERNET6" address=2001:daa:6::/48
 add list="CERNET6" address=2001:daa:9::/48
-add list="CERNET6" address=2400:a980:ee::/48
 add list="CERNET6" address=240c:c000::/20
