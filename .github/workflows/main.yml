@@ -46,7 +46,7 @@ jobs:
 
             if [ ! -s "$output" ]; then
               echo "ERROR: downloaded file is empty: $url"
-              exit 1
+              return 1
             fi
           }
 
@@ -116,8 +116,9 @@ jobs:
 
           if len(merged) < minimum:
               print(
-                  f"ERROR: {name} contains only {len(merged)} "
-                  f"aggregated prefixes, minimum is {minimum}"
+                  f"ERROR: {name} contains only "
+                  f"{len(merged)} aggregated prefixes, "
+                  f"minimum is {minimum}"
               )
               sys.exit(1)
 
@@ -126,8 +127,10 @@ jobs:
                   f.write(str(net) + "\n")
 
           print(
-              f"OK: {name} source={len(networks)} "
-              f"aggregated={len(merged)} invalid={invalid}"
+              f"OK: {name} "
+              f"source={len(networks)} "
+              f"aggregated={len(merged)} "
+              f"invalid={invalid}"
           )
           PY
           }
@@ -153,7 +156,9 @@ jobs:
           command = sys.argv[4]
 
           with open(output, "w", encoding="utf-8") as out:
-              out.write(f'{command} remove [find list="{list_name}"]\n')
+              out.write(
+                  f'{command} remove [find list="{list_name}"]\n'
+              )
               out.write(f'{command}\n')
 
               with open(source, "r", encoding="utf-8") as f:
@@ -164,7 +169,8 @@ jobs:
                           continue
 
                       out.write(
-                          f'add list="{list_name}" address={address}\n'
+                          f'add list="{list_name}" '
+                          f'address={address}\n'
                       )
           PY
           }
@@ -303,7 +309,6 @@ jobs:
             [China_Mobile6]="cmcc6.txt"
             [CERNET6]="cernet6.txt"
             [CSTNET6]="cstnet6.txt"
-            [DRPENG6]="drpeng6.txt"
           )
 
           declare -A ISP_V6_OUTPUT=(
@@ -312,7 +317,6 @@ jobs:
             [China_Mobile6]="data/cmcc6.rsc"
             [CERNET6]="data/cernet6.rsc"
             [CSTNET6]="data/cstnet6.rsc"
-            [DRPENG6]="data/drpeng6.rsc"
           )
 
           for list_name in "${!ISP_V6[@]}"; do
@@ -361,5 +365,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Update IP lists $(date +%Y-%m-%d)"
+          git commit \
+            -m "Update IP lists $(date +%Y-%m-%d)"
+
           git push origin main
