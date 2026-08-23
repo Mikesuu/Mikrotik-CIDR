@@ -82,10 +82,7 @@ jobs:
               for raw in f:
                   line = raw.strip()
 
-                  if not line:
-                      continue
-
-                  if line.startswith("#"):
+                  if not line or line.startswith("#"):
                       continue
 
                   line = line.split("#", 1)[0].strip()
@@ -124,21 +121,14 @@ jobs:
               sys.exit(1)
 
           merged = list(ipaddress.collapse_addresses(networks))
-
           count = len(merged)
 
           if count < minimum:
-              print(
-                  f"ERROR: {name}: "
-                  f"{count} aggregated prefixes < minimum {minimum}"
-              )
+              print(f"ERROR: {name}: {count} prefixes < minimum {minimum}")
               sys.exit(1)
 
           if count > maximum:
-              print(
-                  f"ERROR: {name}: "
-                  f"{count} aggregated prefixes > maximum {maximum}"
-              )
+              print(f"ERROR: {name}: {count} prefixes > maximum {maximum}")
               sys.exit(1)
 
           with open(dst, "w", encoding="utf-8") as f:
@@ -151,96 +141,6 @@ jobs:
               f"aggregated={count} "
               f"invalid={invalid}"
           )
-          PY
-          }
-
-          asn_cross_check() {
-            local cn_file="$1"
-            local asn_file="$2"
-
-            python3 - "$cn_file" "$asn_file" <<'PY'
-          import sys
-          import ipaddress
-
-          cn_file = sys.argv[1]
-          asn_file = sys.argv[2]
-
-          def load_networks(path):
-              result = []
-
-              with open(path, "r", encoding="utf-8-sig", errors="ignore") as f:
-                  for raw in f:
-                      line = raw.strip()
-
-                      if not line or line.startswith("#"):
-                          continue
-
-                      line = line.split("#", 1)[0].strip()
-
-                      if not line:
-                          continue
-
-                      try:
-                          net = ipaddress.ip_network(line, strict=False)
-                      except ValueError:
-                          continue
-
-                      if net.version != 4:
-                          continue
-
-                      if (
-                          net.is_loopback
-                          or net.is_link_local
-                          or net.is_multicast
-                          or net.is_unspecified
-                      ):
-                          continue
-
-                      result.append(net)
-
-              return list(ipaddress.collapse_addresses(result))
-
-          cn = load_networks(cn_file)
-          asn = load_networks(asn_file)
-
-          if not cn:
-              print("ERROR: CN list empty")
-              sys.exit(1)
-
-          if not asn:
-              print("ERROR: ASN-China list empty")
-              sys.exit(1)
-
-          cn_total = sum(n.num_addresses for n in cn)
-          asn_total = sum(n.num_addresses for n in asn)
-
-          overlap = 0
-
-          for c in cn:
-              for a in asn:
-                  if c.overlaps(a):
-                      first = max(int(c.network_address), int(a.network_address))
-                      last = min(int(c.broadcast_address), int(a.broadcast_address))
-
-                      if first <= last:
-                          overlap += last - first + 1
-
-          cn_coverage = overlap / cn_total * 100 if cn_total else 0
-          asn_coverage = overlap / asn_total * 100 if asn_total else 0
-
-          print(f"CN prefixes: {len(cn)}")
-          print(f"ASN-China prefixes: {len(asn)}")
-          print(f"CN addresses: {cn_total}")
-          print(f"ASN-China addresses: {asn_total}")
-          print(f"Overlap addresses: {overlap}")
-          print(f"CN covered by ASN-China: {cn_coverage:.2f}%")
-          print(f"ASN-China covered by CN: {asn_coverage:.2f}%")
-
-          if cn_coverage < 70:
-              print("ERROR: ASN-China overlap with CN is abnormally low")
-              sys.exit(1)
-
-          print("ASN cross-check passed.")
           PY
           }
 
@@ -269,36 +169,31 @@ jobs:
 
           echo
           echo "========================================"
-          echo "Download ASN Cross Check"
+          echo "ASN China Cross Check"
           echo "========================================"
 
-          ASN_RAW="$WORKDIR/asn-china.raw"
-          ASN_FINAL="$WORKDIR/asn-china.final"
+          ASN_CN_RAW="$WORKDIR/asn-cn.raw"
+          ASN_CN_FINAL="$WORKDIR/asn-cn.final"
 
           download \
             "$ASN_CHINA/IPv4.China.list" \
-            "$ASN_RAW"
+            "$ASN_CN_RAW"
 
-          ASN_SOURCE_COUNT=$(source_count "$ASN_RAW")
+          ASN_CN_SOURCE_COUNT=$(source_count "$ASN_CN_RAW")
 
-          echo "ASN-China IPv4 source=$ASN_SOURCE_COUNT"
-
-          if [ "$ASN_SOURCE_COUNT" -lt 5000 ] || [ "$ASN_SOURCE_COUNT" -gt 15000 ]; then
-            echo "ERROR: abnormal ASN-China IPv4 source size"
-            exit 1
-          fi
+          echo "ASN-China IPv4 source=$ASN_CN_SOURCE_COUNT"
 
           normalize \
-            "$ASN_RAW" \
-            "$ASN_FINAL" \
+            "$ASN_CN_RAW" \
+            "$ASN_CN_FINAL" \
             ipv4 \
             ASN-China \
             5000 \
             15000
 
-          ASN_COUNT=$(wc -l < "$ASN_FINAL")
+          ASN_CN_COUNT=$(wc -l < "$ASN_CN_FINAL")
 
-          echo "ASN-China prefixes: $ASN_COUNT"
+          echo "ASN-China prefixes: $ASN_CN_COUNT"
 
           echo
           echo "========================================"
@@ -369,20 +264,255 @@ jobs:
 
           echo "CN final prefixes: $CN_COUNT"
 
+          if ! grep -q '^10.10.10.0/25$' "$CN_FINAL"; then
+            echo "ERROR: custom 10.10.10.0/25 missing"
+            exit 1
+          fi
+
+          if ! grep -q '^172.16.100.0/28$' "$CN_FINAL"; then
+            echo "ERROR: custom 172.16.100.0/28 missing"
+            exit 1
+          fi
+
           echo
           echo "========================================"
           echo "CN ASN Cross Check"
           echo "========================================"
 
-          asn_cross_check \
+          python3 \
             "$CN_FINAL" \
-            "$ASN_FINAL"
+            "$ASN_CN_FINAL" <<'PY'
+          import sys
+          import ipaddress
+
+          cn_file = sys.argv[1]
+          asn_file = sys.argv[2]
+
+          def load(path):
+              result = []
+              with open(path) as f:
+                  for line in f:
+                      line = line.strip()
+                      if line:
+                          result.append(ipaddress.ip_network(line))
+              return result
+
+          cn = load(cn_file)
+          asn = load(asn_file)
+
+          cn_total = sum(n.num_addresses for n in cn)
+          asn_total = sum(n.num_addresses for n in asn)
+
+          overlap = 0
+
+          for a in cn:
+              for b in asn:
+                  if a.overlaps(b):
+                      overlap += 1
+                      break
+
+          ratio = overlap / len(cn) * 100
+
+          print(f"CN prefixes: {len(cn)}")
+          print(f"ASN-China prefixes: {len(asn)}")
+          print(f"CN prefixes overlapping ASN-China: {overlap}")
+          print(f"CN ASN coverage: {ratio:.2f}%")
+
+          if ratio < 90:
+              print("ERROR: CN ASN cross-check coverage below 90%")
+              sys.exit(1)
+          PY
 
           export_rsc \
             CN \
             "$CN_FINAL" \
             data/cn.rsc \
             false
+
+          echo
+          echo "========================================"
+          echo "Operator IPv4"
+          echo "========================================"
+
+          declare -A ISP4=( 
+            [China_Telecom]="chinanet.txt"
+            [China_Telecom_CN2]="cn2.txt"
+            [China_Unicom]="unicom.txt"
+            [China_Mobile]="cmcc.txt"
+            [CERNET]="cernet.txt"
+            [CSTNET]="cstnet.txt"
+            [DRPENG]="drpeng.txt"
+          )
+
+          declare -A ISP4_OUT=(
+            [China_Telecom]="data/telecom.rsc"
+            [China_Telecom_CN2]="data/telecom-cn2.rsc"
+            [China_Unicom]="data/unicom.rsc"
+            [China_Mobile]="data/cmcc.rsc"
+            [CERNET]="data/cernet.rsc"
+            [CSTNET]="data/cstnet.rsc"
+            [DRPENG]="data/drpeng.rsc"
+          )
+
+          declare -A ISP4_MIN=(
+            [China_Telecom]=3000
+            [China_Telecom_CN2]=10
+            [China_Unicom]=3000
+            [China_Mobile]=800
+            [CERNET]=30
+            [CSTNET]=10
+            [DRPENG]=10
+          )
+
+          declare -A ISP4_MAX=(
+            [China_Telecom]=5000
+            [China_Telecom_CN2]=500
+            [China_Unicom]=5000
+            [China_Mobile]=2000
+            [CERNET]=300
+            [CSTNET]=300
+            [DRPENG]=200
+          )
+
+          for name in \
+            China_Telecom \
+            China_Telecom_CN2 \
+            China_Unicom \
+            China_Mobile \
+            CERNET \
+            CSTNET \
+            DRPENG
+          do
+            source="$WORKDIR/${name}.txt"
+            final="$WORKDIR/${name}.final"
+
+            if [ "$name" = "China_Telecom_CN2" ]; then
+              url="$ASN_CHINA/AS4809.txt"
+            else
+              url="$GAOYIFAN/${ISP4[$name]}"
+            fi
+
+            download \
+              "$url" \
+              "$source"
+
+            normalize \
+              "$source" \
+              "$final" \
+              ipv4 \
+              "$name" \
+              "${ISP4_MIN[$name]}" \
+              "${ISP4_MAX[$name]}"
+
+            export_rsc \
+              "$name" \
+              "$final" \
+              "${ISP4_OUT[$name]}" \
+              false
+          done
+
+          echo
+          echo "========================================"
+          echo "ASN Operator Cross Check"
+          echo "========================================"
+
+          declare -A ASN_EXPECTED=(
+            [China_Telecom]="4134"
+            [China_Telecom_CN2]="4809"
+            [China_Unicom]="4837"
+            [China_Mobile]="9808"
+            [CERNET]="4538"
+            [CSTNET]="7497"
+          )
+
+          for name in \
+            China_Telecom \
+            China_Telecom_CN2 \
+            China_Unicom \
+            China_Mobile \
+            CERNET \
+            CSTNET
+          do
+            asn="${ASN_EXPECTED[$name]}"
+            asn_file="$WORKDIR/as${asn}.txt"
+            op_file="$WORKDIR/${name}.final"
+
+            if [ "$name" = "China_Telecom_CN2" ]; then
+              cp "$op_file" "$asn_file"
+            else
+              if curl -fsSL \
+                --retry 5 \
+                --retry-delay 2 \
+                --connect-timeout 15 \
+                --max-time 180 \
+                "https://raw.githubusercontent.com/missuo/ASN-China/main/AS${asn}.list" \
+                -o "$asn_file"
+              then
+                :
+              else
+                echo "WARN: ASN${asn} source unavailable, skip cross-check"
+                continue
+              fi
+            fi
+
+            if [ ! -s "$asn_file" ]; then
+              echo "WARN: ASN${asn} empty, skip"
+              continue
+            fi
+
+            ASN_NORMALIZED="$WORKDIR/as${asn}.final"
+
+            normalize \
+              "$asn_file" \
+              "$ASN_NORMALIZED" \
+              ipv4 \
+              "AS${asn}" \
+              1 \
+              20000
+
+            python3 \
+              "$op_file" \
+              "$ASN_NORMALIZED" \
+              "$name" <<'PY'
+          import sys
+          import ipaddress
+
+          op_file = sys.argv[1]
+          asn_file = sys.argv[2]
+          name = sys.argv[3]
+
+          def load(path):
+              result = []
+              with open(path) as f:
+                  for line in f:
+                      line = line.strip()
+                      if line:
+                          result.append(ipaddress.ip_network(line))
+              return result
+
+          op = load(op_file)
+          asn = load(asn_file)
+
+          overlap = 0
+
+          for a in op:
+              if any(a.overlaps(b) for b in asn):
+                  overlap += 1
+
+          ratio = overlap / len(op) * 100
+
+          print(
+              f"{name}: "
+              f"operator={len(op)} "
+              f"ASN-overlap={overlap} "
+              f"coverage={ratio:.2f}%"
+          )
+
+          if ratio < 70:
+              print(f"ERROR: {name}: ASN cross-check below 70%")
+              sys.exit(1)
+          PY
+          done
 
           echo
           echo "========================================"
@@ -413,86 +543,11 @@ jobs:
             800 \
             3000
 
-          CN6_COUNT=$(wc -l < "$CN6_FINAL")
-
-          echo "CN6 final prefixes: $CN6_COUNT"
-
           export_rsc \
             CN6 \
             "$CN6_FINAL" \
             data/cn6.rsc \
             true
-
-          echo
-          echo "========================================"
-          echo "Operator IPv4"
-          echo "========================================"
-
-          declare -A ISP4=(
-            [China_Telecom]="chinanet.txt"
-            [China_Unicom]="unicom.txt"
-            [China_Mobile]="cmcc.txt"
-            [CERNET]="cernet.txt"
-            [CSTNET]="cstnet.txt"
-            [DRPENG]="drpeng.txt"
-          )
-
-          declare -A ISP4_OUT=(
-            [China_Telecom]="data/telecom.rsc"
-            [China_Unicom]="data/unicom.rsc"
-            [China_Mobile]="data/cmcc.rsc"
-            [CERNET]="data/cernet.rsc"
-            [CSTNET]="data/cstnet.rsc"
-            [DRPENG]="data/drpeng.rsc"
-          )
-
-          declare -A ISP4_MIN=(
-            [China_Telecom]=3000
-            [China_Unicom]=3000
-            [China_Mobile]=800
-            [CERNET]=30
-            [CSTNET]=10
-            [DRPENG]=10
-          )
-
-          declare -A ISP4_MAX=(
-            [China_Telecom]=5000
-            [China_Unicom]=5000
-            [China_Mobile]=2000
-            [CERNET]=300
-            [CSTNET]=300
-            [DRPENG]=200
-          )
-
-          for name in \
-            China_Telecom \
-            China_Unicom \
-            China_Mobile \
-            CERNET \
-            CSTNET \
-            DRPENG
-          do
-            source="$WORKDIR/${name}.txt"
-            final="$WORKDIR/${name}.final"
-
-            download \
-              "$GAOYIFAN/${ISP4[$name]}" \
-              "$source"
-
-            normalize \
-              "$source" \
-              "$final" \
-              ipv4 \
-              "$name" \
-              "${ISP4_MIN[$name]}" \
-              "${ISP4_MAX[$name]}"
-
-            export_rsc \
-              "$name" \
-              "$final" \
-              "${ISP4_OUT[$name]}" \
-              false
-          done
 
           echo
           echo "========================================"
@@ -560,14 +615,7 @@ jobs:
               true
           done
 
-          echo
-          echo "========================================"
-          echo "DRPENG IPv6"
-          echo "========================================"
-
           rm -f data/drpeng6.rsc
-
-          echo "DRPENG6 skipped: upstream IPv6 source is unavailable."
 
           echo
           echo "========================================"
@@ -587,7 +635,7 @@ jobs:
 
           for file in data/*.rsc; do
             count=$(grep -c '^add list=' "$file" || true)
-            printf '%-20s %6d prefixes\n' \
+            printf '%-24s %6d prefixes\n' \
               "$(basename "$file")" \
               "$count"
           done
@@ -602,6 +650,7 @@ jobs:
             data/cn6.rsc
 
             data/telecom.rsc
+            data/telecom-cn2.rsc
             data/telecom6.rsc
 
             data/unicom.rsc
@@ -642,6 +691,14 @@ jobs:
             exit 1
           fi
 
+          if grep -RniE \
+            'address=(10\.0\.0\.0/8|172\.16\.0\.0/12|192\.168\.0\.0/16)' \
+            data/*.rsc
+          then
+            echo "ERROR: unexpected RFC1918 aggregate detected"
+            exit 1
+          fi
+
           if ! grep -q 'address=10.10.10.0/25' data/cn.rsc; then
             echo "ERROR: 10.10.10.0/25 missing from CN"
             exit 1
@@ -649,14 +706,6 @@ jobs:
 
           if ! grep -q 'address=172.16.100.0/28' data/cn.rsc; then
             echo "ERROR: 172.16.100.0/28 missing from CN"
-            exit 1
-          fi
-
-          if grep -RniE \
-            'address=(10\.0\.0\.0/8|172\.16\.0\.0/12|192\.168\.0\.0/16)' \
-            data/*.rsc
-          then
-            echo "ERROR: unexpected RFC1918 aggregate detected"
             exit 1
           fi
 
