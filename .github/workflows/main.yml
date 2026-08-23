@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Process IP Lists
+      - name: Generate IP Lists
         shell: bash
         run: |
           set -euo pipefail
@@ -26,8 +26,9 @@ jobs:
           WORKDIR="$(mktemp -d)"
           trap 'rm -rf "$WORKDIR"' EXIT
 
-          BASE_GAOYIFAN="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
-          BASE_METOWOLF="https://metowolf.github.io/iplist/data"
+          GAOYIFAN="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
+          METOWOLF="https://metowolf.github.io/iplist/data"
+          MON17="https://raw.githubusercontent.com/17mon/china_ip_list/master"
 
           download() {
             local url="$1"
@@ -40,24 +41,29 @@ jobs:
               --retry 5 \
               --retry-delay 2 \
               --connect-timeout 15 \
-              --max-time 120 \
+              --max-time 180 \
               "$url" \
               -o "$output"
 
             if [ ! -s "$output" ]; then
-              echo "ERROR: downloaded file is empty: $url"
-              return 1
+              echo "ERROR: empty download: $url"
+              exit 1
             fi
           }
 
-          parse_and_merge() {
+          source_count() {
+            grep -Evc '^[[:space:]]*(#|$)' "$1" || true
+          }
+
+          normalize() {
             local input="$1"
             local output="$2"
             local family="$3"
             local name="$4"
             local minimum="$5"
+            local maximum="$6"
 
-            python3 - "$input" "$output" "$family" "$name" "$minimum" << 'PY'
+            python3 - "$input" "$output" "$family" "$name" "$minimum" "$maximum" <<'PY'
           import sys
           import ipaddress
 
@@ -66,6 +72,7 @@ jobs:
           family = sys.argv[3]
           name = sys.argv[4]
           minimum = int(sys.argv[5])
+          maximum = int(sys.argv[6])
 
           networks = []
           invalid = 0
@@ -106,30 +113,41 @@ jobs:
                   if net.is_multicast:
                       continue
 
+                  if net.is_unspecified:
+                      continue
+
                   networks.append(net)
 
           if not networks:
-              print(f"ERROR: {name} contains no valid {family} prefixes")
+              print(f"ERROR: {name}: no valid networks")
               sys.exit(1)
 
           merged = list(ipaddress.collapse_addresses(networks))
 
-          if len(merged) < minimum:
+          count = len(merged)
+
+          if count < minimum:
               print(
-                  f"ERROR: {name} contains only "
-                  f"{len(merged)} aggregated prefixes, "
-                  f"minimum is {minimum}"
+                  f"ERROR: {name}: "
+                  f"{count} aggregated prefixes < minimum {minimum}"
+              )
+              sys.exit(1)
+
+          if count > maximum:
+              print(
+                  f"ERROR: {name}: "
+                  f"{count} aggregated prefixes > maximum {maximum}"
               )
               sys.exit(1)
 
           with open(dst, "w", encoding="utf-8") as f:
               for net in merged:
-                  f.write(str(net) + "\n")
+                  f.write(f"{net}\n")
 
           print(
-              f"OK: {name} "
+              f"OK: {name}: "
               f"source={len(networks)} "
-              f"aggregated={len(merged)} "
+              f"aggregated={count} "
               f"invalid={invalid}"
           )
           PY
@@ -147,119 +165,137 @@ jobs:
               local command="/ip firewall address-list"
             fi
 
-            python3 - "$list_name" "$input" "$output" "$command" << 'PY'
-          import sys
+            {
+              echo "$command remove [find list=\"$list_name\"]"
+              echo "$command"
 
-          list_name = sys.argv[1]
-          source = sys.argv[2]
-          output = sys.argv[3]
-          command = sys.argv[4]
-
-          with open(output, "w", encoding="utf-8") as out:
-              out.write(
-                  f'{command} remove [find list="{list_name}"]\n'
-              )
-              out.write(f'{command}\n')
-
-              with open(source, "r", encoding="utf-8") as f:
-                  for line in f:
-                      address = line.strip()
-
-                      if not address:
-                          continue
-
-                      out.write(
-                          f'add list="{list_name}" '
-                          f'address={address}\n'
-                      )
-          PY
+              while IFS= read -r cidr; do
+                [ -z "$cidr" ] && continue
+                echo "add list=\"$list_name\" address=$cidr"
+              done < "$input"
+            } > "$output"
           }
 
+          echo
           echo "========================================"
           echo "China IPv4"
           echo "========================================"
 
-          CN_GAOYIFAN="$WORKDIR/china-gaoyifan.txt"
-          CN_METOWOLF="$WORKDIR/china-metowolf.txt"
-          CN_LOCAL="$WORKDIR/local.txt"
+          CN_GAO="$WORKDIR/cn-gaoyifan.txt"
+          CN_META="$WORKDIR/cn-metowolf.txt"
+          CN_17MON="$WORKDIR/cn-17mon.txt"
           CN_RAW="$WORKDIR/cn.raw"
           CN_FINAL="$WORKDIR/cn.final"
 
           download \
-            "$BASE_GAOYIFAN/china.txt" \
-            "$CN_GAOYIFAN"
+            "$GAOYIFAN/china.txt" \
+            "$CN_GAO"
 
           download \
-            "$BASE_METOWOLF/special/china.txt" \
-            "$CN_METOWOLF"
+            "$METOWOLF/special/china.txt" \
+            "$CN_META"
 
-          parse_and_merge \
-            "$CN_GAOYIFAN" \
-            "$WORKDIR/china-gaoyifan.final" \
-            "ipv4" \
-            "gaoyifan china IPv4" \
-            3000
+          download \
+            "$MON17/china_ip_list.txt" \
+            "$CN_17MON"
 
-          parse_and_merge \
-            "$CN_METOWOLF" \
-            "$WORKDIR/china-metowolf.final" \
-            "ipv4" \
-            "metowolf china IPv4" \
-            3000
+          CN_GAO_COUNT=$(source_count "$CN_GAO")
+          CN_META_COUNT=$(source_count "$CN_META")
+          CN_17MON_COUNT=$(source_count "$CN_17MON")
 
-          printf '%s\n' \
-            "10.10.10.0/25" \
-            "172.16.100.0/28" \
-            > "$CN_LOCAL"
+          echo "gaoyifan CN IPv4 source=$CN_GAO_COUNT"
+          echo "metowolf CN IPv4 source=$CN_META_COUNT"
+          echo "17mon CN IPv4 source=$CN_17MON_COUNT"
+
+          if [ "$CN_GAO_COUNT" -lt 3000 ] || [ "$CN_GAO_COUNT" -gt 7000 ]; then
+            echo "ERROR: abnormal gaoyifan CN IPv4 source size"
+            exit 1
+          fi
+
+          if [ "$CN_META_COUNT" -lt 3000 ] || [ "$CN_META_COUNT" -gt 8000 ]; then
+            echo "ERROR: abnormal metowolf CN IPv4 source size"
+            exit 1
+          fi
+
+          if [ "$CN_17MON_COUNT" -lt 5000 ] || [ "$CN_17MON_COUNT" -gt 10000 ]; then
+            echo "ERROR: abnormal 17mon CN IPv4 source size"
+            exit 1
+          fi
 
           cat \
-            "$CN_LOCAL" \
-            "$CN_GAOYIFAN" \
-            "$CN_METOWOLF" \
+            "$CN_GAO" \
+            "$CN_META" \
+            "$CN_17MON" \
             > "$CN_RAW"
 
-          parse_and_merge \
+          cat >> "$CN_RAW" <<'EOF'
+          10.10.10.0/25
+          172.16.100.0/28
+          EOF
+
+          normalize \
             "$CN_RAW" \
             "$CN_FINAL" \
-            "ipv4" \
-            "CN" \
-            3000
+            ipv4 \
+            CN \
+            4500 \
+            9000
+
+          CN_COUNT=$(wc -l < "$CN_FINAL")
+
+          echo "OK: final CN = $CN_COUNT prefixes"
 
           export_rsc \
-            "CN" \
+            CN \
             "$CN_FINAL" \
-            "data/cn.rsc" \
-            "false"
+            data/cn.rsc \
+            false
 
+          echo
           echo "========================================"
           echo "China IPv6"
           echo "========================================"
 
-          CN6_GAOYIFAN="$WORKDIR/china6-gaoyifan.txt"
+          CN6_RAW="$WORKDIR/cn6.raw"
           CN6_FINAL="$WORKDIR/cn6.final"
 
           download \
-            "$BASE_GAOYIFAN/china6.txt" \
-            "$CN6_GAOYIFAN"
+            "$GAOYIFAN/china6.txt" \
+            "$CN6_RAW"
 
-          parse_and_merge \
-            "$CN6_GAOYIFAN" \
+          CN6_SOURCE_COUNT=$(source_count "$CN6_RAW")
+
+          echo "gaoyifan CN IPv6 source=$CN6_SOURCE_COUNT"
+
+          if [ "$CN6_SOURCE_COUNT" -lt 800 ] || [ "$CN6_SOURCE_COUNT" -gt 3000 ]; then
+            echo "ERROR: abnormal CN IPv6 source size"
+            exit 1
+          fi
+
+          normalize \
+            "$CN6_RAW" \
             "$CN6_FINAL" \
-            "ipv6" \
-            "CN6" \
-            500
+            ipv6 \
+            CN6 \
+            800 \
+            3000
+
+          CN6_COUNT=$(wc -l < "$CN6_FINAL")
+
+          echo "OK: final CN6 = $CN6_COUNT prefixes"
 
           export_rsc \
-            "CN6" \
+            CN6 \
             "$CN6_FINAL" \
-            "data/cn6.rsc" \
-            "true"
+            data/cn6.rsc \
+            true
 
+          echo
           echo "========================================"
           echo "Operator IPv4"
           echo "========================================"
 
-          declare -A ISP_V4=(
+          declare -A ISP4=(
             [China_Telecom]="chinanet.txt"
             [China_Unicom]="unicom.txt"
             [China_Mobile]="cmcc.txt"
@@ -268,7 +304,7 @@ jobs:
             [DRPENG]="drpeng.txt"
           )
 
-          declare -A ISP_V4_OUTPUT=(
+          declare -A ISP4_OUT=(
             [China_Telecom]="data/telecom.rsc"
             [China_Unicom]="data/unicom.rsc"
             [China_Mobile]="data/cmcc.rsc"
@@ -277,33 +313,60 @@ jobs:
             [DRPENG]="data/drpeng.rsc"
           )
 
-          for list_name in "${!ISP_V4[@]}"; do
-            source="$WORKDIR/${list_name}.txt"
-            final="$WORKDIR/${list_name}.final"
+          declare -A ISP4_MIN=(
+            [China_Telecom]=3000
+            [China_Unicom]=3000
+            [China_Mobile]=800
+            [CERNET]=30
+            [CSTNET]=10
+            [DRPENG]=10
+          )
+
+          declare -A ISP4_MAX=(
+            [China_Telecom]=5000
+            [China_Unicom]=5000
+            [China_Mobile]=2000
+            [CERNET]=300
+            [CSTNET]=300
+            [DRPENG]=200
+          )
+
+          for name in \
+            China_Telecom \
+            China_Unicom \
+            China_Mobile \
+            CERNET \
+            CSTNET \
+            DRPENG
+          do
+            source="$WORKDIR/${name}.txt"
+            final="$WORKDIR/${name}.final"
 
             download \
-              "$BASE_GAOYIFAN/${ISP_V4[$list_name]}" \
+              "$GAOYIFAN/${ISP4[$name]}" \
               "$source"
 
-            parse_and_merge \
+            normalize \
               "$source" \
               "$final" \
-              "ipv4" \
-              "$list_name" \
-              1
+              ipv4 \
+              "$name" \
+              "${ISP4_MIN[$name]}" \
+              "${ISP4_MAX[$name]}"
 
             export_rsc \
-              "$list_name" \
+              "$name" \
               "$final" \
-              "${ISP_V4_OUTPUT[$list_name]}" \
-              "false"
+              "${ISP4_OUT[$name]}" \
+              false
           done
 
+          echo
           echo "========================================"
           echo "Operator IPv6"
           echo "========================================"
 
-          declare -A ISP_V6=(
+          declare -A ISP6=(
             [China_Telecom6]="chinanet6.txt"
             [China_Unicom6]="unicom6.txt"
             [China_Mobile6]="cmcc6.txt"
@@ -311,7 +374,7 @@ jobs:
             [CSTNET6]="cstnet6.txt"
           )
 
-          declare -A ISP_V6_OUTPUT=(
+          declare -A ISP6_OUT=(
             [China_Telecom6]="data/telecom6.rsc"
             [China_Unicom6]="data/unicom6.rsc"
             [China_Mobile6]="data/cmcc6.rsc"
@@ -319,53 +382,172 @@ jobs:
             [CSTNET6]="data/cstnet6.rsc"
           )
 
-          for list_name in "${!ISP_V6[@]}"; do
-            source="$WORKDIR/${list_name}.txt"
-            final="$WORKDIR/${list_name}.final"
+          declare -A ISP6_MIN=(
+            [China_Telecom6]=500
+            [China_Unicom6]=800
+            [China_Mobile6]=50
+            [CERNET6]=30
+            [CSTNET6]=1
+          )
+
+          declare -A ISP6_MAX=(
+            [China_Telecom6]=1500
+            [China_Unicom6]=2000
+            [China_Mobile6]=500
+            [CERNET6]=300
+            [CSTNET6]=100
+          )
+
+          for name in \
+            China_Telecom6 \
+            China_Unicom6 \
+            China_Mobile6 \
+            CERNET6 \
+            CSTNET6
+          do
+            source="$WORKDIR/${name}.txt"
+            final="$WORKDIR/${name}.final"
 
             download \
-              "$BASE_GAOYIFAN/${ISP_V6[$list_name]}" \
+              "$GAOYIFAN/${ISP6[$name]}" \
               "$source"
 
-            parse_and_merge \
+            normalize \
               "$source" \
               "$final" \
-              "ipv6" \
-              "$list_name" \
-              1
+              ipv6 \
+              "$name" \
+              "${ISP6_MIN[$name]}" \
+              "${ISP6_MAX[$name]}"
 
             export_rsc \
-              "$list_name" \
+              "$name" \
               "$final" \
-              "${ISP_V6_OUTPUT[$list_name]}" \
-              "true"
+              "${ISP6_OUT[$name]}" \
+              true
           done
 
+          echo
           echo "========================================"
-          echo "Final statistics"
+          echo "DRPENG IPv6"
+          echo "========================================"
+
+          rm -f data/drpeng6.rsc
+
+          echo "DRPENG6 skipped: upstream IPv6 source is unavailable."
+
+          echo
+          echo "========================================"
+          echo "Remove unsupported lists"
+          echo "========================================"
+
+          rm -f \
+            data/cbnnet.rsc \
+            data/cbnnet6.rsc \
+            data/cietnet.rsc \
+            data/cietnet6.rsc
+
+          echo
+          echo "========================================"
+          echo "Generated files"
           echo "========================================"
 
           for file in data/*.rsc; do
             count=$(grep -c '^add list=' "$file" || true)
-            echo "$(basename "$file"): $count entries"
+            printf '%-20s %6d prefixes\n' \
+              "$(basename "$file")" \
+              "$count"
           done
+
+      - name: Validate generated files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          required=(
+            data/cn.rsc
+            data/cn6.rsc
+
+            data/telecom.rsc
+            data/telecom6.rsc
+
+            data/unicom.rsc
+            data/unicom6.rsc
+
+            data/cmcc.rsc
+            data/cmcc6.rsc
+
+            data/cernet.rsc
+            data/cernet6.rsc
+
+            data/cstnet.rsc
+            data/cstnet6.rsc
+
+            data/drpeng.rsc
+          )
+
+          for file in "${required[@]}"; do
+            if [ ! -s "$file" ]; then
+              echo "ERROR: missing or empty $file"
+              exit 1
+            fi
+          done
+
+          if grep -RniE \
+            '(^|address=)(0\.0\.0\.0/0|::/0|127\.0\.0\.0/8|::1/128|224\.0\.0\.0/4|ff00::/8)' \
+            data/*.rsc
+          then
+            echo "ERROR: invalid special/catch-all prefix detected"
+            exit 1
+          fi
+
+          if grep -RniE \
+            '(^|address=)(192\.168\.0\.0/16|fc00::/7|fe80::/10)' \
+            data/*.rsc
+          then
+            echo "ERROR: unexpected private/link-local prefix detected"
+            exit 1
+          fi
+
+          if ! grep -q 'address=10.10.10.0/25' data/cn.rsc; then
+            echo "ERROR: 10.10.10.0/25 missing from CN"
+            exit 1
+          fi
+
+          if ! grep -q 'address=172.16.100.0/28' data/cn.rsc; then
+            echo "ERROR: 172.16.100.0/28 missing from CN"
+            exit 1
+          fi
+
+          if grep -RniE \
+            'address=(10\.0\.0\.0/8|172\.16\.0\.0/12|192\.168\.0\.0/16)' \
+            data/*.rsc
+          then
+            echo "ERROR: unexpected RFC1918 aggregate detected"
+            exit 1
+          fi
+
+          echo "Validation passed."
 
       - name: Commit and Push
         shell: bash
         run: |
           set -euo pipefail
 
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
+          git config --local user.email \
+            "github-actions[bot]@users.noreply.github.com"
+
+          git config --local user.name \
+            "github-actions[bot]"
 
           git add data/*.rsc
 
           if git diff --cached --quiet; then
-            echo "No changes"
+            echo "No changes."
             exit 0
           fi
 
           git commit \
-            -m "Update IP lists $(date +%Y-%m-%d)"
+            -m "Update MikroTik IP lists $(date +%Y-%m-%d)"
 
           git push origin main
