@@ -68,7 +68,7 @@ jobs:
               exit 1
             fi
 
-            echo "OK: $name = $count prefixes"
+            echo "OK: $name source = $count prefixes"
           }
 
           normalize_and_merge() {
@@ -110,9 +110,6 @@ jobs:
                       continue
 
                   if family == "ipv6" and net.version != 6:
-                      continue
-
-                  if net.is_private:
                       continue
 
                   if net.is_loopback:
@@ -285,6 +282,15 @@ jobs:
             [DRPENG]="drpeng.txt"
           )
 
+          declare -A ISP_V4_MIN=(
+            [China_Telecom]=100
+            [China_Unicom]=100
+            [China_Mobile]=50
+            [CERNET]=10
+            [CSTNET]=1
+            [DRPENG]=1
+          )
+
           for list_name in "${!ISP_V4[@]}"; do
             source_file="$WORKDIR/${list_name}.raw"
             final_file="$WORKDIR/${list_name}.final"
@@ -296,8 +302,8 @@ jobs:
 
             validate_source \
               "$source_file" \
-              20 \
-              "$list_name source" \
+              "${ISP_V4_MIN[$list_name]}" \
+              "$list_name" \
               "ipv4"
 
             normalize_and_merge \
@@ -307,7 +313,7 @@ jobs:
 
             validate_final \
               "$final_file" \
-              20 \
+              "${ISP_V4_MIN[$list_name]}" \
               "$list_name"
 
             case "$list_name" in
@@ -351,6 +357,15 @@ jobs:
             [DRPENG6]="drpeng6.txt"
           )
 
+          declare -A ISP_V6_MIN=(
+            [China_Telecom6]=50
+            [China_Unicom6]=50
+            [China_Mobile6]=20
+            [CERNET6]=5
+            [CSTNET6]=1
+            [DRPENG6]=1
+          )
+
           for list_name in "${!ISP_V6[@]}"; do
             source_file="$WORKDIR/${list_name}.raw"
             final_file="$WORKDIR/${list_name}.final"
@@ -362,8 +377,8 @@ jobs:
 
             validate_source \
               "$source_file" \
-              10 \
-              "$list_name source" \
+              "${ISP_V6_MIN[$list_name]}" \
+              "$list_name" \
               "ipv6"
 
             normalize_and_merge \
@@ -373,7 +388,7 @@ jobs:
 
             validate_final \
               "$final_file" \
-              10 \
+              "${ISP_V6_MIN[$list_name]}" \
               "$list_name"
 
             case "$list_name" in
