@@ -22,6 +22,7 @@ jobs:
           set -euo pipefail
 
           mkdir -p data
+
           WORKDIR="$(mktemp -d)"
           trap 'rm -rf "$WORKDIR"' EXIT
 
@@ -45,8 +46,9 @@ jobs:
 
           validate_source() {
             local file="$1"
-            local min_lines="$2"
+            local min_count="$2"
             local name="$3"
+            local family="$4"
 
             if [ ! -s "$file" ]; then
               echo "ERROR: $name is empty"
@@ -54,10 +56,15 @@ jobs:
             fi
 
             local count
-            count=$(grep -Ec '^[[:space:]]*([0-9]{1,3}\.){3}[0-9]{1,3}(/[0-9]{1,2})?[[:space:]]*$|^[[:space:]]*[0-9A-Fa-f:]+(/[0-9]{1,3})?[[:space:]]*$' "$file" || true)
 
-            if [ "$count" -lt "$min_lines" ]; then
-              echo "ERROR: $name contains only $count valid-looking prefixes, minimum is $min_lines"
+            if [ "$family" = "ipv4" ]; then
+              count=$(grep -Ec '^[[:space:]]*([0-9]{1,3}\.){3}[0-9]{1,3}(/[0-9]{1,2})?[[:space:]]*$' "$file" || true)
+            else
+              count=$(grep -Ec '^[[:space:]]*[0-9A-Fa-f:]+(/[0-9]{1,3})?[[:space:]]*$' "$file" || true)
+            fi
+
+            if [ "$count" -lt "$min_count" ]; then
+              echo "ERROR: $name contains only $count valid prefixes, minimum is $min_count"
               exit 1
             fi
 
@@ -77,7 +84,7 @@ jobs:
           dst = sys.argv[2]
           family = sys.argv[3]
 
-          nets = []
+          networks = []
 
           with open(src, "r", encoding="utf-8", errors="ignore") as f:
               for raw in f:
@@ -91,6 +98,9 @@ jobs:
 
                   line = line.split("#", 1)[0].strip()
 
+                  if not line:
+                      continue
+
                   try:
                       net = ipaddress.ip_network(line, strict=False)
                   except ValueError:
@@ -102,24 +112,33 @@ jobs:
                   if family == "ipv6" and net.version != 6:
                       continue
 
-                  if net.is_private or net.is_loopback or net.is_link_local or net.is_multicast:
+                  if net.is_private:
                       continue
 
-                  nets.append(net)
+                  if net.is_loopback:
+                      continue
 
-          merged = list(ipaddress.collapse_addresses(nets))
+                  if net.is_link_local:
+                      continue
+
+                  if net.is_multicast:
+                      continue
+
+                  networks.append(net)
+
+          networks = list(ipaddress.collapse_addresses(networks))
 
           with open(dst, "w", encoding="utf-8") as f:
-              for net in merged:
-                  f.write(str(net) + "\n")
+              for network in networks:
+                  f.write(str(network) + "\n")
 
-          print(f"{dst}: {len(merged)} aggregated prefixes")
+          print(f"{dst}: {len(networks)} aggregated prefixes")
           PY
           }
 
           validate_final() {
             local file="$1"
-            local min_lines="$2"
+            local min_count="$2"
             local name="$3"
 
             if [ ! -s "$file" ]; then
@@ -130,8 +149,8 @@ jobs:
             local count
             count=$(wc -l < "$file")
 
-            if [ "$count" -lt "$min_lines" ]; then
-              echo "ERROR: final $name contains only $count prefixes, minimum is $min_lines"
+            if [ "$count" -lt "$min_count" ]; then
+              echo "ERROR: final $name contains only $count prefixes, minimum is $min_count"
               exit 1
             fi
 
@@ -144,41 +163,44 @@ jobs:
             local output="$3"
             local ipv6="$4"
 
-            local cmd="/ip firewall address-list"
+            local command="/ip firewall address-list"
 
             if [ "$ipv6" = "true" ]; then
-              cmd="/ipv6 firewall address-list"
+              command="/ipv6 firewall address-list"
             fi
 
-            python3 - "$list_name" "$input" "$output" "$cmd" << 'PY'
+            python3 - "$list_name" "$input" "$output" "$command" << 'PY'
           import sys
 
           list_name = sys.argv[1]
-          src = sys.argv[2]
-          dst = sys.argv[3]
-          cmd = sys.argv[4]
+          source = sys.argv[2]
+          output = sys.argv[3]
+          command = sys.argv[4]
 
-          with open(dst, "w", encoding="utf-8") as out:
-              out.write(f'{cmd} remove [find list="{list_name}"]\n')
-              out.write(f'{cmd}\n')
+          with open(output, "w", encoding="utf-8") as out:
+              out.write(f'{command} remove [find list="{list_name}"]\n')
+              out.write(f'{command}\n')
 
-              with open(src, "r", encoding="utf-8") as f:
+              with open(source, "r", encoding="utf-8") as f:
                   for line in f:
-                      ip = line.strip()
+                      address = line.strip()
 
-                      if not ip:
+                      if not address:
                           continue
 
-                      out.write(f'add list="{list_name}" address={ip}\n')
+                      out.write(
+                          f'add list="{list_name}" address={address}\n'
+                      )
           PY
           }
 
           echo "========================================"
-          echo " Download China mainland IPv4 sources"
+          echo "Download China mainland IPv4 sources"
           echo "========================================"
 
           CN_GAOYIFAN="$WORKDIR/china-gaoyifan.txt"
           CN_METOWOLF="$WORKDIR/china-metowolf.txt"
+          CN_LOCAL="$WORKDIR/local.txt"
           CN_RAW="$WORKDIR/cn.raw"
           CN_FINAL="$WORKDIR/cn.final"
 
@@ -190,10 +212,25 @@ jobs:
             "$BASE_METOWOLF/special/china.txt" \
             "$CN_METOWOLF"
 
-          validate_source "$CN_GAOYIFAN" 3000 "gaoyifan china IPv4"
-          validate_source "$CN_METOWOLF" 3000 "metowolf china IPv4"
+          validate_source \
+            "$CN_GAOYIFAN" \
+            3000 \
+            "gaoyifan china IPv4" \
+            "ipv4"
+
+          validate_source \
+            "$CN_METOWOLF" \
+            3000 \
+            "metowolf china IPv4" \
+            "ipv4"
+
+          printf '%s\n' \
+            "10.10.10.0/25" \
+            "172.16.100.0/28" \
+            > "$CN_LOCAL"
 
           cat \
+            "$CN_LOCAL" \
             "$CN_GAOYIFAN" \
             "$CN_METOWOLF" \
             > "$CN_RAW"
@@ -203,42 +240,40 @@ jobs:
             "$CN_FINAL" \
             "ipv4"
 
-          validate_final "$CN_FINAL" 3000 "CN"
+          validate_final \
+            "$CN_FINAL" \
+            3000 \
+            "CN"
 
           echo "========================================"
-          echo " Download China mainland IPv6 sources"
+          echo "Download China mainland IPv6 source"
           echo "========================================"
 
           CN6_GAOYIFAN="$WORKDIR/china6-gaoyifan.txt"
-          CN6_METOWOLF="$WORKDIR/china6-metowolf.txt"
-          CN6_RAW="$WORKDIR/cn6.raw"
           CN6_FINAL="$WORKDIR/cn6.final"
 
           download \
             "$BASE_GAOYIFAN/china6.txt" \
             "$CN6_GAOYIFAN"
 
-          download \
-            "$BASE_METOWOLF/special/china6.txt" \
-            "$CN6_METOWOLF"
-
-          validate_source "$CN6_GAOYIFAN" 500 "gaoyifan china IPv6"
-          validate_source "$CN6_METOWOLF" 500 "metowolf china IPv6"
-
-          cat \
+          validate_source \
             "$CN6_GAOYIFAN" \
-            "$CN6_METOWOLF" \
-            > "$CN6_RAW"
+            500 \
+            "gaoyifan china IPv6" \
+            "ipv6"
 
           normalize_and_merge \
-            "$CN6_RAW" \
+            "$CN6_GAOYIFAN" \
             "$CN6_FINAL" \
             "ipv6"
 
-          validate_final "$CN6_FINAL" 500 "CN6"
+          validate_final \
+            "$CN6_FINAL" \
+            500 \
+            "CN6"
 
           echo "========================================"
-          echo " Download operator IPv4 lists"
+          echo "Download operator IPv4 lists"
           echo "========================================"
 
           declare -A ISP_V4=(
@@ -250,15 +285,6 @@ jobs:
             [DRPENG]="drpeng.txt"
           )
 
-          declare -A ISP_V6=(
-            [China_Telecom6]="chinanet6.txt"
-            [China_Unicom6]="unicom6.txt"
-            [China_Mobile6]="cmcc6.txt"
-            [CERNET6]="cernet6.txt"
-            [CSTNET6]="cstnet6.txt"
-            [DRPENG6]="drpeng6.txt"
-          )
-
           for list_name in "${!ISP_V4[@]}"; do
             source_file="$WORKDIR/${list_name}.raw"
             final_file="$WORKDIR/${list_name}.final"
@@ -268,16 +294,42 @@ jobs:
               "$BASE_GAOYIFAN/$source_name" \
               "$source_file"
 
-            validate_source "$source_file" 20 "$list_name source"
+            validate_source \
+              "$source_file" \
+              20 \
+              "$list_name source" \
+              "ipv4"
 
             normalize_and_merge \
               "$source_file" \
               "$final_file" \
               "ipv4"
 
-            validate_final "$final_file" 20 "$list_name"
+            validate_final \
+              "$final_file" \
+              20 \
+              "$list_name"
 
-            output="data/$(echo "$list_name" | tr '[:upper:]' '[:lower:]' | sed 's/china_//; s/6$//').rsc"
+            case "$list_name" in
+              China_Telecom)
+                output="data/telecom.rsc"
+                ;;
+              China_Unicom)
+                output="data/unicom.rsc"
+                ;;
+              China_Mobile)
+                output="data/cmcc.rsc"
+                ;;
+              CERNET)
+                output="data/cernet.rsc"
+                ;;
+              CSTNET)
+                output="data/cstnet.rsc"
+                ;;
+              DRPENG)
+                output="data/drpeng.rsc"
+                ;;
+            esac
 
             export_rsc \
               "$list_name" \
@@ -285,6 +337,19 @@ jobs:
               "$output" \
               "false"
           done
+
+          echo "========================================"
+          echo "Download operator IPv6 lists"
+          echo "========================================"
+
+          declare -A ISP_V6=(
+            [China_Telecom6]="chinanet6.txt"
+            [China_Unicom6]="unicom6.txt"
+            [China_Mobile6]="cmcc6.txt"
+            [CERNET6]="cernet6.txt"
+            [CSTNET6]="cstnet6.txt"
+            [DRPENG6]="drpeng6.txt"
+          )
 
           for list_name in "${!ISP_V6[@]}"; do
             source_file="$WORKDIR/${list_name}.raw"
@@ -295,16 +360,42 @@ jobs:
               "$BASE_GAOYIFAN/$source_name" \
               "$source_file"
 
-            validate_source "$source_file" 10 "$list_name source"
+            validate_source \
+              "$source_file" \
+              10 \
+              "$list_name source" \
+              "ipv6"
 
             normalize_and_merge \
               "$source_file" \
               "$final_file" \
               "ipv6"
 
-            validate_final "$final_file" 10 "$list_name"
+            validate_final \
+              "$final_file" \
+              10 \
+              "$list_name"
 
-            output="data/$(echo "$list_name" | tr '[:upper:]' '[:lower:]' | sed 's/china_//').rsc"
+            case "$list_name" in
+              China_Telecom6)
+                output="data/telecom6.rsc"
+                ;;
+              China_Unicom6)
+                output="data/unicom6.rsc"
+                ;;
+              China_Mobile6)
+                output="data/cmcc6.rsc"
+                ;;
+              CERNET6)
+                output="data/cernet6.rsc"
+                ;;
+              CSTNET6)
+                output="data/cstnet6.rsc"
+                ;;
+              DRPENG6)
+                output="data/drpeng6.rsc"
+                ;;
+            esac
 
             export_rsc \
               "$list_name" \
@@ -314,7 +405,7 @@ jobs:
           done
 
           echo "========================================"
-          echo " Generate CN / CN6"
+          echo "Generate CN / CN6"
           echo "========================================"
 
           export_rsc \
@@ -330,11 +421,12 @@ jobs:
             "true"
 
           echo "========================================"
-          echo " Final statistics"
+          echo "Final statistics"
           echo "========================================"
 
           for file in data/*.rsc; do
-            echo "$(basename "$file"): $(grep -c '^add list=' "$file") entries"
+            count=$(grep -c '^add list=' "$file" || true)
+            echo "$(basename "$file"): $count entries"
           done
 
       - name: Commit and Push
