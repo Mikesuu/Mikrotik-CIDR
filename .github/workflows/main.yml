@@ -29,6 +29,7 @@ jobs:
           GAOYIFAN="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
           METOWOLF="https://metowolf.github.io/iplist/data"
           MON17="https://raw.githubusercontent.com/17mon/china_ip_list/master"
+          ASN_CHINA="https://raw.githubusercontent.com/missuo/ASN-China/main"
 
           download() {
             local url="$1"
@@ -123,7 +124,6 @@ jobs:
               sys.exit(1)
 
           merged = list(ipaddress.collapse_addresses(networks))
-
           count = len(merged)
 
           if count < minimum:
@@ -175,6 +175,38 @@ jobs:
               done < "$input"
             } > "$output"
           }
+
+          echo
+          echo "========================================"
+          echo "Download ASN Cross Check"
+          echo "========================================"
+
+          ASN_RAW="$WORKDIR/asn-china-ipv4.txt"
+
+          download \
+            "$ASN_CHINA/IPv4.China.list" \
+            "$ASN_RAW"
+
+          ASN_COUNT=$(source_count "$ASN_RAW")
+
+          echo "ASN-China IPv4 source=$ASN_COUNT"
+
+          if [ "$ASN_COUNT" -lt 5000 ] || [ "$ASN_COUNT" -gt 50000 ]; then
+            echo "ERROR: abnormal ASN-China IPv4 source size"
+            exit 1
+          fi
+
+          normalize \
+            "$ASN_RAW" \
+            "$WORKDIR/asn-china.final" \
+            ipv4 \
+            ASN-China \
+            5000 \
+            50000
+
+          ASN_FINAL="$WORKDIR/asn-china.final"
+
+          echo "ASN-China prefixes: $(wc -l < "$ASN_FINAL")"
 
           echo
           echo "========================================"
@@ -243,7 +275,109 @@ jobs:
 
           CN_COUNT=$(wc -l < "$CN_FINAL")
 
-          echo "OK: final CN = $CN_COUNT prefixes"
+          echo "CN final prefixes: $CN_COUNT"
+
+          echo
+          echo "========================================"
+          echo "CN ASN Cross Check"
+          echo "========================================"
+
+          python3 \
+            "$CN_FINAL" \
+            "$ASN_FINAL" \
+            "$WORKDIR/cn-unknown.txt" \
+            "$WORKDIR/cn-confirmed.txt" <<'PY'
+          import sys
+          import ipaddress
+
+          cn_file = sys.argv[1]
+          asn_file = sys.argv[2]
+          unknown_file = sys.argv[3]
+          confirmed_file = sys.argv[4]
+
+          def load(path):
+              result = []
+
+              with open(path, encoding="utf-8", errors="ignore") as f:
+                  for line in f:
+                      line = line.strip()
+
+                      if not line:
+                          continue
+
+                      try:
+                          result.append(ipaddress.ip_network(line, strict=False))
+                      except ValueError:
+                          pass
+
+              return result
+
+          cn = load(cn_file)
+          asn = load(asn_file)
+
+          confirmed = 0
+          unknown = 0
+
+          with open(unknown_file, "w") as u, \
+               open(confirmed_file, "w") as c:
+
+              for net in cn:
+                  matched = False
+
+                  for other in asn:
+                      if net.subnet_of(other) or other.subnet_of(net):
+                          matched = True
+                          break
+
+                  if matched:
+                      confirmed += 1
+                      c.write(str(net) + "\n")
+                  else:
+                      unknown += 1
+                      u.write(str(net) + "\n")
+
+          total = confirmed + unknown
+
+          coverage = (confirmed / total * 100) if total else 0
+
+          print(f"CN total={total}")
+          print(f"ASN confirmed={confirmed}")
+          print(f"ASN unconfirmed={unknown}")
+          print(f"ASN coverage={coverage:.2f}%")
+
+          if coverage < 85:
+              print("ERROR: CN ASN coverage below 85%")
+              sys.exit(1)
+          PY
+
+          CN_ASN_CONFIRMED=$(wc -l < "$WORKDIR/cn-confirmed.txt")
+          CN_ASN_UNKNOWN=$(wc -l < "$WORKDIR/cn-unknown.txt")
+
+          CN_ASN_COVERAGE=$(python3 \
+            "$CN_COUNT" \
+            "$CN_ASN_CONFIRMED" <<'PY'
+          import sys
+
+          total = int(sys.argv[1])
+          confirmed = int(sys.argv[2])
+
+          if total == 0:
+              print("0.00")
+          else:
+              print(f"{confirmed / total * 100:.2f}")
+          PY
+          )
+
+          echo "CN total        = $CN_COUNT"
+          echo "ASN confirmed   = $CN_ASN_CONFIRMED"
+          echo "ASN unconfirmed = $CN_ASN_UNKNOWN"
+          echo "ASN coverage    = ${CN_ASN_COVERAGE}%"
+
+          if [ "$CN_ASN_UNKNOWN" -gt 0 ]; then
+            echo
+            echo "Unconfirmed CN prefixes:"
+            head -50 "$WORKDIR/cn-unknown.txt"
+          fi
 
           export_rsc \
             CN \
@@ -280,15 +414,13 @@ jobs:
             800 \
             3000
 
-          CN6_COUNT=$(wc -l < "$CN6_FINAL")
-
-          echo "OK: final CN6 = $CN6_COUNT prefixes"
-
           export_rsc \
             CN6 \
             "$CN6_FINAL" \
             data/cn6.rsc \
             true
+
+          echo "CN6 prefixes: $(wc -l < "$CN6_FINAL")"
 
           echo
           echo "========================================"
@@ -359,6 +491,8 @@ jobs:
               "$final" \
               "${ISP4_OUT[$name]}" \
               false
+
+            echo "$name prefixes: $(wc -l < "$final")"
           done
 
           echo
@@ -425,6 +559,8 @@ jobs:
               "$final" \
               "${ISP6_OUT[$name]}" \
               true
+
+            echo "$name prefixes: $(wc -l < "$final")"
           done
 
           echo
@@ -434,22 +570,23 @@ jobs:
 
           rm -f data/drpeng6.rsc
 
-          echo "DRPENG6 skipped: upstream IPv6 source is unavailable."
+          echo "DRPENG6 skipped."
 
           echo
           echo "========================================"
-          echo "Remove unsupported lists"
+          echo "Remove Unsupported Lists"
           echo "========================================"
 
           rm -f \
             data/cbnnet.rsc \
             data/cbnnet6.rsc \
             data/cietnet.rsc \
-            data/cietnet6.rsc
+            data/cietnet6.rsc \
+            data/drpeng6.rsc
 
           echo
           echo "========================================"
-          echo "Generated files"
+          echo "Generated Files"
           echo "========================================"
 
           for file in data/*.rsc; do
@@ -494,7 +631,7 @@ jobs:
           done
 
           if grep -RniE \
-            '(^|address=)(0\.0\.0\.0/0|::/0|127\.0\.0\.0/8|::1/128|224\.0\.0\.0/4|ff00::/8)' \
+            'address=(0\.0\.0\.0/0|::/0|127\.0\.0\.0/8|::1/128|224\.0\.0\.0/4|ff00::/8)' \
             data/*.rsc
           then
             echo "ERROR: invalid special/catch-all prefix detected"
@@ -502,10 +639,18 @@ jobs:
           fi
 
           if grep -RniE \
-            '(^|address=)(192\.168\.0\.0/16|fc00::/7|fe80::/10)' \
+            'address=(192\.168\.0\.0/16|fc00::/7|fe80::/10)' \
             data/*.rsc
           then
             echo "ERROR: unexpected private/link-local prefix detected"
+            exit 1
+          fi
+
+          if grep -RniE \
+            'address=(10\.0\.0\.0/8|172\.16\.0\.0/12|192\.168\.0\.0/16)' \
+            data/*.rsc
+          then
+            echo "ERROR: unexpected RFC1918 aggregate detected"
             exit 1
           fi
 
@@ -519,11 +664,16 @@ jobs:
             exit 1
           fi
 
+          if ! grep -q 'add list="CN6" address=' data/cn6.rsc; then
+            echo "ERROR: CN6 contains no IPv6 prefix"
+            exit 1
+          fi
+
           if grep -RniE \
-            'address=(10\.0\.0\.0/8|172\.16\.0\.0/12|192\.168\.0\.0/16)' \
+            'address=(10\.|172\.16\.|192\.168\.)' \
             data/*.rsc
           then
-            echo "ERROR: unexpected RFC1918 aggregate detected"
+            echo "ERROR: private IPv4 prefix detected"
             exit 1
           fi
 
