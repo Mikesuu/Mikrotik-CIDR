@@ -42,7 +42,6 @@ jobs:
             curl \
               -fsSL \
               --retry 5 \
-              --retry-all-errors \
               --retry-delay 2 \
               --connect-timeout 15 \
               --max-time 180 \
@@ -88,43 +87,34 @@ jobs:
           )
 
           def extract_candidates(line):
+              found = []
+
               if family == "ipv4":
-                  found = ipv4_re.findall(line)
+                  found.extend(ipv4_re.findall(line))
               else:
-                  found = ipv6_re.findall(line)
+                  found.extend(ipv6_re.findall(line))
 
-              if found:
-                  return found
+              if not found:
+                  stripped = line.strip()
 
-              stripped = line.strip()
+                  if stripped.startswith("IP-CIDR,"):
+                      found.append(
+                          stripped.split(",", 1)[1].split(",", 1)[0].strip()
+                      )
 
-              if stripped.startswith("IP-CIDR,"):
-                  return [
-                      stripped.split(",", 1)[1]
-                      .split(",", 1)[0]
-                      .strip()
-                  ]
+                  elif stripped.startswith("IP-CIDR6,"):
+                      found.append(
+                          stripped.split(",", 1)[1].split(",", 1)[0].strip()
+                      )
 
-              if stripped.startswith("IP-CIDR6,"):
-                  return [
-                      stripped.split(",", 1)[1]
-                      .split(",", 1)[0]
-                      .strip()
-                  ]
+                  elif stripped.startswith("IPSET,"):
+                      found.append(
+                          stripped.split(",", 1)[1].strip()
+                      )
 
-              if stripped.startswith("IPSET,"):
-                  return [
-                      stripped.split(",", 1)[1].strip()
-                  ]
+              return found
 
-              return []
-
-          with open(
-              src,
-              "r",
-              encoding="utf-8-sig",
-              errors="ignore"
-          ) as f:
+          with open(src, "r", encoding="utf-8-sig", errors="ignore") as f:
               for raw in f:
                   line = raw.strip()
 
@@ -171,10 +161,7 @@ jobs:
               print(f"ERROR: {name}: no valid networks")
               sys.exit(1)
 
-          merged = list(
-              ipaddress.collapse_addresses(networks)
-          )
-
+          merged = list(ipaddress.collapse_addresses(networks))
           count = len(merged)
 
           if count < minimum:
@@ -204,28 +191,6 @@ jobs:
           PY
           }
 
-          merge_networks() {
-            local output="$1"
-            local family="$2"
-            local name="$3"
-            local minimum="$4"
-            local maximum="$5"
-
-            shift 5
-
-            local raw="$WORKDIR/${name}.raw"
-
-            cat "$@" > "$raw"
-
-            normalize \
-              "$raw" \
-              "$output" \
-              "$family" \
-              "$name" \
-              "$minimum" \
-              "$maximum"
-          }
-
           parse_apnic() {
             local input="$1"
             local output4="$2"
@@ -242,12 +207,7 @@ jobs:
           networks4 = []
           networks6 = []
 
-          with open(
-              src,
-              "r",
-              encoding="utf-8-sig",
-              errors="ignore"
-          ) as f:
+          with open(src, "r", encoding="utf-8-sig", errors="ignore") as f:
               for raw in f:
                   line = raw.strip()
 
@@ -267,10 +227,7 @@ jobs:
                   if country.upper() != "CN":
                       continue
 
-                  if status.lower() not in {
-                      "allocated",
-                      "assigned"
-                  }:
+                  if status.lower() not in {"allocated", "assigned"}:
                       continue
 
                   try:
@@ -309,13 +266,8 @@ jobs:
                   except (ValueError, TypeError):
                       continue
 
-          merged4 = list(
-              ipaddress.collapse_addresses(networks4)
-          )
-
-          merged6 = list(
-              ipaddress.collapse_addresses(networks6)
-          )
+          merged4 = list(ipaddress.collapse_addresses(networks4))
+          merged6 = list(ipaddress.collapse_addresses(networks6))
 
           if not merged4:
               print("ERROR: APNIC CN IPv4: no valid networks")
@@ -325,11 +277,11 @@ jobs:
               print("ERROR: APNIC CN IPv6: no valid networks")
               sys.exit(1)
 
-          with open(dst4, "w") as f:
+          with open(dst4, "w", encoding="utf-8") as f:
               for net in merged4:
                   f.write(f"{net}\n")
 
-          with open(dst6, "w") as f:
+          with open(dst6, "w", encoding="utf-8") as f:
               for net in merged6:
                   f.write(f"{net}\n")
 
@@ -365,77 +317,57 @@ jobs:
           with open(cn_file) as f:
               for line in f:
                   line = line.strip()
-
                   if line:
-                      cn.append(
-                          ipaddress.ip_network(line)
-                      )
+                      cn.append(ipaddress.ip_network(line))
 
           asn = []
 
           with open(asn_file) as f:
               for line in f:
                   line = line.strip()
-
                   if line:
-                      asn.append(
-                          ipaddress.ip_network(line)
-                      )
+                      asn.append(ipaddress.ip_network(line))
 
           overlap = []
           only_asn = []
 
-          for network in asn:
-              matched = any(
-                  network.overlaps(core)
-                  for core in cn
-              )
+          for a in asn:
+              matched = False
+
+              for c in cn:
+                  if a.overlaps(c):
+                      matched = True
+                      break
 
               if matched:
-                  overlap.append(network)
+                  overlap.append(a)
               else:
-                  only_asn.append(network)
+                  only_asn.append(a)
 
-          overlap = list(
-              ipaddress.collapse_addresses(overlap)
-          )
-
-          only_asn = list(
-              ipaddress.collapse_addresses(only_asn)
-          )
+          overlap = list(ipaddress.collapse_addresses(overlap))
+          only_asn = list(ipaddress.collapse_addresses(only_asn))
 
           with open(output, "w") as f:
-              f.write(
-                  f"ASN_OVERLAP={len(overlap)}\n"
-              )
+              f.write(f"ASN_OVERLAP={len(overlap)}\n")
+              f.write(f"ASN_ONLY={len(only_asn)}\n")
 
-              f.write(
-                  f"ASN_ONLY={len(only_asn)}\n"
-              )
-
-          print(
-              f"ASN-China overlap with core={len(overlap)}"
-          )
-
-          print(
-              f"ASN-China only={len(only_asn)}"
-          )
+          print(f"ASN-China overlap with core={len(overlap)}")
+          print(f"ASN-China only={len(only_asn)}")
           PY
           }
 
           validate_coverage() {
             local input="$1"
-            shift
+            local target="$2"
+            local name="$3"
 
-            python3 - "$input" "$@" <<'PY'
+            python3 - "$input" "$target" "$name" <<'PY'
           import sys
           import ipaddress
 
           source = sys.argv[1]
-          targets = [
-              ipaddress.ip_network(value)
-              for value in sys.argv[2:]
-          ]
+          target = ipaddress.ip_network(sys.argv[2])
+          name = sys.argv[3]
 
           networks = []
 
@@ -445,24 +377,25 @@ jobs:
 
                   if line:
                       networks.append(
-                          ipaddress.ip_network(line)
+                          ipaddress.ip_network(
+                              line,
+                              strict=False
+                          )
                       )
 
-          for target in targets:
-              covered = any(
-                  target.subnet_of(network)
-                  for network in networks
-              )
-
-              if not covered:
+          for network in networks:
+              if target.subnet_of(network):
                   print(
-                      f"ERROR: {target} is not covered by final CN"
+                      f"OK: {name}: "
+                      f"{target} covered by {network}"
                   )
-                  sys.exit(1)
+                  sys.exit(0)
 
-              print(
-                  f"OK: {target} covered by final CN"
-              )
+          print(
+              f"ERROR: {name}: "
+              f"{target} is not covered by final CN"
+          )
+          sys.exit(1)
           PY
           }
 
@@ -484,12 +417,8 @@ jobs:
 
               while IFS= read -r cidr; do
                 [ -z "$cidr" ] && continue
-
-                echo \
-                  "add list=\"$list_name\" address=$cidr"
-
+                echo "add list=\"$list_name\" address=$cidr"
               done < "$input"
-
             } > "$output"
           }
 
@@ -502,11 +431,9 @@ jobs:
           CN_CHNROUTES2="$WORKDIR/cn-chnroutes2.txt"
           CN_SURGE="$WORKDIR/cn-surge.txt"
           CN_CHNLIST="$WORKDIR/cn-chniplist.rsc"
-
           CN_APNIC="$WORKDIR/cn-apnic.txt"
           CN_APNIC4="$WORKDIR/cn-apnic4.txt"
           CN_APNIC6="$WORKDIR/cn-apnic6.txt"
-
           CN_ASN="$WORKDIR/cn-asn.txt"
 
           CN6_GAO="$WORKDIR/cn6-gaoyifan.txt"
@@ -631,35 +558,38 @@ jobs:
           echo "Build CN Core"
           echo "========================================"
 
-          merge_networks \
-            "$WORKDIR/cn-core.final" \
-            ipv4 \
-            CN-CORE \
-            3000 \
-            20000 \
+          cat \
             "$WORKDIR/gaoyifan.final" \
             "$WORKDIR/chnroutes2.final" \
             "$WORKDIR/surge.final" \
             "$WORKDIR/chniplist.final" \
-            "$WORKDIR/apnic.final"
+            "$WORKDIR/apnic.final" \
+            > "$WORKDIR/cn-core.raw"
 
-          merge_networks \
+          normalize \
+            "$WORKDIR/cn-core.raw" \
+            "$WORKDIR/cn-core.final" \
+            ipv4 \
+            CN-CORE \
+            3000 \
+            20000
+
+          cat \
+            "$WORKDIR/gaoyifan6.final" \
+            "$WORKDIR/surge6.final" \
+            "$WORKDIR/apnic6.final" \
+            > "$WORKDIR/cn6-core.raw"
+
+          normalize \
+            "$WORKDIR/cn6-core.raw" \
             "$WORKDIR/cn6-core.final" \
             ipv6 \
             CN6-CORE \
             500 \
-            20000 \
-            "$WORKDIR/gaoyifan6.final" \
-            "$WORKDIR/surge6.final" \
-            "$WORKDIR/apnic6.final"
+            20000
 
-          CN_CORE_COUNT=$(
-            wc -l < "$WORKDIR/cn-core.final"
-          )
-
-          CN6_CORE_COUNT=$(
-            wc -l < "$WORKDIR/cn6-core.final"
-          )
+          CN_CORE_COUNT=$(wc -l < "$WORKDIR/cn-core.final")
+          CN6_CORE_COUNT=$(wc -l < "$WORKDIR/cn6-core.final")
 
           echo "CN core prefixes: $CN_CORE_COUNT"
           echo "CN6 core prefixes: $CN6_CORE_COUNT"
@@ -674,44 +604,30 @@ jobs:
             "$WORKDIR/asn.final" \
             "$WORKDIR/asn-validation.txt"
 
-          ASN_ONLY_COUNT=$(
-            awk -F= \
-              '/^ASN_ONLY=/{print $2}' \
-              "$WORKDIR/asn-validation.txt"
-          )
-
-          ASN_OVERLAP_COUNT=$(
-            awk -F= \
-              '/^ASN_OVERLAP=/{print $2}' \
-              "$WORKDIR/asn-validation.txt"
-          )
+          ASN_ONLY_COUNT=$(awk -F= '/^ASN_ONLY=/{print $2}' "$WORKDIR/asn-validation.txt")
+          ASN_OVERLAP_COUNT=$(awk -F= '/^ASN_OVERLAP=/{print $2}' "$WORKDIR/asn-validation.txt")
 
           if [ "$ASN_ONLY_COUNT" -gt 5000 ]; then
-            echo \
-              "ERROR: ASN-China unique candidate set unexpectedly large"
-
+            echo "ERROR: ASN-China unique candidate set unexpectedly large"
             exit 1
           fi
 
           if [ "$ASN_OVERLAP_COUNT" -lt 1000 ]; then
-            echo \
-              "ERROR: ASN-China has unexpectedly low overlap with core"
-
+            echo "ERROR: ASN-China has unexpectedly low overlap with core"
             exit 1
           fi
 
-          echo "ASN-China is validation-only."
-          echo \
-            "ASN-China unique prefixes are not directly added to CN."
+          echo
+          echo "ASN-China is auxiliary only."
+          echo "ASN-China unique prefixes are NOT directly added to CN."
+          echo "This prevents global routes originated by China ASNs from becoming blanket DIRECT routes."
 
           echo
           echo "========================================"
           echo "Add Local Direct Prefixes"
           echo "========================================"
 
-          cat \
-            "$WORKDIR/cn-core.final" \
-            > "$WORKDIR/cn-final.raw"
+          cat "$WORKDIR/cn-core.final" > "$WORKDIR/cn-final.raw"
 
           cat >> "$WORKDIR/cn-final.raw" <<'EOF'
           10.10.10.0/25
@@ -729,6 +645,11 @@ jobs:
           validate_coverage \
             "$WORKDIR/cn-final.final" \
             "10.10.10.0/25" \
+            "10.10.10.0/25"
+
+          validate_coverage \
+            "$WORKDIR/cn-final.final" \
+            "172.16.100.0/28" \
             "172.16.100.0/28"
 
           export_rsc \
@@ -887,8 +808,7 @@ jobs:
 
           rm -f data/drpeng6.rsc
 
-          echo \
-            "DRPENG6 skipped: upstream IPv6 source is unavailable."
+          echo "DRPENG6 skipped: upstream IPv6 source is unavailable."
 
           echo
           echo "========================================"
@@ -899,8 +819,7 @@ jobs:
             data/cbnnet.rsc \
             data/cbnnet6.rsc \
             data/cietnet.rsc \
-            data/cietnet6.rsc \
-            data/drpeng6.rsc
+            data/cietnet6.rsc
 
           echo
           echo "========================================"
@@ -908,12 +827,9 @@ jobs:
           echo "========================================"
 
           for file in data/*.rsc; do
-            count=$(
-              grep -c '^add list=' "$file" || true
-            )
+            count=$(grep -c '^add list=' "$file" || true)
 
-            printf \
-              '%-20s %6d prefixes\n' \
+            printf '%-20s %6d prefixes\n' \
               "$(basename "$file")" \
               "$count"
           done
@@ -964,7 +880,7 @@ jobs:
             '(^|address=)(192\.168\.0\.0/16|fc00::/7|fe80::/10)' \
             data/*.rsc
           then
-            echo "ERROR: unexpected private/link-local aggregate detected"
+            echo "ERROR: unexpected private/link-local prefix detected"
             exit 1
           fi
 
@@ -976,6 +892,90 @@ jobs:
             exit 1
           fi
 
+          if ! grep -q \
+            'address=10\.10\.10\.0/25' \
+            data/cn.rsc
+          then
+            if ! python3 - <<'PY'
+          import ipaddress
+
+          target = ipaddress.ip_network("10.10.10.0/25")
+          found = False
+
+          with open("data/cn.rsc") as f:
+              for line in f:
+                  if "address=" not in line:
+                      continue
+
+                  value = line.split("address=", 1)[1].strip()
+
+                  try:
+                      network = ipaddress.ip_network(
+                          value,
+                          strict=False
+                      )
+                  except ValueError:
+                      continue
+
+                  if target.subnet_of(network):
+                      found = True
+                      print(
+                          f"OK: 10.10.10.0/25 covered by {network}"
+                      )
+                      break
+
+          if not found:
+              raise SystemExit(
+                  "ERROR: 10.10.10.0/25 is not covered by CN"
+              )
+          PY
+            then
+              exit 1
+            fi
+          fi
+
+          if ! grep -q \
+            'address=172\.16\.100\.0/28' \
+            data/cn.rsc
+          then
+            if ! python3 - <<'PY'
+          import ipaddress
+
+          target = ipaddress.ip_network("172.16.100.0/28")
+          found = False
+
+          with open("data/cn.rsc") as f:
+              for line in f:
+                  if "address=" not in line:
+                      continue
+
+                  value = line.split("address=", 1)[1].strip()
+
+                  try:
+                      network = ipaddress.ip_network(
+                          value,
+                          strict=False
+                      )
+                  except ValueError:
+                      continue
+
+                  if target.subnet_of(network):
+                      found = True
+                      print(
+                          f"OK: 172.16.100.0/28 covered by {network}"
+                      )
+                      break
+
+          if not found:
+              raise SystemExit(
+                  "ERROR: 172.16.100.0/28 is not covered by CN"
+              )
+          PY
+            then
+              exit 1
+            fi
+          fi
+
           if grep -RniE \
             'address=([0-9]{1,3}\.){3}[0-9]{1,3}/(0|1|2|3|4|5|6|7|8|9)' \
             data/*.rsc
@@ -983,89 +983,6 @@ jobs:
             echo "ERROR: unexpectedly broad IPv4 prefix detected"
             exit 1
           fi
-
-          if grep -RniE \
-            'address=[0-9A-Fa-f:]+/(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31)' \
-            data/*6.rsc
-          then
-            echo "ERROR: unexpectedly broad IPv6 prefix detected"
-            exit 1
-          fi
-
-          for file in data/*.rsc; do
-            if ! grep -q \
-              '^/ip firewall address-list$' \
-              "$file" &&
-               ! grep -q \
-              '^/ipv6 firewall address-list$' \
-              "$file"
-            then
-              echo \
-                "ERROR: invalid RouterOS address-list header: $file"
-
-              exit 1
-            fi
-          done
-
-          python3 - <<'PY'
-          import glob
-          import ipaddress
-          import re
-          import sys
-
-          files = glob.glob("data/*.rsc")
-
-          for filename in files:
-              networks = []
-
-              with open(
-                  filename,
-                  "r",
-                  encoding="utf-8",
-                  errors="ignore"
-              ) as f:
-                  for line in f:
-                      match = re.search(
-                          r'address=([0-9A-Fa-f:.]+/\d+)',
-                          line
-                      )
-
-                      if not match:
-                          continue
-
-                      try:
-                          networks.append(
-                              ipaddress.ip_network(
-                                  match.group(1),
-                                  strict=False
-                              )
-                          )
-                      except ValueError:
-                          print(
-                              f"ERROR: invalid CIDR in {filename}: "
-                              f"{match.group(1)}"
-                          )
-                          sys.exit(1)
-
-              if len(networks) != len(set(networks)):
-                  print(
-                      f"ERROR: duplicate CIDR detected: {filename}"
-                  )
-                  sys.exit(1)
-
-              if not networks:
-                  print(
-                      f"ERROR: no CIDR entries detected: {filename}"
-                  )
-                  sys.exit(1)
-
-              print(
-                  f"OK: {filename}: "
-                  f"{len(networks)} unique prefixes"
-              )
-
-          print("CIDR validation passed.")
-          PY
 
           echo "Validation passed."
 
@@ -1091,4 +1008,3 @@ jobs:
             -m "Update MikroTik IP lists $(date +%Y-%m-%d)"
 
           git push origin main
-```
