@@ -1,131 +1,133 @@
-/ipv6 firewall address-list add list="cmcc6" address=2001:dc7:3::/48
-/ipv6 firewall address-list add list="cmcc6" address=2400:9020:f012::/47
-/ipv6 firewall address-list add list="cmcc6" address=2400:95e0::/48
-/ipv6 firewall address-list add list="cmcc6" address=2400:a860:1::/48
-/ipv6 firewall address-list add list="cmcc6" address=2400:a860:2::/47
-/ipv6 firewall address-list add list="cmcc6" address=2400:a860:4::/47
-/ipv6 firewall address-list add list="cmcc6" address=2400:a860:6::/48
-/ipv6 firewall address-list add list="cmcc6" address=2400:ae00:1981::/48
-/ipv6 firewall address-list add list="cmcc6" address=2400:ee00:ffec::/46
-/ipv6 firewall address-list add list="cmcc6" address=2400:ee00:fff0::/44
-/ipv6 firewall address-list add list="cmcc6" address=2401:1320::/32
-/ipv6 firewall address-list add list="cmcc6" address=2401:2a00:f000::/43
-/ipv6 firewall address-list add list="cmcc6" address=2401:8be0::/48
-/ipv6 firewall address-list add list="cmcc6" address=2401:9a00::/44
-/ipv6 firewall address-list add list="cmcc6" address=2401:9a00:10::/46
-/ipv6 firewall address-list add list="cmcc6" address=2401:c020:6::/48
-/ipv6 firewall address-list add list="cmcc6" address=2401:c020:8::/47
-/ipv6 firewall address-list add list="cmcc6" address=2401:c020:14::/48
-/ipv6 firewall address-list add list="cmcc6" address=2402:1440:30::/48
-/ipv6 firewall address-list add list="cmcc6" address=2402:1440:200::/39
-/ipv6 firewall address-list add list="cmcc6" address=2402:1440:400::/38
-/ipv6 firewall address-list add list="cmcc6" address=2402:1440:800::/37
-/ipv6 firewall address-list add list="cmcc6" address=2402:1440:1000::/36
-/ipv6 firewall address-list add list="cmcc6" address=2402:1440:2000::/35
-/ipv6 firewall address-list add list="cmcc6" address=2402:1440:4000::/34
-/ipv6 firewall address-list add list="cmcc6" address=2402:1440:8000::/33
-/ipv6 firewall address-list add list="cmcc6" address=2402:5ec0::/36
-/ipv6 firewall address-list add list="cmcc6" address=2402:5ec0:1f00::/40
-/ipv6 firewall address-list add list="cmcc6" address=2402:5ec0:2000::/35
-/ipv6 firewall address-list add list="cmcc6" address=2402:5ec0:4000::/34
-/ipv6 firewall address-list add list="cmcc6" address=2402:5ec0:8000::/33
-/ipv6 firewall address-list add list="cmcc6" address=2402:6e80::/32
-/ipv6 firewall address-list add list="cmcc6" address=2402:8bc0::/32
-/ipv6 firewall address-list add list="cmcc6" address=2402:9a80::/32
-/ipv6 firewall address-list add list="cmcc6" address=2402:e880::/48
-/ipv6 firewall address-list add list="cmcc6" address=2403:7580::/44
-/ipv6 firewall address-list add list="cmcc6" address=2403:7580:10::/46
-/ipv6 firewall address-list add list="cmcc6" address=2403:b400::/32
-/ipv6 firewall address-list add list="cmcc6" address=2403:c980::/32
-/ipv6 firewall address-list add list="cmcc6" address=2404:7240:6000::/48
-/ipv6 firewall address-list add list="cmcc6" address=2404:e280::/47
-/ipv6 firewall address-list add list="cmcc6" address=2405:80:10::/48
-/ipv6 firewall address-list add list="cmcc6" address=2405:80:13::/48
-/ipv6 firewall address-list add list="cmcc6" address=2405:6c0:2::/48
-/ipv6 firewall address-list add list="cmcc6" address=2405:6c0:4::/48
-/ipv6 firewall address-list add list="cmcc6" address=2405:6f00:c101::/48
-/ipv6 firewall address-list add list="cmcc6" address=2405:6f00:c102::/48
-/ipv6 firewall address-list add list="cmcc6" address=2405:6f00:c170::/47
-/ipv6 firewall address-list add list="cmcc6" address=2405:6f00:c602::/48
-/ipv6 firewall address-list add list="cmcc6" address=2405:b7c0::/32
-/ipv6 firewall address-list add list="cmcc6" address=2406:52c0::/32
-/ipv6 firewall address-list add list="cmcc6" address=2406:5340:6666::/48
-/ipv6 firewall address-list add list="cmcc6" address=2406:5340:8888::/48
-/ipv6 firewall address-list add list="cmcc6" address=2406:d440:210::/44
-/ipv6 firewall address-list add list="cmcc6" address=2407:23c0::/48
-/ipv6 firewall address-list add list="cmcc6" address=2407:2840::/48
-/ipv6 firewall address-list add list="cmcc6" address=2407:37c0::/32
-/ipv6 firewall address-list add list="cmcc6" address=2407:6c40:1210::/48
-/ipv6 firewall address-list add list="cmcc6" address=2407:8f40:2::/48
-/ipv6 firewall address-list add list="cmcc6" address=2409:27fc::/48
-/ipv6 firewall address-list add list="cmcc6" address=2409:8000::/20
-/ipv6 firewall address-list add list="cmcc6" address=240a:4020:83a::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:4020:883a::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:4021:83a::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:4021:883a::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:50::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:120::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:250::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:1000::/39
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:1200::/40
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:2010::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:2041::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:2061::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:3000::/39
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:3200::/40
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:5000::/39
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:5200::/40
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:7000::/39
-/ipv6 firewall address-list add list="cmcc6" address=240a:4090:7200::/40
-/ipv6 firewall address-list add list="cmcc6" address=240a:40b0:83a::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:40b0:283a::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:40b0:483a::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:40b0:683a::/48
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c0:8000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c0:a000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c0:c000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c0:e000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c1::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c1:2000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c1:4000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c1:6000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c1:8000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c1:a000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c1:c000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c1:e000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c2::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c2:2000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c2:4000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c2:6000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c2:8000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c2:a000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c2:c000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c2:e000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c3::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c3:2000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c3:4000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c3:6000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c3:8000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c3:a000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c3:c000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c3:e000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c4::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c4:2000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:40c4:4000::/43
-/ipv6 firewall address-list add list="cmcc6" address=240a:4280::/26
-/ipv6 firewall address-list add list="cmcc6" address=240a:42c0::/27
-/ipv6 firewall address-list add list="cmcc6" address=240a:42e0::/28
-/ipv6 firewall address-list add list="cmcc6" address=240a:42f0::/29
-/ipv6 firewall address-list add list="cmcc6" address=240a:42f8::/30
-/ipv6 firewall address-list add list="cmcc6" address=240a:c000::/25
-/ipv6 firewall address-list add list="cmcc6" address=240a:c080::/26
-/ipv6 firewall address-list add list="cmcc6" address=240a:c0c1::/32
-/ipv6 firewall address-list add list="cmcc6" address=240a:c0c2::/31
-/ipv6 firewall address-list add list="cmcc6" address=240a:c0c4::/30
-/ipv6 firewall address-list add list="cmcc6" address=240a:c0c8::/29
-/ipv6 firewall address-list add list="cmcc6" address=240a:c0d0::/28
-/ipv6 firewall address-list add list="cmcc6" address=240a:c0e0::/27
-/ipv6 firewall address-list add list="cmcc6" address=240a:c100::/24
-/ipv6 firewall address-list add list="cmcc6" address=240a:c200::/23
-/ipv6 firewall address-list add list="cmcc6" address=240a:c400::/22
-/ipv6 firewall address-list add list="cmcc6" address=240a:c800::/21
+/ipv6 firewall address-list
+remove [find list="cmcc6"]
+add list="cmcc6" address=2001:dc7:3::/48
+add list="cmcc6" address=2400:9020:f012::/47
+add list="cmcc6" address=2400:95e0::/48
+add list="cmcc6" address=2400:a860:1::/48
+add list="cmcc6" address=2400:a860:2::/47
+add list="cmcc6" address=2400:a860:4::/47
+add list="cmcc6" address=2400:a860:6::/48
+add list="cmcc6" address=2400:ae00:1981::/48
+add list="cmcc6" address=2400:ee00:ffec::/46
+add list="cmcc6" address=2400:ee00:fff0::/44
+add list="cmcc6" address=2401:1320::/32
+add list="cmcc6" address=2401:2a00:f000::/43
+add list="cmcc6" address=2401:8be0::/48
+add list="cmcc6" address=2401:9a00::/44
+add list="cmcc6" address=2401:9a00:10::/46
+add list="cmcc6" address=2401:c020:6::/48
+add list="cmcc6" address=2401:c020:8::/47
+add list="cmcc6" address=2401:c020:14::/48
+add list="cmcc6" address=2402:1440:30::/48
+add list="cmcc6" address=2402:1440:200::/39
+add list="cmcc6" address=2402:1440:400::/38
+add list="cmcc6" address=2402:1440:800::/37
+add list="cmcc6" address=2402:1440:1000::/36
+add list="cmcc6" address=2402:1440:2000::/35
+add list="cmcc6" address=2402:1440:4000::/34
+add list="cmcc6" address=2402:1440:8000::/33
+add list="cmcc6" address=2402:5ec0::/36
+add list="cmcc6" address=2402:5ec0:1f00::/40
+add list="cmcc6" address=2402:5ec0:2000::/35
+add list="cmcc6" address=2402:5ec0:4000::/34
+add list="cmcc6" address=2402:5ec0:8000::/33
+add list="cmcc6" address=2402:6e80::/32
+add list="cmcc6" address=2402:8bc0::/32
+add list="cmcc6" address=2402:9a80::/32
+add list="cmcc6" address=2402:e880::/48
+add list="cmcc6" address=2403:7580::/44
+add list="cmcc6" address=2403:7580:10::/46
+add list="cmcc6" address=2403:b400::/32
+add list="cmcc6" address=2403:c980::/32
+add list="cmcc6" address=2404:7240:6000::/48
+add list="cmcc6" address=2404:e280::/47
+add list="cmcc6" address=2405:80:10::/48
+add list="cmcc6" address=2405:80:13::/48
+add list="cmcc6" address=2405:6c0:2::/48
+add list="cmcc6" address=2405:6c0:4::/48
+add list="cmcc6" address=2405:6f00:c101::/48
+add list="cmcc6" address=2405:6f00:c102::/48
+add list="cmcc6" address=2405:6f00:c170::/47
+add list="cmcc6" address=2405:6f00:c602::/48
+add list="cmcc6" address=2405:b7c0::/32
+add list="cmcc6" address=2406:52c0::/32
+add list="cmcc6" address=2406:5340:6666::/48
+add list="cmcc6" address=2406:5340:8888::/48
+add list="cmcc6" address=2406:d440:210::/44
+add list="cmcc6" address=2407:23c0::/48
+add list="cmcc6" address=2407:2840::/48
+add list="cmcc6" address=2407:37c0::/32
+add list="cmcc6" address=2407:6c40:1210::/48
+add list="cmcc6" address=2407:8f40:2::/48
+add list="cmcc6" address=2409:27fc::/48
+add list="cmcc6" address=2409:8000::/20
+add list="cmcc6" address=240a:4020:83a::/48
+add list="cmcc6" address=240a:4020:883a::/48
+add list="cmcc6" address=240a:4021:83a::/48
+add list="cmcc6" address=240a:4021:883a::/48
+add list="cmcc6" address=240a:4090:50::/48
+add list="cmcc6" address=240a:4090:120::/48
+add list="cmcc6" address=240a:4090:250::/48
+add list="cmcc6" address=240a:4090:1000::/39
+add list="cmcc6" address=240a:4090:1200::/40
+add list="cmcc6" address=240a:4090:2010::/48
+add list="cmcc6" address=240a:4090:2041::/48
+add list="cmcc6" address=240a:4090:2061::/48
+add list="cmcc6" address=240a:4090:3000::/39
+add list="cmcc6" address=240a:4090:3200::/40
+add list="cmcc6" address=240a:4090:5000::/39
+add list="cmcc6" address=240a:4090:5200::/40
+add list="cmcc6" address=240a:4090:7000::/39
+add list="cmcc6" address=240a:4090:7200::/40
+add list="cmcc6" address=240a:40b0:83a::/48
+add list="cmcc6" address=240a:40b0:283a::/48
+add list="cmcc6" address=240a:40b0:483a::/48
+add list="cmcc6" address=240a:40b0:683a::/48
+add list="cmcc6" address=240a:40c0:8000::/43
+add list="cmcc6" address=240a:40c0:a000::/43
+add list="cmcc6" address=240a:40c0:c000::/43
+add list="cmcc6" address=240a:40c0:e000::/43
+add list="cmcc6" address=240a:40c1::/43
+add list="cmcc6" address=240a:40c1:2000::/43
+add list="cmcc6" address=240a:40c1:4000::/43
+add list="cmcc6" address=240a:40c1:6000::/43
+add list="cmcc6" address=240a:40c1:8000::/43
+add list="cmcc6" address=240a:40c1:a000::/43
+add list="cmcc6" address=240a:40c1:c000::/43
+add list="cmcc6" address=240a:40c1:e000::/43
+add list="cmcc6" address=240a:40c2::/43
+add list="cmcc6" address=240a:40c2:2000::/43
+add list="cmcc6" address=240a:40c2:4000::/43
+add list="cmcc6" address=240a:40c2:6000::/43
+add list="cmcc6" address=240a:40c2:8000::/43
+add list="cmcc6" address=240a:40c2:a000::/43
+add list="cmcc6" address=240a:40c2:c000::/43
+add list="cmcc6" address=240a:40c2:e000::/43
+add list="cmcc6" address=240a:40c3::/43
+add list="cmcc6" address=240a:40c3:2000::/43
+add list="cmcc6" address=240a:40c3:4000::/43
+add list="cmcc6" address=240a:40c3:6000::/43
+add list="cmcc6" address=240a:40c3:8000::/43
+add list="cmcc6" address=240a:40c3:a000::/43
+add list="cmcc6" address=240a:40c3:c000::/43
+add list="cmcc6" address=240a:40c3:e000::/43
+add list="cmcc6" address=240a:40c4::/43
+add list="cmcc6" address=240a:40c4:2000::/43
+add list="cmcc6" address=240a:40c4:4000::/43
+add list="cmcc6" address=240a:4280::/26
+add list="cmcc6" address=240a:42c0::/27
+add list="cmcc6" address=240a:42e0::/28
+add list="cmcc6" address=240a:42f0::/29
+add list="cmcc6" address=240a:42f8::/30
+add list="cmcc6" address=240a:c000::/25
+add list="cmcc6" address=240a:c080::/26
+add list="cmcc6" address=240a:c0c1::/32
+add list="cmcc6" address=240a:c0c2::/31
+add list="cmcc6" address=240a:c0c4::/30
+add list="cmcc6" address=240a:c0c8::/29
+add list="cmcc6" address=240a:c0d0::/28
+add list="cmcc6" address=240a:c0e0::/27
+add list="cmcc6" address=240a:c100::/24
+add list="cmcc6" address=240a:c200::/23
+add list="cmcc6" address=240a:c400::/22
+add list="cmcc6" address=240a:c800::/21
