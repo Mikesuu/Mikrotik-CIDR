@@ -32,7 +32,6 @@ jobs:
           GAOYIFAN="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
           CHNROUTES2="https://raw.githubusercontent.com/misakaio/chnroutes2/master"
           SURGE="https://ruleset.skk.moe/Clash/ip"
-          CHN_IPLIST="https://raw.githubusercontent.com/PaPerseller/chn-iplist/master"
           ASN_CHINA="https://raw.githubusercontent.com/missuo/ASN-China/main"
           APNIC_STATS="https://ftp.apnic.net/apnic/stats/apnic"
 
@@ -44,7 +43,6 @@ jobs:
           download "$GAOYIFAN/china.txt" WORKDIR/cn-gaoyifan.txt
           download "$CHNROUTES2/chnroutes.txt" WORKDIR/cn-chnroutes2.txt
           download "$SURGE/china_ip.txt" WORKDIR/cn-surge.txt
-          download "$CHN_IPLIST/cn.rsc" WORKDIR/cn-chnlist.rsc
           download "$APNIC_STATS/delegated-apnic-latest" WORKDIR/cn-apnic.txt
           download "$ASN_CHINA/IPv4.China.list" WORKDIR/cn-asn.txt
           download "$GAOYIFAN/china6.txt" WORKDIR/cn6-gaoyifan.txt
@@ -115,7 +113,7 @@ jobs:
           python3 process.py norm WORKDIR/cn-gaoyifan.txt WORKDIR/gaoyifan.final ipv4
           python3 process.py norm WORKDIR/cn-chnroutes2.txt WORKDIR/chnroutes2.final ipv4
           python3 process.py norm WORKDIR/cn-surge.txt WORKDIR/surge.final ipv4
-          python3 process.py norm WORKDIR/cn-chnlist.rsc WORKDIR/chniplist.final ipv4
+          python3 process.py norm WORKDIR/cn-asn.txt WORKDIR/asn.final ipv4
           python3 process.py norm WORKDIR/cn-apnic4.txt WORKDIR/apnic.final ipv4
 
           python3 process.py norm WORKDIR/cn6-gaoyifan.txt WORKDIR/gaoyifan6.final ipv6
@@ -133,6 +131,7 @@ jobs:
             local list_name="$1" input="$2" output="$3" ipv6="$4"
             local cmd="/ip firewall address-list"
             [ "$ipv6" = "true" ] && cmd="/ipv6 firewall address-list"
+            > "$output"
             while IFS= read -r cidr; do
               [ -n "$cidr" ] && echo "$cmd add list=\"$list_name\" address=$cidr" >> "$output"
             done < "$input"
