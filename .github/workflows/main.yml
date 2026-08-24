@@ -183,10 +183,12 @@ jobs:
           with open(src, "r", encoding="utf-8-sig", errors="ignore") as f:
               for raw in f:
                   line = raw.strip()
+
                   if not line or line.startswith("#"):
                       continue
 
                   fields = line.split("|")
+
                   if len(fields) < 7:
                       continue
 
@@ -194,20 +196,34 @@ jobs:
 
                   if registry.lower() != "apnic":
                       continue
+
                   if country.upper() != "CN":
                       continue
+
                   if resource_type.lower() != "ipv4":
                       continue
+
                   if status.lower() not in {"allocated", "assigned"}:
                       continue
 
                   try:
                       first = ipaddress.ip_address(start)
                       count = int(value)
+
                       if first.version != 4 or count <= 0:
                           continue
-                      last = ipaddress.ip_address(int(first) + count - 1)
-                      networks.extend(ipaddress.summarize_address_range(first, last))
+
+                      last = ipaddress.ip_address(
+                          int(first) + count - 1
+                      )
+
+                      networks.extend(
+                          ipaddress.summarize_address_range(
+                              first,
+                              last
+                          )
+                      )
+
                   except ValueError:
                       continue
 
@@ -221,7 +237,11 @@ jobs:
               for net in merged:
                   f.write(f"{net}\n")
 
-          print(f"OK: APNIC CN IPv4: source={len(networks)} aggregated={len(merged)}")
+          print(
+              f"OK: APNIC CN IPv4: "
+              f"source={len(networks)} "
+              f"aggregated={len(merged)}"
+          )
           PY
           }
 
@@ -240,23 +260,36 @@ jobs:
           with open(src, "r", encoding="utf-8") as f:
               data = json.load(f)
 
-          prefixes = data.get("data", {}).get("resources", {}).get("ipv4", [])
+          prefixes = (
+              data
+              .get("data", {})
+              .get("resources", {})
+              .get("ipv4", [])
+          )
+
           networks = []
 
           for item in prefixes:
               try:
                   if "/" in item:
-                      net = ipaddress.ip_network(item, strict=False)
+                      net = ipaddress.ip_network(
+                          item,
+                          strict=False
+                      )
+
+                      if net.version == 4:
+                          networks.append(net)
+
                   else:
                       start, end = item.split("-", 1)
-                      net = list(ipaddress.summarize_address_range(
-                          ipaddress.ip_address(start.strip()),
-                          ipaddress.ip_address(end.strip())
-                      ))
-                      networks.extend(net)
-                      continue
-                  if net.version == 4:
-                      networks.append(net)
+
+                      networks.extend(
+                          ipaddress.summarize_address_range(
+                              ipaddress.ip_address(start.strip()),
+                              ipaddress.ip_address(end.strip())
+                          )
+                      )
+
               except (ValueError, TypeError):
                   continue
 
@@ -270,7 +303,11 @@ jobs:
               for net in merged:
                   f.write(f"{net}\n")
 
-          print(f"OK: RIPEstat CN IPv4: source={len(networks)} aggregated={len(merged)}")
+          print(
+              f"OK: RIPEstat CN IPv4: "
+              f"source={len(networks)} "
+              f"aggregated={len(merged)}"
+          )
           PY
           }
 
@@ -283,30 +320,39 @@ jobs:
 
           src = sys.argv[1]
 
-          with open(src, "r", encoding="utf-8") as f:
-              data = json.load(f)
+          try:
+              with open(src, "r", encoding="utf-8") as f:
+                  data = json.load(f)
+          except Exception as e:
+              print(f"WARN: RIPEstat CN routing stats unavailable: {e}")
+              sys.exit(0)
 
           payload = data.get("data", {})
           stats = payload.get("stats", [])
 
           if not stats:
-              print("ERROR: RIPEstat CN routing stats unavailable")
-              sys.exit(1)
+              print("WARN: RIPEstat CN routing stats unavailable")
+              sys.exit(0)
 
           latest = stats[-1]
+
           ris = latest.get("v4_prefixes_ris")
           registered = latest.get("v4_prefixes_stats")
 
-          if not isinstance(ris, int) or ris <= 0:
-              print("ERROR: RIPEstat CN BGP IPv4 prefix count unavailable")
-              sys.exit(1)
+          if isinstance(ris, int) and ris > 0:
+              print(f"RIPEstat CN routing prefixes={ris}")
+          else:
+              print("WARN: RIPEstat CN BGP IPv4 prefix count unavailable")
 
-          if not isinstance(registered, int) or registered <= 0:
-              print("ERROR: RIPEstat CN registration IPv4 prefix count unavailable")
-              sys.exit(1)
+          if isinstance(registered, int) and registered > 0:
+              print(f"RIPEstat CN registered prefixes={registered}")
+          else:
+              print(
+                  "WARN: RIPEstat CN registration IPv4 "
+                  "prefix count unavailable"
+              )
 
-          print(f"RIPEstat CN routing prefixes={ris}")
-          print(f"RIPEstat CN registered prefixes={registered}")
+          sys.exit(0)
           PY
           }
 
@@ -370,9 +416,7 @@ jobs:
           CN_META="$WORKDIR/cn-metowolf.txt"
           CN_17MON="$WORKDIR/cn-17mon.txt"
           CN_APNIC_RAW="$WORKDIR/cn-apnic.raw"
-          CN_APNIC_FINAL="$WORKDIR/cn-apnic.final"
           CN_RIPE_RAW="$WORKDIR/cn-ripestat.raw"
-          CN_RIPE_FINAL="$WORKDIR/cn-ripestat.final"
           CN_RIPE_STATS="$WORKDIR/cn-ripestat-stats.json"
           CN_RAW="$WORKDIR/cn.raw"
           CN_FINAL="$WORKDIR/cn.final"
@@ -483,8 +527,6 @@ jobs:
           echo "ASN Intersection"
           echo "========================================"
 
-          python3 "$WORKDIR/empty.py" 2>/dev/null || true
-
           python3 - "$CN_FINAL" "$ASN_FINAL" "$CN_ASN_EXTRA" <<'PY'
           import sys
           import ipaddress
@@ -508,8 +550,6 @@ jobs:
                   if line:
                       asn.append(ipaddress.ip_network(line))
 
-          cn_set = set(cn)
-
           extra = []
 
           for a in asn:
@@ -529,7 +569,9 @@ jobs:
               for net in extra:
                   f.write(f"{net}\n")
 
-          print(f"ASN prefixes not overlapping CN primary: {len(extra)}")
+          print(
+              f"ASN prefixes not overlapping CN primary: {len(extra)}"
+          )
           PY
 
           echo
@@ -578,6 +620,36 @@ jobs:
             "$CN_ALL_FINAL" \
             data/cn.rsc \
             false
+
+          echo
+          echo "========================================"
+          echo "China IPv6"
+          echo "========================================"
+
+          CN6_RAW="$WORKDIR/cn6.raw"
+          CN6_FINAL="$WORKDIR/cn6.final"
+
+          download \
+            "$GAOYIFAN/china6.txt" \
+            "$CN6_RAW"
+
+          normalize \
+            "$CN6_RAW" \
+            "$CN6_FINAL" \
+            ipv6 \
+            CN6 \
+            500 \
+            3000
+
+          CN6_COUNT=$(wc -l < "$CN6_FINAL")
+
+          echo "CN IPv6 prefixes: $CN6_COUNT"
+
+          export_rsc \
+            CN6 \
+            "$CN6_FINAL" \
+            data/cn6.rsc \
+            true
 
           echo
           echo "========================================"
