@@ -119,9 +119,6 @@
 /ip firewall address-list add list="CN" address=14.255.16.0/24
 /ip firewall address-list add list="CN" address=14.255.238.0/24
 /ip firewall address-list add list="CN" address=14.255.254.0/24
-/ip firewall address-list add list="CN" address=15.230.41.0/24
-/ip firewall address-list add list="CN" address=15.230.49.0/24
-/ip firewall address-list add list="CN" address=15.230.141.0/24
 /ip firewall address-list add list="CN" address=16.2.142.0/23
 /ip firewall address-list add list="CN" address=16.2.152.0/23
 /ip firewall address-list add list="CN" address=16.163.30.245/32
