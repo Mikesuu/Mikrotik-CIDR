@@ -30,6 +30,9 @@ jobs:
           METOWOLF="https://metowolf.github.io/iplist/data"
           MON17="https://raw.githubusercontent.com/17mon/china_ip_list/master"
           ASN_CHINA="https://raw.githubusercontent.com/missuo/ASN-China/main"
+          APNIC_STATS="https://ftp.apnic.net/apnic/stats/apnic"
+          RIPESTAT_CN="https://stat.ripe.net/data/country-resource-list/data.json?resource=cn&v4_format=prefix"
+          RIPESTAT_STATS="https://stat.ripe.net/data/country-resource-stats/data.json?resource=cn&resolution=1d"
 
           download() {
             local url="$1"
@@ -165,6 +168,148 @@ jobs:
           PY
           }
 
+          parse_apnic_cn_ipv4() {
+            local input="$1"
+            local output="$2"
+
+            python3 - "$input" "$output" <<'PY'
+          import sys
+          import ipaddress
+
+          src = sys.argv[1]
+          dst = sys.argv[2]
+          networks = []
+
+          with open(src, "r", encoding="utf-8-sig", errors="ignore") as f:
+              for raw in f:
+                  line = raw.strip()
+                  if not line or line.startswith("#"):
+                      continue
+
+                  fields = line.split("|")
+                  if len(fields) < 7:
+                      continue
+
+                  registry, country, resource_type, start, value, date, status = fields[:7]
+
+                  if registry.lower() != "apnic":
+                      continue
+                  if country.upper() != "CN":
+                      continue
+                  if resource_type.lower() != "ipv4":
+                      continue
+                  if status.lower() not in {"allocated", "assigned"}:
+                      continue
+
+                  try:
+                      first = ipaddress.ip_address(start)
+                      count = int(value)
+                      if first.version != 4 or count <= 0:
+                          continue
+                      last = ipaddress.ip_address(int(first) + count - 1)
+                      networks.extend(ipaddress.summarize_address_range(first, last))
+                  except ValueError:
+                      continue
+
+          merged = list(ipaddress.collapse_addresses(networks))
+
+          if not merged:
+              print("ERROR: APNIC CN IPv4: no valid networks")
+              sys.exit(1)
+
+          with open(dst, "w", encoding="utf-8") as f:
+              for net in merged:
+                  f.write(f"{net}\n")
+
+          print(f"OK: APNIC CN IPv4: source={len(networks)} aggregated={len(merged)}")
+          PY
+          }
+
+          parse_ripestat_cn_ipv4() {
+            local input="$1"
+            local output="$2"
+
+            python3 - "$input" "$output" <<'PY'
+          import sys
+          import json
+          import ipaddress
+
+          src = sys.argv[1]
+          dst = sys.argv[2]
+
+          with open(src, "r", encoding="utf-8") as f:
+              data = json.load(f)
+
+          prefixes = data.get("data", {}).get("resources", {}).get("ipv4", [])
+          networks = []
+
+          for item in prefixes:
+              try:
+                  if "/" in item:
+                      net = ipaddress.ip_network(item, strict=False)
+                  else:
+                      start, end = item.split("-", 1)
+                      net = list(ipaddress.summarize_address_range(
+                          ipaddress.ip_address(start.strip()),
+                          ipaddress.ip_address(end.strip())
+                      ))
+                      networks.extend(net)
+                      continue
+                  if net.version == 4:
+                      networks.append(net)
+              except (ValueError, TypeError):
+                  continue
+
+          merged = list(ipaddress.collapse_addresses(networks))
+
+          if not merged:
+              print("ERROR: RIPEstat CN IPv4: no valid networks")
+              sys.exit(1)
+
+          with open(dst, "w", encoding="utf-8") as f:
+              for net in merged:
+                  f.write(f"{net}\n")
+
+          print(f"OK: RIPEstat CN IPv4: source={len(networks)} aggregated={len(merged)}")
+          PY
+          }
+
+          validate_ripestat_routing() {
+            local input="$1"
+
+            python3 - "$input" <<'PY'
+          import sys
+          import json
+
+          src = sys.argv[1]
+
+          with open(src, "r", encoding="utf-8") as f:
+              data = json.load(f)
+
+          payload = data.get("data", {})
+          stats = payload.get("stats", [])
+
+          if not stats:
+              print("ERROR: RIPEstat CN routing stats unavailable")
+              sys.exit(1)
+
+          latest = stats[-1]
+          ris = latest.get("v4_prefixes_ris")
+          registered = latest.get("v4_prefixes_stats")
+
+          if not isinstance(ris, int) or ris <= 0:
+              print("ERROR: RIPEstat CN BGP IPv4 prefix count unavailable")
+              sys.exit(1)
+
+          if not isinstance(registered, int) or registered <= 0:
+              print("ERROR: RIPEstat CN registration IPv4 prefix count unavailable")
+              sys.exit(1)
+
+          print(f"RIPEstat CN routing prefixes={ris}")
+          print(f"RIPEstat CN registered prefixes={registered}")
+          PY
+          }
+
           export_rsc() {
             local list_name="$1"
             local input="$2"
@@ -224,6 +369,11 @@ jobs:
           CN_GAO="$WORKDIR/cn-gaoyifan.txt"
           CN_META="$WORKDIR/cn-metowolf.txt"
           CN_17MON="$WORKDIR/cn-17mon.txt"
+          CN_APNIC_RAW="$WORKDIR/cn-apnic.raw"
+          CN_APNIC_FINAL="$WORKDIR/cn-apnic.final"
+          CN_RIPE_RAW="$WORKDIR/cn-ripestat.raw"
+          CN_RIPE_FINAL="$WORKDIR/cn-ripestat.final"
+          CN_RIPE_STATS="$WORKDIR/cn-ripestat-stats.json"
           CN_RAW="$WORKDIR/cn.raw"
           CN_FINAL="$WORKDIR/cn.final"
           CN_ASN_EXTRA="$WORKDIR/cn-asn-extra.txt"
@@ -241,6 +391,18 @@ jobs:
           download \
             "$MON17/china_ip_list.txt" \
             "$CN_17MON"
+
+          download \
+            "$APNIC_STATS/delegated-apnic-latest" \
+            "$WORKDIR/delegated-apnic-latest"
+
+          download \
+            "$RIPESTAT_CN" \
+            "$WORKDIR/ripestat-cn.json"
+
+          download \
+            "$RIPESTAT_STATS" \
+            "$CN_RIPE_STATS"
 
           CN_GAO_COUNT=$(source_count "$CN_GAO")
           CN_META_COUNT=$(source_count "$CN_META")
@@ -265,10 +427,38 @@ jobs:
             exit 1
           fi
 
+          parse_apnic_cn_ipv4 \
+            "$WORKDIR/delegated-apnic-latest" \
+            "$CN_APNIC_RAW"
+
+          parse_ripestat_cn_ipv4 \
+            "$WORKDIR/ripestat-cn.json" \
+            "$CN_RIPE_RAW"
+
+          validate_ripestat_routing "$CN_RIPE_STATS"
+
+          CN_APNIC_COUNT=$(wc -l < "$CN_APNIC_RAW")
+          CN_RIPE_COUNT=$(wc -l < "$CN_RIPE_RAW")
+
+          echo "APNIC CN IPv4 prefixes: $CN_APNIC_COUNT"
+          echo "RIPEstat CN IPv4 prefixes: $CN_RIPE_COUNT"
+
+          if [ "$CN_APNIC_COUNT" -lt 1000 ] || [ "$CN_APNIC_COUNT" -gt 30000 ]; then
+            echo "ERROR: abnormal APNIC CN IPv4 source size"
+            exit 1
+          fi
+
+          if [ "$CN_RIPE_COUNT" -lt 1000 ] || [ "$CN_RIPE_COUNT" -gt 30000 ]; then
+            echo "ERROR: abnormal RIPEstat CN IPv4 source size"
+            exit 1
+          fi
+
           cat \
             "$CN_GAO" \
             "$CN_META" \
             "$CN_17MON" \
+            "$CN_APNIC_RAW" \
+            "$CN_RIPE_RAW" \
             > "$CN_RAW"
 
           cat >> "$CN_RAW" <<'EOF'
