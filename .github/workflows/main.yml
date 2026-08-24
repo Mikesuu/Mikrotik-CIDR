@@ -1,4 +1,3 @@
-```yaml
 name: Generate MikroTik v7 IP Lists
 
 on:
