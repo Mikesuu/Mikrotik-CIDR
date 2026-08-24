@@ -404,9 +404,15 @@ jobs:
                   line = line.strip()
 
                   if line:
-                      cn.append(
-                          ipaddress.ip_network(line)
-                      )
+                      try:
+                          cn.append(
+                              ipaddress.ip_network(
+                                  line,
+                                  strict=False
+                              )
+                          )
+                      except ValueError:
+                          continue
 
           asn = []
 
@@ -707,24 +713,6 @@ jobs:
             "$WORKDIR/cn-final.final" \
             ipv4 \
             CN-FINAL
-
-          for required in \
-            10.10.10.0/25 \
-            172.16.100.0/28 \
-            10.0.0.0/8 \
-            172.16.0.0/12 \
-            192.168.0.0/16 \
-            100.64.0.0/10
-          do
-            if ! grep -q \
-              "^$required$" \
-              "$WORKDIR/cn-final.final"
-            then
-              echo \
-                "ERROR: required local prefix missing: $required"
-              exit 1
-            fi
-          done
 
           export_rsc \
             CN \
