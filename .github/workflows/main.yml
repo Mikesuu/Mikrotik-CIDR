@@ -54,10 +54,16 @@ jobs:
           def normalize(src, dst, family):
               nets = []
               forbidden = [
-                  ipaddress.ip_network("0.0.0.0/8"), ipaddress.ip_network("127.0.0.0/8"),
-                  ipaddress.ip_network("169.254.0.0/16"), ipaddress.ip_network("224.0.0.0/4"),
-                  ipaddress.ip_network("240.0.0.0/4"), ipaddress.ip_network("::/0"),
-                  ipaddress.ip_network("::1/128"), ipaddress.ip_network("fe80::/10")
+                  ipaddress.ip_network("0.0.0.0/8"),
+                  ipaddress.ip_network("1.0.0.0/24"),
+                  ipaddress.ip_network("15.0.0.0/8"),
+                  ipaddress.ip_network("127.0.0.0/8"),
+                  ipaddress.ip_network("169.254.0.0/16"),
+                  ipaddress.ip_network("224.0.0.0/4"),
+                  ipaddress.ip_network("240.0.0.0/4"),
+                  ipaddress.ip_network("::/0"),
+                  ipaddress.ip_network("::1/128"),
+                  ipaddress.ip_network("fe80::/10")
               ]
               token_re = re.compile(r'(?i)(?:[0-9a-f]{0,4}:){2,}[0-9a-f:.]+/\d{1,3}|(?:\d{1,3}\.){3}\d{1,3}/\d{1,3}')
               
@@ -110,22 +116,25 @@ jobs:
 
           python3 process.py apnic WORKDIR/cn-apnic.txt WORKDIR/cn-apnic4.txt WORKDIR/cn-apnic6.txt
 
-          python3 process.py norm WORKDIR/cn-gaoyifan.txt WORKDIR/gaoyifan.final ipv4
-          python3 process.py norm WORKDIR/cn-chnroutes2.txt WORKDIR/chnroutes2.final ipv4
-          python3 process.py norm WORKDIR/cn-surge.txt WORKDIR/surge.final ipv4
-          python3 process.py norm WORKDIR/cn-asn.txt WORKDIR/asn.final ipv4
-          python3 process.py norm WORKDIR/cn-apnic4.txt WORKDIR/apnic.final ipv4
+          python3 process.py norm WORKDIR/cn-gaoyifan.txt WORKDIR/gaoyifan.v4.final ipv4
+          python3 process.py norm WORKDIR/cn-chnroutes2.txt WORKDIR/chnroutes2.v4.final ipv4
+          python3 process.py norm WORKDIR/cn-surge.txt WORKDIR/surge.v4.final ipv4
+          python3 process.py norm WORKDIR/cn-asn.txt WORKDIR/asn.v4.final ipv4
+          python3 process.py norm WORKDIR/cn-apnic4.txt WORKDIR/apnic.v4.final ipv4
 
-          python3 process.py norm WORKDIR/cn6-gaoyifan.txt WORKDIR/gaoyifan6.final ipv6
-          python3 process.py norm WORKDIR/cn6-surge.txt WORKDIR/surge6.final ipv6
-          python3 process.py norm WORKDIR/cn-apnic6.txt WORKDIR/apnic6.final ipv6
+          python3 process.py norm WORKDIR/cn6-gaoyifan.txt WORKDIR/gaoyifan6.v6.final ipv6
+          python3 process.py norm WORKDIR/cn6-surge.txt WORKDIR/surge6.v6.final ipv6
+          python3 process.py norm WORKDIR/cn-apnic6.txt WORKDIR/apnic6.v6.final ipv6
 
-          cat WORKDIR/*.final > WORKDIR/cn-core.raw
+          cat WORKDIR/*.v4.final > WORKDIR/cn-core.raw
           python3 process.py norm WORKDIR/cn-core.raw WORKDIR/cn-core.final ipv4
 
           cat WORKDIR/cn-core.final > WORKDIR/cn-final.raw
-          printf "10.0.0.0/8\n172.16.0.0/12\n192.168.0.0/16\n10.10.10.0/25\n172.16.100.0/28\n" >> WORKDIR/cn-final.raw
+          printf "10.0.0.0/8\n172.16.0.0/12\n192.168.0.0/16\n" >> WORKDIR/cn-final.raw
           python3 process.py norm WORKDIR/cn-final.raw WORKDIR/cn-final.final ipv4
+
+          cat WORKDIR/*.v6.final > WORKDIR/cn6-core.raw
+          python3 process.py norm WORKDIR/cn6-core.raw WORKDIR/cn6-final.final ipv6
 
           export_rsc() {
             local list_name="$1" input="$2" output="$3" ipv6="$4"
@@ -138,7 +147,7 @@ jobs:
           }
 
           export_rsc "CN" WORKDIR/cn-final.final data/cn.rsc false
-          export_rsc "CN6" WORKDIR/gaoyifan6.final data/cn6.rsc true
+          export_rsc "CN6" WORKDIR/cn6-final.final data/cn6.rsc true
 
           ISPS_KEYS=("telecom" "unicom" "cmcc" "cernet" "cstnet" "drpeng")
           ISPS_VALS=("chinanet.txt" "unicom.txt" "cmcc.txt" "cernet.txt" "cstnet.txt" "drpeng.txt")
