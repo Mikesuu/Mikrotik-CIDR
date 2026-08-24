@@ -49,7 +49,7 @@ jobs:
           download "$SURGE/china_ip_ipv6.txt" WORKDIR/cn6-surge.txt
 
           cat << 'EOF' > process.py
-          import sys, ipaddress, re, os
+          import sys, ipaddress, os
 
           def normalize(src, dst, family):
               nets = []
@@ -63,18 +63,18 @@ jobs:
                   ipaddress.ip_network("240.0.0.0/4")
               ]
               
-              pat = r'(?i)(?:[0-9a-f]{1,4}:){1,7}:?(?:[0-9a-f]{1,4})?(?:/\d{1,3})?' if family == "ipv6" else r'(?:\d{1,3}\.){3}\d{1,3}(?:/\d{1,2})?'
-              token_re = re.compile(pat)
-
               if os.path.exists(src):
                   with open(src, 'r', encoding='utf-8-sig', errors='ignore') as f:
                       for line in f:
                           line = line.strip()
                           if not line or line.startswith(('#', '//')): continue
-                          cands = token_re.findall(line)
-                          for c in cands:
+                          
+                          tokens = line.replace(',', ' ').split()
+                          for t in tokens:
+                              if family == "ipv6" and ":" not in t: continue
+                              if family == "ipv4" and "." not in t: continue
                               try:
-                                  net = ipaddress.ip_network(c, strict=False)
+                                  net = ipaddress.ip_network(t, strict=False)
                                   if family == "ipv4":
                                       if net.version != 4: continue
                                       if any(net.overlaps(bad) for bad in forbidden_v4): continue
