@@ -53,35 +53,33 @@ jobs:
 
           def normalize(src, dst, family):
               nets = []
-              forbidden = [
+              forbidden_v4 = [
                   ipaddress.ip_network("0.0.0.0/8"),
                   ipaddress.ip_network("1.0.0.0/24"),
                   ipaddress.ip_network("15.0.0.0/8"),
                   ipaddress.ip_network("127.0.0.0/8"),
                   ipaddress.ip_network("169.254.0.0/16"),
                   ipaddress.ip_network("224.0.0.0/4"),
-                  ipaddress.ip_network("240.0.0.0/4"),
-                  ipaddress.ip_network("::/0"),
-                  ipaddress.ip_network("::1/128"),
-                  ipaddress.ip_network("fe80::/10")
+                  ipaddress.ip_network("240.0.0.0/4")
               ]
-              token_re = re.compile(r'(?i)(?:[0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F:]*(?:/\d{1,3})?|(?:\d{1,3}\.){3}\d{1,3}(?:/\d{1,2})?')
               
               if os.path.exists(src):
                   with open(src, 'r', encoding='utf-8-sig', errors='ignore') as f:
                       for line in f:
                           line = line.strip()
                           if not line or line.startswith(('#', '//')): continue
-                          cands = token_re.findall(line)
-                          if not cands and ',' in line:
-                              parts = line.split(',')
-                              if len(parts) >= 2: cands = [parts[1].strip()]
-                          for c in cands:
+                          
+                          tokens = line.split() if not ',' in line else line.split(',')
+                          for t in tokens:
+                              t = t.strip()
+                              if not t: continue
                               try:
-                                  net = ipaddress.ip_network(c, strict=False)
-                                  if family == "ipv4" and net.version != 4: continue
-                                  if family == "ipv6" and net.version != 6: continue
-                                  if any(net.overlaps(bad) for bad in forbidden): continue
+                                  net = ipaddress.ip_network(t, strict=False)
+                                  if family == "ipv4":
+                                      if net.version != 4: continue
+                                      if any(net.overlaps(bad) for bad in forbidden_v4): continue
+                                  elif family == "ipv6":
+                                      if net.version != 6: continue
                                   nets.append(net)
                               except ValueError: pass
 
@@ -98,7 +96,7 @@ jobs:
                   for line in f:
                       if line.startswith('#') or '|CN|' not in line: continue
                       p = line.strip().split('|')
-                      if len(p) >= 7 and p[0] == 'apnic' and p[1] == 'CN' and p[6] in ('allocated', 'assigned'):
+                      if len(p) >= 7 and p[0] == 'apnic' and p[1] == 'CN':
                           try:
                               if p[2] == 'ipv4':
                                   f_ip, cnt = ipaddress.ip_address(p[3]), int(p[4])
