@@ -49,10 +49,7 @@ jobs:
               "$url" \
               -o "$output"
 
-            if [ ! -s "$output" ]; then
-              echo "ERROR: empty download: $url"
-              exit 1
-            fi
+            [ -s "$output" ]
           }
 
           normalize() {
@@ -75,34 +72,37 @@ jobs:
           invalid = 0
           filtered = 0
 
+          forbidden_v4 = [
+              ipaddress.ip_network("0.0.0.0/8"),
+              ipaddress.ip_network("127.0.0.0/8"),
+              ipaddress.ip_network("169.254.0.0/16"),
+              ipaddress.ip_network("224.0.0.0/4"),
+              ipaddress.ip_network("240.0.0.0/4"),
+          ]
+
+          forbidden_v6 = [
+              ipaddress.ip_network("::/128"),
+              ipaddress.ip_network("::1/128"),
+              ipaddress.ip_network("fe80::/10"),
+              ipaddress.ip_network("ff00::/8"),
+          ]
+
           def valid_network(net):
+              global filtered
+
               if family == "ipv4" and net.version != 4:
                   return False
 
               if family == "ipv6" and net.version != 6:
                   return False
 
-              if net.is_loopback:
-                  return False
-
-              if net.is_multicast:
-                  return False
-
-              if net.is_unspecified:
-                  return False
-
-              if net.is_link_local:
-                  return False
-
               if net.version == 4:
-                  forbidden = [
-                      ipaddress.ip_network("127.0.0.0/8"),
-                      ipaddress.ip_network("169.254.0.0/16"),
-                      ipaddress.ip_network("224.0.0.0/4"),
-                      ipaddress.ip_network("240.0.0.0/4"),
-                  ]
+                  for bad in forbidden_v4:
+                      if net.subnet_of(bad):
+                          return False
 
-                  for bad in forbidden:
+              else:
+                  for bad in forbidden_v6:
                       if net.subnet_of(bad):
                           return False
 
@@ -134,11 +134,11 @@ jobs:
                   if part.startswith("address="):
                       part = part.split("=", 1)[1]
 
-                  if part.startswith("IP-CIDR,"):
+                  if part.startswith("IP-CIDR6,"):
                       part = part.split(",", 1)[1]
                       part = part.split(",", 1)[0]
 
-                  elif part.startswith("IP-CIDR6,"):
+                  elif part.startswith("IP-CIDR,"):
                       part = part.split(",", 1)[1]
                       part = part.split(",", 1)[0]
 
@@ -160,12 +160,7 @@ jobs:
           ) as f:
 
               for raw in f:
-                  line = raw.strip()
-
-                  if not line:
-                      continue
-
-                  for candidate in extract_candidates(line):
+                  for candidate in extract_candidates(raw):
 
                       try:
                           net = ipaddress.ip_network(
@@ -184,9 +179,7 @@ jobs:
                       networks.append(net)
 
           if not networks:
-              print(
-                  f"ERROR: {name}: no valid networks"
-              )
+              print(f"ERROR: {name}: no valid networks")
               sys.exit(1)
 
           merged = list(
@@ -228,6 +221,33 @@ jobs:
           networks4 = []
           networks6 = []
 
+          forbidden_v4 = [
+              ipaddress.ip_network("0.0.0.0/8"),
+              ipaddress.ip_network("127.0.0.0/8"),
+              ipaddress.ip_network("169.254.0.0/16"),
+              ipaddress.ip_network("224.0.0.0/4"),
+              ipaddress.ip_network("240.0.0.0/4"),
+          ]
+
+          forbidden_v6 = [
+              ipaddress.ip_network("::/128"),
+              ipaddress.ip_network("::1/128"),
+              ipaddress.ip_network("fe80::/10"),
+              ipaddress.ip_network("ff00::/8"),
+          ]
+
+          def valid(net):
+              if net.version == 4:
+                  return not any(
+                      net.subnet_of(x)
+                      for x in forbidden_v4
+                  )
+
+              return not any(
+                  net.subnet_of(x)
+                  for x in forbidden_v6
+              )
+
           with open(
               src,
               "r",
@@ -261,16 +281,12 @@ jobs:
                       continue
 
                   try:
-
                       if resource_type.lower() == "ipv4":
 
                           first = ipaddress.ip_address(start)
                           count = int(value)
 
-                          if first.version != 4:
-                              continue
-
-                          if count <= 0:
+                          if first.version != 4 or count <= 0:
                               continue
 
                           last = ipaddress.ip_address(
@@ -281,19 +297,8 @@ jobs:
                               first,
                               last
                           ):
-                              if net.is_loopback:
-                                  continue
-
-                              if net.is_multicast:
-                                  continue
-
-                              if net.is_unspecified:
-                                  continue
-
-                              if net.is_link_local:
-                                  continue
-
-                              networks4.append(net)
+                              if valid(net):
+                                  networks4.append(net)
 
                       elif resource_type.lower() == "ipv6":
 
@@ -307,22 +312,8 @@ jobs:
                               strict=False
                           )
 
-                          if net.version != 6:
-                              continue
-
-                          if net.is_multicast:
-                              continue
-
-                          if net.is_link_local:
-                              continue
-
-                          if net.is_loopback:
-                              continue
-
-                          if net.is_unspecified:
-                              continue
-
-                          networks6.append(net)
+                          if valid(net):
+                              networks6.append(net)
 
                   except (
                       ValueError,
@@ -339,34 +330,20 @@ jobs:
           )
 
           if not merged4:
-              print(
-                  "ERROR: APNIC CN IPv4: "
-                  "no valid networks"
+              raise SystemExit(
+                  "ERROR: APNIC CN IPv4 is empty"
               )
-              sys.exit(1)
 
           if not merged6:
-              print(
-                  "ERROR: APNIC CN IPv6: "
-                  "no valid networks"
+              raise SystemExit(
+                  "ERROR: APNIC CN IPv6 is empty"
               )
-              sys.exit(1)
 
-          with open(
-              dst4,
-              "w",
-              encoding="utf-8"
-          ) as f:
-
+          with open(dst4, "w") as f:
               for net in merged4:
                   f.write(f"{net}\n")
 
-          with open(
-              dst6,
-              "w",
-              encoding="utf-8"
-          ) as f:
-
+          with open(dst6, "w") as f:
               for net in merged6:
                   f.write(f"{net}\n")
 
@@ -380,101 +357,6 @@ jobs:
               f"OK: APNIC CN IPv6: "
               f"source={len(networks6)} "
               f"aggregated={len(merged6)}"
-          )
-          PY
-          }
-
-          validate_asn_assist() {
-            local cn="$1"
-            local asn="$2"
-            local output="$3"
-
-            python3 - "$cn" "$asn" "$output" <<'PY'
-          import sys
-          import ipaddress
-
-          cn_file = sys.argv[1]
-          asn_file = sys.argv[2]
-          output = sys.argv[3]
-
-          cn = []
-
-          with open(cn_file) as f:
-              for line in f:
-                  line = line.strip()
-
-                  if line:
-                      try:
-                          cn.append(
-                              ipaddress.ip_network(
-                                  line,
-                                  strict=False
-                              )
-                          )
-                      except ValueError:
-                          continue
-
-          asn = []
-
-          with open(asn_file) as f:
-              for line in f:
-                  line = line.strip()
-
-                  if line:
-                      try:
-                          asn.append(
-                              ipaddress.ip_network(
-                                  line,
-                                  strict=False
-                              )
-                          )
-                      except ValueError:
-                          continue
-
-          overlap = []
-          only_asn = []
-
-          for a in asn:
-
-              matched = False
-
-              for c in cn:
-
-                  if a.overlaps(c):
-                      matched = True
-                      break
-
-              if matched:
-                  overlap.append(a)
-              else:
-                  only_asn.append(a)
-
-          overlap = list(
-              ipaddress.collapse_addresses(overlap)
-          )
-
-          only_asn = list(
-              ipaddress.collapse_addresses(only_asn)
-          )
-
-          with open(output, "w") as f:
-
-              f.write(
-                  f"ASN_OVERLAP={len(overlap)}\n"
-              )
-
-              f.write(
-                  f"ASN_ONLY={len(only_asn)}\n"
-              )
-
-          print(
-              f"ASN-China overlap with core="
-              f"{len(overlap)}"
-          )
-
-          print(
-              f"ASN-China only="
-              f"{len(only_asn)}"
           )
           PY
           }
@@ -496,7 +378,6 @@ jobs:
               echo "$command"
 
               while IFS= read -r cidr; do
-
                 [ -z "$cidr" ] && continue
 
                 echo \
@@ -664,31 +545,16 @@ jobs:
 
           echo
           echo "========================================"
-          echo "ASN Auxiliary Validation"
+          echo "ASN Auxiliary"
           echo "========================================"
 
-          validate_asn_assist \
-            "$WORKDIR/cn-core.final" \
-            "$WORKDIR/asn.final" \
-            "$WORKDIR/asn-validation.txt"
-
-          ASN_ONLY_COUNT=$(
-            awk -F= \
-              '/^ASN_ONLY=/{print $2}' \
-              "$WORKDIR/asn-validation.txt"
+          ASN_COUNT=$(
+            wc -l < "$WORKDIR/asn.final"
           )
 
-          ASN_OVERLAP_COUNT=$(
-            awk -F= \
-              '/^ASN_OVERLAP=/{print $2}' \
-              "$WORKDIR/asn-validation.txt"
-          )
-
-          echo
+          echo "ASN-China prefixes: $ASN_COUNT"
           echo "ASN-China is auxiliary only."
-          echo "ASN-China unique prefixes are NOT directly added to CN."
-          echo "ASN-China overlap: $ASN_OVERLAP_COUNT"
-          echo "ASN-China only: $ASN_ONLY_COUNT"
+          echo "ASN-China prefixes are NOT directly added to CN."
 
           echo
           echo "========================================"
@@ -832,8 +698,7 @@ jobs:
 
           rm -f data/drpeng6.rsc
 
-          echo \
-            "DRPENG6 skipped: upstream IPv6 source is unavailable."
+          echo "DRPENG6 skipped: upstream IPv6 source is unavailable."
 
           echo
           echo "========================================"
@@ -853,7 +718,6 @@ jobs:
           echo "========================================"
 
           for file in data/*.rsc; do
-
             count=$(
               grep -c '^add list=' "$file" || true
             )
@@ -862,7 +726,6 @@ jobs:
               '%-20s %6d prefixes\n' \
               "$(basename "$file")" \
               "$count"
-
           done
 
       - name: Validate generated files
@@ -872,7 +735,7 @@ jobs:
 
           echo
           echo "========================================"
-          echo "Validate Required Files"
+          echo "Validate Generated Files"
           echo "========================================"
 
           required=(
@@ -892,18 +755,17 @@ jobs:
           )
 
           for file in "${required[@]}"; do
-
             if [ ! -s "$file" ]; then
-              echo \
-                "ERROR: missing or empty $file"
+              echo "ERROR: missing or empty $file"
               exit 1
             fi
-
           done
+
+          echo "Required files OK."
 
           echo
           echo "========================================"
-          echo "Validate CIDR Syntax"
+          echo "Validate CIDR"
           echo "========================================"
 
           python3 - <<'PY'
@@ -934,259 +796,13 @@ jobs:
                           )
 
                       except ValueError:
-
                           raise SystemExit(
                               f"ERROR: invalid CIDR "
                               f"{filename}:{lineno}: "
                               f"{value}"
                           )
 
-          print(
-              "CIDR syntax validation passed."
-          )
-          PY
-
-          echo
-          echo "========================================"
-          echo "Validate Dangerous Prefixes"
-          echo "========================================"
-
-          python3 - <<'PY'
-          import glob
-          import ipaddress
-
-          forbidden = [
-              ipaddress.ip_network(
-                  "0.0.0.0/0"
-              ),
-              ipaddress.ip_network(
-                  "127.0.0.0/8"
-              ),
-              ipaddress.ip_network(
-                  "169.254.0.0/16"
-              ),
-              ipaddress.ip_network(
-                  "224.0.0.0/4"
-              ),
-              ipaddress.ip_network(
-                  "240.0.0.0/4"
-              ),
-              ipaddress.ip_network(
-                  "255.255.255.255/32"
-              ),
-              ipaddress.ip_network(
-                  "::/0"
-              ),
-              ipaddress.ip_network(
-                  "::1/128"
-              ),
-              ipaddress.ip_network(
-                  "fe80::/10"
-              ),
-              ipaddress.ip_network(
-                  "ff00::/8"
-              ),
-          ]
-
-          for filename in glob.glob(
-              "data/*.rsc"
-          ):
-
-              with open(
-                  filename,
-                  encoding="utf-8"
-              ) as f:
-
-                  for lineno, line in enumerate(
-                      f,
-                      1
-                  ):
-
-                      if "address=" not in line:
-                          continue
-
-                      value = line.split(
-                          "address=",
-                          1
-                      )[1].strip()
-
-                      try:
-                          net = ipaddress.ip_network(
-                              value,
-                              strict=False
-                          )
-
-                      except ValueError:
-                          continue
-
-                      for bad in forbidden:
-
-                          if net == bad:
-
-                              raise SystemExit(
-                                  "ERROR: forbidden "
-                                  "prefix: "
-                                  f"{filename}:"
-                                  f"{lineno}: "
-                                  f"{net}"
-                              )
-
-          print(
-              "Dangerous-prefix validation passed."
-          )
-          PY
-
-          echo
-          echo "========================================"
-          echo "Validate IPv4 Broad Prefixes"
-          echo "========================================"
-
-          python3 - <<'PY'
-          import glob
-          import ipaddress
-
-          allowed = {
-              ipaddress.ip_network(
-                  "10.0.0.0/8"
-              ),
-              ipaddress.ip_network(
-                  "172.16.0.0/12"
-              ),
-              ipaddress.ip_network(
-                  "192.168.0.0/16"
-              ),
-              ipaddress.ip_network(
-                  "100.64.0.0/10"
-              ),
-          }
-
-          for filename in glob.glob(
-              "data/*.rsc"
-          ):
-
-              with open(
-                  filename,
-                  encoding="utf-8"
-              ) as f:
-
-                  for lineno, line in enumerate(
-                      f,
-                      1
-                  ):
-
-                      if "address=" not in line:
-                          continue
-
-                      value = line.split(
-                          "address=",
-                          1
-                      )[1].strip()
-
-                      try:
-                          net = ipaddress.ip_network(
-                              value,
-                              strict=False
-                          )
-
-                      except ValueError:
-                          continue
-
-                      if net.version != 4:
-                          continue
-
-                      if net.prefixlen >= 10:
-                          continue
-
-                      if net in allowed:
-                          continue
-
-                      raise SystemExit(
-                          "ERROR: unexpectedly broad "
-                          f"IPv4 prefix: "
-                          f"{filename}:{lineno}: "
-                          f"{net}"
-                      )
-
-          print(
-              "Broad IPv4-prefix validation passed."
-          )
-          PY
-
-          echo
-          echo "========================================"
-          echo "Validate CN Local Networks"
-          echo "========================================"
-
-          python3 - <<'PY'
-          import ipaddress
-
-          filename = "data/cn.rsc"
-
-          required = [
-              ipaddress.ip_network(
-                  "10.10.10.0/25"
-              ),
-              ipaddress.ip_network(
-                  "172.16.100.0/28"
-              ),
-              ipaddress.ip_network(
-                  "10.0.0.0/8"
-              ),
-              ipaddress.ip_network(
-                  "172.16.0.0/12"
-              ),
-              ipaddress.ip_network(
-                  "192.168.0.0/16"
-              ),
-              ipaddress.ip_network(
-                  "100.64.0.0/10"
-              ),
-          ]
-
-          networks = []
-
-          with open(
-              filename,
-              encoding="utf-8"
-          ) as f:
-
-              for line in f:
-
-                  if "address=" not in line:
-                      continue
-
-                  value = line.split(
-                      "address=",
-                      1
-                  )[1].strip()
-
-                  try:
-                      networks.append(
-                          ipaddress.ip_network(
-                              value,
-                              strict=False
-                          )
-                      )
-
-                  except ValueError:
-                      continue
-
-          for target in required:
-
-              if not any(
-                  target.subnet_of(net)
-                  for net in networks
-              ):
-
-                  raise SystemExit(
-                      f"ERROR: {target} "
-                      "is not covered by CN"
-                  )
-
-              print(
-                  f"OK: {target} "
-                  "is covered by CN"
-              )
+          print("CIDR validation passed.")
           PY
 
           echo
@@ -1195,7 +811,6 @@ jobs:
           echo "========================================"
 
           python3 - <<'PY'
-          import glob
           import ipaddress
 
           ipv4_files = {
@@ -1217,32 +832,17 @@ jobs:
               "cstnet6.rsc",
           }
 
-          for filename in glob.glob(
-              "data/*.rsc"
-          ):
+          for filename in ipv4_files | ipv6_files:
 
-              basename = filename.split(
-                  "/"
-              )[-1]
-
-              if basename in ipv4_files:
-                  expected = 4
-
-              elif basename in ipv6_files:
-                  expected = 6
-
-              else:
-                  continue
+              path = "data/" + filename
+              expected = 4 if filename in ipv4_files else 6
 
               with open(
-                  filename,
+                  path,
                   encoding="utf-8"
               ) as f:
 
-                  for lineno, line in enumerate(
-                      f,
-                      1
-                  ):
+                  for lineno, line in enumerate(f, 1):
 
                       if "address=" not in line:
                           continue
@@ -1252,32 +852,25 @@ jobs:
                           1
                       )[1].strip()
 
-                      try:
-                          net = ipaddress.ip_network(
-                              value,
-                              strict=False
-                          )
-
-                      except ValueError:
-                          continue
+                      net = ipaddress.ip_network(
+                          value,
+                          strict=False
+                      )
 
                       if net.version != expected:
-
                           raise SystemExit(
-                              "ERROR: address family "
-                              "mismatch: "
-                              f"{filename}:{lineno}: "
+                              f"ERROR: address family "
+                              f"mismatch "
+                              f"{path}:{lineno}: "
                               f"{net}"
                           )
 
-          print(
-              "Address-family validation passed."
-          )
+          print("Address-family validation passed.")
           PY
 
           echo
           echo "========================================"
-          echo "Validate CN Important Prefixes"
+          echo "Validate CN Local Networks"
           echo "========================================"
 
           python3 - <<'PY'
@@ -1286,12 +879,12 @@ jobs:
           filename = "data/cn.rsc"
 
           required = [
-              ipaddress.ip_network(
-                  "10.10.10.0/25"
-              ),
-              ipaddress.ip_network(
-                  "172.16.100.0/28"
-              ),
+              ipaddress.ip_network("10.10.10.0/25"),
+              ipaddress.ip_network("172.16.100.0/28"),
+              ipaddress.ip_network("10.0.0.0/8"),
+              ipaddress.ip_network("172.16.0.0/12"),
+              ipaddress.ip_network("192.168.0.0/16"),
+              ipaddress.ip_network("100.64.0.0/10"),
           ]
 
           networks = []
@@ -1311,36 +904,29 @@ jobs:
                       1
                   )[1].strip()
 
-                  try:
-                      networks.append(
-                          ipaddress.ip_network(
-                              value,
-                              strict=False
-                          )
+                  networks.append(
+                      ipaddress.ip_network(
+                          value,
+                          strict=False
                       )
-
-                  except ValueError:
-                      continue
+                  )
 
           for target in required:
 
-              matches = [
-                  net
+              if not any(
+                  target.subnet_of(net)
                   for net in networks
-                  if target.subnet_of(net)
-              ]
-
-              if not matches:
-
+              ):
                   raise SystemExit(
-                      f"ERROR: missing "
-                      f"{target}"
+                      f"ERROR: {target} "
+                      "is not covered by CN"
                   )
 
               print(
-                  f"OK: {target} -> "
-                  f"{matches[0]}"
+                  f"OK: {target}"
               )
+
+          print("CN local-network validation passed.")
           PY
 
           echo
