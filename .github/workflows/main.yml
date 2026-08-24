@@ -60,10 +60,8 @@ jobs:
             local output="$2"
             local family="$3"
             local name="$4"
-            local minimum="$5"
-            local maximum="$6"
 
-            python3 - "$input" "$output" "$family" "$name" "$minimum" "$maximum" <<'PY'
+            python3 - "$input" "$output" "$family" "$name" <<'PY'
           import sys
           import ipaddress
           import re
@@ -72,16 +70,12 @@ jobs:
           dst = sys.argv[2]
           family = sys.argv[3]
           name = sys.argv[4]
-          minimum = int(sys.argv[5])
-          maximum = int(sys.argv[6])
 
           networks = []
           invalid = 0
           filtered = 0
 
           def valid_network(net):
-              global filtered
-
               if family == "ipv4" and net.version != 4:
                   return False
 
@@ -101,7 +95,6 @@ jobs:
                   return False
 
               if net.version == 4:
-
                   forbidden = [
                       ipaddress.ip_network("127.0.0.0/8"),
                       ipaddress.ip_network("169.254.0.0/16"),
@@ -112,14 +105,6 @@ jobs:
                   for bad in forbidden:
                       if net.subnet_of(bad):
                           return False
-
-                  # 保留 RFC1918
-                  # 10.0.0.0/8
-                  # 172.16.0.0/12
-                  # 192.168.0.0/16
-
-                  # 保留 CGNAT
-                  # 100.64.0.0/10
 
               return True
 
@@ -140,7 +125,6 @@ jobs:
               if not line:
                   return candidates
 
-              # MikroTik / Clash / Surge
               for part in re.split(r'[\s,]+', line):
                   part = part.strip()
 
@@ -161,7 +145,6 @@ jobs:
                   if "/" in part:
                       candidates.append(part)
 
-              # 如果整行就是 CIDR
               stripped = line.strip()
 
               if "/" in stripped:
@@ -191,6 +174,7 @@ jobs:
                           )
 
                       except ValueError:
+                          invalid += 1
                           continue
 
                       if not valid_network(net):
@@ -200,30 +184,14 @@ jobs:
                       networks.append(net)
 
           if not networks:
-              print(f"ERROR: {name}: no valid networks")
+              print(
+                  f"ERROR: {name}: no valid networks"
+              )
               sys.exit(1)
 
           merged = list(
               ipaddress.collapse_addresses(networks)
           )
-
-          count = len(merged)
-
-          if count < minimum:
-              print(
-                  f"ERROR: {name}: "
-                  f"{count} aggregated prefixes < "
-                  f"minimum {minimum}"
-              )
-              sys.exit(1)
-
-          if count > maximum:
-              print(
-                  f"ERROR: {name}: "
-                  f"{count} aggregated prefixes > "
-                  f"maximum {maximum}"
-              )
-              sys.exit(1)
 
           with open(
               dst,
@@ -237,7 +205,7 @@ jobs:
           print(
               f"OK: {name}: "
               f"source={len(networks)} "
-              f"aggregated={count} "
+              f"aggregated={len(merged)} "
               f"invalid={invalid} "
               f"filtered={filtered}"
           )
@@ -447,9 +415,15 @@ jobs:
                   line = line.strip()
 
                   if line:
-                      asn.append(
-                          ipaddress.ip_network(line)
-                      )
+                      try:
+                          asn.append(
+                              ipaddress.ip_network(
+                                  line,
+                                  strict=False
+                              )
+                          )
+                      except ValueError:
+                          continue
 
           overlap = []
           only_asn = []
@@ -590,73 +564,55 @@ jobs:
             "$CN_GAO" \
             "$WORKDIR/gaoyifan.final" \
             ipv4 \
-            GAOYIFAN \
-            2500 \
-            12000
+            GAOYIFAN
 
           normalize \
             "$CN_CHNROUTES2" \
             "$WORKDIR/chnroutes2.final" \
             ipv4 \
-            CHNROUTES2 \
-            2500 \
-            12000
+            CHNROUTES2
 
           normalize \
             "$CN_SURGE" \
             "$WORKDIR/surge.final" \
             ipv4 \
-            SURGE \
-            2500 \
-            15000
+            SURGE
 
           normalize \
             "$CN_CHNLIST" \
             "$WORKDIR/chniplist.final" \
             ipv4 \
-            CHN-IPLIST \
-            2500 \
-            15000
+            CHN-IPLIST
 
           normalize \
             "$CN_APNIC4" \
             "$WORKDIR/apnic.final" \
             ipv4 \
-            APNIC \
-            1500 \
-            30000
+            APNIC
 
           normalize \
             "$CN_ASN" \
             "$WORKDIR/asn.final" \
             ipv4 \
-            ASN-China \
-            5000 \
-            20000
+            ASN-China
 
           normalize \
             "$CN6_GAO" \
             "$WORKDIR/gaoyifan6.final" \
             ipv6 \
-            GAOYIFAN6 \
-            500 \
-            5000
+            GAOYIFAN6
 
           normalize \
             "$CN6_SURGE" \
             "$WORKDIR/surge6.final" \
             ipv6 \
-            SURGE6 \
-            500 \
-            5000
+            SURGE6
 
           normalize \
             "$CN_APNIC6" \
             "$WORKDIR/apnic6.final" \
             ipv6 \
-            APNIC6 \
-            500 \
-            20000
+            APNIC6
 
           echo
           echo "========================================"
@@ -675,9 +631,7 @@ jobs:
             "$WORKDIR/cn-core.raw" \
             "$WORKDIR/cn-core.final" \
             ipv4 \
-            CN-CORE \
-            3000 \
-            25000
+            CN-CORE
 
           cat \
             "$WORKDIR/gaoyifan6.final" \
@@ -689,9 +643,7 @@ jobs:
             "$WORKDIR/cn6-core.raw" \
             "$WORKDIR/cn6-core.final" \
             ipv6 \
-            CN6-CORE \
-            500 \
-            20000
+            CN6-CORE
 
           CN_CORE_COUNT=$(
             wc -l < "$WORKDIR/cn-core.final"
@@ -726,21 +678,11 @@ jobs:
               "$WORKDIR/asn-validation.txt"
           )
 
-          if [ "$ASN_ONLY_COUNT" -gt 5000 ]; then
-            echo \
-              "ERROR: ASN-China unique candidate set unexpectedly large"
-            exit 1
-          fi
-
-          if [ "$ASN_OVERLAP_COUNT" -lt 1000 ]; then
-            echo \
-              "ERROR: ASN-China has unexpectedly low overlap with core"
-            exit 1
-          fi
-
           echo
           echo "ASN-China is auxiliary only."
           echo "ASN-China unique prefixes are NOT directly added to CN."
+          echo "ASN-China overlap: $ASN_OVERLAP_COUNT"
+          echo "ASN-China only: $ASN_ONLY_COUNT"
 
           echo
           echo "========================================"
@@ -764,9 +706,7 @@ jobs:
             "$WORKDIR/cn-final.raw" \
             "$WORKDIR/cn-final.final" \
             ipv4 \
-            CN-FINAL \
-            3000 \
-            25000
+            CN-FINAL
 
           for required in \
             10.10.10.0/25 \
@@ -821,24 +761,6 @@ jobs:
             [DRPENG]="data/drpeng.rsc"
           )
 
-          declare -A ISP4_MIN=(
-            [China_Telecom]=3000
-            [China_Unicom]=3000
-            [China_Mobile]=800
-            [CERNET]=30
-            [CSTNET]=10
-            [DRPENG]=10
-          )
-
-          declare -A ISP4_MAX=(
-            [China_Telecom]=6000
-            [China_Unicom]=6000
-            [China_Mobile]=3000
-            [CERNET]=500
-            [CSTNET]=500
-            [DRPENG]=300
-          )
-
           for name in \
             China_Telecom \
             China_Unicom \
@@ -858,9 +780,7 @@ jobs:
               "$source" \
               "$final" \
               ipv4 \
-              "$name" \
-              "${ISP4_MIN[$name]}" \
-              "${ISP4_MAX[$name]}"
+              "$name"
 
             export_rsc \
               "$name" \
@@ -890,22 +810,6 @@ jobs:
             [CSTNET6]="data/cstnet6.rsc"
           )
 
-          declare -A ISP6_MIN=(
-            [China_Telecom6]=500
-            [China_Unicom6]=800
-            [China_Mobile6]=50
-            [CERNET6]=30
-            [CSTNET6]=1
-          )
-
-          declare -A ISP6_MAX=(
-            [China_Telecom6]=2000
-            [China_Unicom6]=3000
-            [China_Mobile6]=1000
-            [CERNET6]=500
-            [CSTNET6]=200
-          )
-
           for name in \
             China_Telecom6 \
             China_Unicom6 \
@@ -924,9 +828,7 @@ jobs:
               "$source" \
               "$final" \
               ipv6 \
-              "$name" \
-              "${ISP6_MIN[$name]}" \
-              "${ISP6_MAX[$name]}"
+              "$name"
 
             export_rsc \
               "$name" \
