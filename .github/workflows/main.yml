@@ -53,7 +53,7 @@ jobs:
           cat << 'EOF' > process.py
           import sys, ipaddress, re, os
 
-          def normalize(src, dst, family, min_c, max_c):
+          def normalize(src, dst, family):
               nets = []
               forbidden = [
                   ipaddress.ip_network("0.0.0.0/8"), ipaddress.ip_network("127.0.0.0/8"),
@@ -82,15 +82,12 @@ jobs:
                               except ValueError: pass
 
               merged = list(ipaddress.collapse_addresses(nets))
-              if not (min_c <= len(merged) <= max_c):
-                  if len(merged) == 0: sys.exit(1)
-
               with open(dst, 'w', encoding='utf-8') as f:
                   for net in merged: f.write(f"{net}\n")
 
           cmd = sys.argv[1]
           if cmd == "norm":
-              normalize(sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5]), int(sys.argv[6]))
+              normalize(sys.argv[2], sys.argv[3], sys.argv[4])
           elif cmd == "apnic":
               nets4, nets6 = [], []
               with open(sys.argv[2], 'r', encoding='utf-8-sig', errors='ignore') as f:
@@ -115,22 +112,22 @@ jobs:
 
           python3 process.py apnic WORKDIR/cn-apnic.txt WORKDIR/cn-apnic4.txt WORKDIR/cn-apnic6.txt
 
-          python3 process.py norm WORKDIR/cn-gaoyifan.txt WORKDIR/gaoyifan.final ipv4 2500 12000
-          python3 process.py norm WORKDIR/cn-chnroutes2.txt WORKDIR/chnroutes2.final ipv4 2500 12000
-          python3 process.py norm WORKDIR/cn-surge.txt WORKDIR/surge.final ipv4 2500 15000
-          python3 process.py norm WORKDIR/cn-chnlist.rsc WORKDIR/chniplist.final ipv4 2500 15000
-          python3 process.py norm WORKDIR/cn-apnic4.txt WORKDIR/apnic.final ipv4 1500 30000
+          python3 process.py norm WORKDIR/cn-gaoyifan.txt WORKDIR/gaoyifan.final ipv4
+          python3 process.py norm WORKDIR/cn-chnroutes2.txt WORKDIR/chnroutes2.final ipv4
+          python3 process.py norm WORKDIR/cn-surge.txt WORKDIR/surge.final ipv4
+          python3 process.py norm WORKDIR/cn-chnlist.rsc WORKDIR/chniplist.final ipv4
+          python3 process.py norm WORKDIR/cn-apnic4.txt WORKDIR/apnic.final ipv4
 
-          python3 process.py norm WORKDIR/cn6-gaoyifan.txt WORKDIR/gaoyifan6.final ipv6 500 5000
-          python3 process.py norm WORKDIR/cn6-surge.txt WORKDIR/surge6.final ipv6 500 5000
-          python3 process.py norm WORKDIR/cn-apnic6.txt WORKDIR/apnic6.final ipv6 500 20000
+          python3 process.py norm WORKDIR/cn6-gaoyifan.txt WORKDIR/gaoyifan6.final ipv6
+          python3 process.py norm WORKDIR/cn6-surge.txt WORKDIR/surge6.final ipv6
+          python3 process.py norm WORKDIR/cn-apnic6.txt WORKDIR/apnic6.final ipv6
 
           cat WORKDIR/*.final > WORKDIR/cn-core.raw
-          python3 process.py norm WORKDIR/cn-core.raw WORKDIR/cn-core.final ipv4 3000 25000
+          python3 process.py norm WORKDIR/cn-core.raw WORKDIR/cn-core.final ipv4
 
           cat WORKDIR/cn-core.final > WORKDIR/cn-final.raw
           printf "10.0.0.0/8\n172.16.0.0/12\n192.168.0.0/16\n10.10.10.0/25\n172.16.100.0/28\n" >> WORKDIR/cn-final.raw
-          python3 process.py norm WORKDIR/cn-final.raw WORKDIR/cn-final.final ipv4 3000 25000
+          python3 process.py norm WORKDIR/cn-final.raw WORKDIR/cn-final.final ipv4
 
           export_rsc() {
             local list_name="$1" input="$2" output="$3" ipv6="$4"
@@ -145,18 +142,26 @@ jobs:
           export_rsc "CN" WORKDIR/cn-final.final data/cn.rsc false
           export_rsc "CN6" WORKDIR/gaoyifan6.final data/cn6.rsc true
 
-          declare -A ISPS=( ["telecom"]="chinanet.txt" ["unicom"]="unicom.txt" ["cmcc"]="cmcc.txt" ["cernet"]="cernet.txt" ["cstnet"]="cstnet.txt" ["drpeng"]="drpeng.txt" )
-          for isp in "${!ISPS[@]}"; do
-            download "$GAOYIFAN/${ISPS[$isp]}" "WORKDIR/$isp.txt"
-            python3 process.py norm "WORKDIR/$isp.txt" "WORKDIR/$isp.final" ipv4 10 10000
+          ISPS_KEYS=("telecom" "unicom" "cmcc" "cernet" "cstnet" "drpeng")
+          ISPS_VALS=("chinanet.txt" "unicom.txt" "cmcc.txt" "cernet.txt" "cstnet.txt" "drpeng.txt")
+
+          for i in "${!ISPS_KEYS[@]}"; do
+            isp="${ISPS_KEYS[$i]}"
+            file="${ISPS_VALS[$i]}"
+            download "$GAOYIFAN/$file" "WORKDIR/$isp.txt"
+            python3 process.py norm "WORKDIR/$isp.txt" "WORKDIR/$isp.final" ipv4
             export_rsc "$isp" "WORKDIR/$isp.final" "data/$isp.rsc" false
           done
 
-          declare -A ISPS6=( ["telecom6"]="chinanet6.txt" ["unicom6"]="unicom6.txt" ["cmcc6"]="cmcc6.txt" ["cernet6"]="cernet6.txt" ["cstnet6"]="cstnet6.txt" )
-          for isp in "${!ISPS6[@]}"; do
-            download "$GAOYIFAN/${ISPS6[$isp]}" "WORKDIR/$isp.txt"
-            python3 process.py norm "WORKDIR/$isp.txt" "WORKDIR/$isp.final" ipv6 1 10000
-            export_rsc "$isp" "WORKDIR/$isp.final" "data/$isp6.rsc" true
+          ISPS6_KEYS=("telecom6" "unicom6" "cmcc6" "cernet6" "cstnet6")
+          ISPS6_VALS=("chinanet6.txt" "unicom6.txt" "cmcc6.txt" "cernet6.txt" "cstnet6.txt")
+
+          for i in "${!ISPS6_KEYS[@]}"; do
+            isp="${ISPS6_KEYS[$i]}"
+            file="${ISPS6_VALS[$i]}"
+            download "$GAOYIFAN/$file" "WORKDIR/$isp.txt"
+            python3 process.py norm "WORKDIR/$isp.txt" "WORKDIR/$isp.final" ipv6
+            export_rsc "$isp" "WORKDIR/$isp.final" "data/$isp.rsc" true
           done
 
       - name: Commit & Push
