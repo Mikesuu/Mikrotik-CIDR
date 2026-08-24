@@ -27,11 +27,12 @@ jobs:
           trap 'rm -rf "$WORKDIR"' EXIT
 
           GAOYIFAN="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
-          CHNROUTES2="https://raw.githubusercontent.com/misakaio/chnroutes2/master"
-          SURGE="https://ruleset.skk.moe/Clash/ip"
-          CHN_IPLIST="https://raw.githubusercontent.com/PaPerseller/chn-iplist/master"
+          METOWOLF="https://metowolf.github.io/iplist/data"
+          MON17="https://raw.githubusercontent.com/17mon/china_ip_list/master"
           ASN_CHINA="https://raw.githubusercontent.com/missuo/ASN-China/main"
           APNIC_STATS="https://ftp.apnic.net/apnic/stats/apnic"
+          RIPESTAT_CN="https://stat.ripe.net/data/country-resource-list/data.json?resource=cn&v4_format=prefix"
+          RIPESTAT_STATS="https://stat.ripe.net/data/country-resource-stats/data.json?resource=cn&resolution=1d"
 
           download() {
             local url="$1"
@@ -49,7 +50,14 @@ jobs:
               "$url" \
               -o "$output"
 
-            [ -s "$output" ]
+            if [ ! -s "$output" ]; then
+              echo "ERROR: empty download: $url"
+              exit 1
+            fi
+          }
+
+          source_count() {
+            grep -Evc '^[[:space:]]*(#|//|$)' "$1" || true
           }
 
           normalize() {
@@ -57,204 +65,122 @@ jobs:
             local output="$2"
             local family="$3"
             local name="$4"
+            local minimum="$5"
+            local maximum="$6"
 
-            python3 - "$input" "$output" "$family" "$name" <<'PY'
+            python3 - "$input" "$output" "$family" "$name" "$minimum" "$maximum" <<'PY'
           import sys
           import ipaddress
-          import re
 
           src = sys.argv[1]
           dst = sys.argv[2]
           family = sys.argv[3]
           name = sys.argv[4]
+          minimum = int(sys.argv[5])
+          maximum = int(sys.argv[6])
 
           networks = []
           invalid = 0
-          filtered = 0
 
-          forbidden_v4 = [
-              ipaddress.ip_network("0.0.0.0/8"),
-              ipaddress.ip_network("127.0.0.0/8"),
-              ipaddress.ip_network("169.254.0.0/16"),
-              ipaddress.ip_network("224.0.0.0/4"),
-              ipaddress.ip_network("240.0.0.0/4"),
-          ]
+          with open(src, "r", encoding="utf-8-sig", errors="ignore") as f:
+              for raw in f:
+                  line = raw.strip()
 
-          forbidden_v6 = [
-              ipaddress.ip_network("::/128"),
-              ipaddress.ip_network("::1/128"),
-              ipaddress.ip_network("fe80::/10"),
-              ipaddress.ip_network("ff00::/8"),
-          ]
-
-          def valid_network(net):
-              global filtered
-
-              if family == "ipv4" and net.version != 4:
-                  return False
-
-              if family == "ipv6" and net.version != 6:
-                  return False
-
-              if net.version == 4:
-                  for bad in forbidden_v4:
-                      if net.subnet_of(bad):
-                          return False
-
-              else:
-                  for bad in forbidden_v6:
-                      if net.subnet_of(bad):
-                          return False
-
-              return True
-
-          def extract_candidates(line):
-              candidates = []
-
-              line = line.strip()
-
-              if not line:
-                  return candidates
-
-              if line.startswith("#") or line.startswith("//"):
-                  return candidates
-
-              line = line.split("#", 1)[0]
-              line = line.split("//", 1)[0].strip()
-
-              if not line:
-                  return candidates
-
-              for part in re.split(r'[\s,]+', line):
-                  part = part.strip()
-
-                  if not part:
+                  if not line:
                       continue
 
-                  if part.startswith("address="):
-                      part = part.split("=", 1)[1]
+                  if line.startswith("#") or line.startswith("//"):
+                      continue
 
-                  if part.startswith("IP-CIDR6,"):
-                      part = part.split(",", 1)[1]
-                      part = part.split(",", 1)[0]
+                  line = line.split("#", 1)[0]
+                  line = line.split("//", 1)[0]
+                  line = line.strip()
 
-                  elif part.startswith("IP-CIDR,"):
-                      part = part.split(",", 1)[1]
-                      part = part.split(",", 1)[0]
+                  if not line:
+                      continue
 
-                  if "/" in part:
-                      candidates.append(part)
+                  if line.startswith("IP-CIDR,"):
+                      line = line.split(",", 1)[1].split(",", 1)[0].strip()
 
-              stripped = line.strip()
+                  if line.startswith("IP-CIDR6,"):
+                      line = line.split(",", 1)[1].split(",", 1)[0].strip()
 
-              if "/" in stripped:
-                  candidates.append(stripped)
+                  if line.startswith("IPSET,"):
+                      line = line.split(",", 1)[1].strip()
 
-              return candidates
+                  try:
+                      net = ipaddress.ip_network(line, strict=False)
+                  except ValueError:
+                      invalid += 1
+                      continue
 
-          with open(
-              src,
-              "r",
-              encoding="utf-8-sig",
-              errors="ignore"
-          ) as f:
+                  if family == "ipv4" and net.version != 4:
+                      continue
 
-              for raw in f:
-                  for candidate in extract_candidates(raw):
+                  if family == "ipv6" and net.version != 6:
+                      continue
 
-                      try:
-                          net = ipaddress.ip_network(
-                              candidate,
-                              strict=False
-                          )
+                  if net.is_loopback:
+                      continue
 
-                      except ValueError:
-                          invalid += 1
-                          continue
+                  if net.is_link_local:
+                      continue
 
-                      if not valid_network(net):
-                          filtered += 1
-                          continue
+                  if net.is_multicast:
+                      continue
 
-                      networks.append(net)
+                  if net.is_unspecified:
+                      continue
+
+                  networks.append(net)
 
           if not networks:
               print(f"ERROR: {name}: no valid networks")
               sys.exit(1)
 
-          merged = list(
-              ipaddress.collapse_addresses(networks)
-          )
+          merged = list(ipaddress.collapse_addresses(networks))
+          count = len(merged)
 
-          with open(
-              dst,
-              "w",
-              encoding="utf-8"
-          ) as f:
+          if count < minimum:
+              print(
+                  f"ERROR: {name}: "
+                  f"{count} aggregated prefixes < minimum {minimum}"
+              )
+              sys.exit(1)
 
+          if count > maximum:
+              print(
+                  f"ERROR: {name}: "
+                  f"{count} aggregated prefixes > maximum {maximum}"
+              )
+              sys.exit(1)
+
+          with open(dst, "w", encoding="utf-8") as f:
               for net in merged:
                   f.write(f"{net}\n")
 
           print(
               f"OK: {name}: "
               f"source={len(networks)} "
-              f"aggregated={len(merged)} "
-              f"invalid={invalid} "
-              f"filtered={filtered}"
+              f"aggregated={count} "
+              f"invalid={invalid}"
           )
           PY
           }
 
-          parse_apnic() {
+          parse_apnic_cn_ipv4() {
             local input="$1"
-            local output4="$2"
-            local output6="$3"
+            local output="$2"
 
-            python3 - "$input" "$output4" "$output6" <<'PY'
+            python3 - "$input" "$output" <<'PY'
           import sys
           import ipaddress
 
           src = sys.argv[1]
-          dst4 = sys.argv[2]
-          dst6 = sys.argv[3]
+          dst = sys.argv[2]
+          networks = []
 
-          networks4 = []
-          networks6 = []
-
-          forbidden_v4 = [
-              ipaddress.ip_network("0.0.0.0/8"),
-              ipaddress.ip_network("127.0.0.0/8"),
-              ipaddress.ip_network("169.254.0.0/16"),
-              ipaddress.ip_network("224.0.0.0/4"),
-              ipaddress.ip_network("240.0.0.0/4"),
-          ]
-
-          forbidden_v6 = [
-              ipaddress.ip_network("::/128"),
-              ipaddress.ip_network("::1/128"),
-              ipaddress.ip_network("fe80::/10"),
-              ipaddress.ip_network("ff00::/8"),
-          ]
-
-          def valid(net):
-              if net.version == 4:
-                  return not any(
-                      net.subnet_of(x)
-                      for x in forbidden_v4
-                  )
-
-              return not any(
-                  net.subnet_of(x)
-                  for x in forbidden_v6
-              )
-
-          with open(
-              src,
-              "r",
-              encoding="utf-8-sig",
-              errors="ignore"
-          ) as f:
-
+          with open(src, "r", encoding="utf-8-sig", errors="ignore") as f:
               for raw in f:
                   line = raw.strip()
 
@@ -274,90 +200,159 @@ jobs:
                   if country.upper() != "CN":
                       continue
 
-                  if status.lower() not in {
-                      "allocated",
-                      "assigned"
-                  }:
+                  if resource_type.lower() != "ipv4":
+                      continue
+
+                  if status.lower() not in {"allocated", "assigned"}:
                       continue
 
                   try:
-                      if resource_type.lower() == "ipv4":
+                      first = ipaddress.ip_address(start)
+                      count = int(value)
 
-                          first = ipaddress.ip_address(start)
-                          count = int(value)
+                      if first.version != 4 or count <= 0:
+                          continue
 
-                          if first.version != 4 or count <= 0:
-                              continue
+                      last = ipaddress.ip_address(
+                          int(first) + count - 1
+                      )
 
-                          last = ipaddress.ip_address(
-                              int(first) + count - 1
-                          )
-
-                          for net in ipaddress.summarize_address_range(
+                      networks.extend(
+                          ipaddress.summarize_address_range(
                               first,
                               last
-                          ):
-                              if valid(net):
-                                  networks4.append(net)
-
-                      elif resource_type.lower() == "ipv6":
-
-                          prefix = int(value)
-
-                          if prefix < 0 or prefix > 128:
-                              continue
-
-                          net = ipaddress.ip_network(
-                              f"{start}/{prefix}",
-                              strict=False
                           )
+                      )
 
-                          if valid(net):
-                              networks6.append(net)
-
-                  except (
-                      ValueError,
-                      TypeError
-                  ):
+                  except ValueError:
                       continue
 
-          merged4 = list(
-              ipaddress.collapse_addresses(networks4)
-          )
+          merged = list(ipaddress.collapse_addresses(networks))
 
-          merged6 = list(
-              ipaddress.collapse_addresses(networks6)
-          )
+          if not merged:
+              print("ERROR: APNIC CN IPv4: no valid networks")
+              sys.exit(1)
 
-          if not merged4:
-              raise SystemExit(
-                  "ERROR: APNIC CN IPv4 is empty"
-              )
-
-          if not merged6:
-              raise SystemExit(
-                  "ERROR: APNIC CN IPv6 is empty"
-              )
-
-          with open(dst4, "w") as f:
-              for net in merged4:
-                  f.write(f"{net}\n")
-
-          with open(dst6, "w") as f:
-              for net in merged6:
+          with open(dst, "w", encoding="utf-8") as f:
+              for net in merged:
                   f.write(f"{net}\n")
 
           print(
               f"OK: APNIC CN IPv4: "
-              f"source={len(networks4)} "
-              f"aggregated={len(merged4)}"
+              f"source={len(networks)} "
+              f"aggregated={len(merged)}"
+          )
+          PY
+          }
+
+          parse_ripestat_cn_ipv4() {
+            local input="$1"
+            local output="$2"
+
+            python3 - "$input" "$output" <<'PY'
+          import sys
+          import json
+          import ipaddress
+
+          src = sys.argv[1]
+          dst = sys.argv[2]
+
+          with open(src, "r", encoding="utf-8") as f:
+              data = json.load(f)
+
+          prefixes = (
+              data
+              .get("data", {})
+              .get("resources", {})
+              .get("ipv4", [])
           )
 
+          networks = []
+
+          for item in prefixes:
+              try:
+                  if "/" in item:
+                      net = ipaddress.ip_network(
+                          item,
+                          strict=False
+                      )
+
+                      if net.version == 4:
+                          networks.append(net)
+
+                  else:
+                      start, end = item.split("-", 1)
+
+                      networks.extend(
+                          ipaddress.summarize_address_range(
+                              ipaddress.ip_address(start.strip()),
+                              ipaddress.ip_address(end.strip())
+                          )
+                      )
+
+              except (ValueError, TypeError):
+                  continue
+
+          merged = list(ipaddress.collapse_addresses(networks))
+
+          if not merged:
+              print("ERROR: RIPEstat CN IPv4: no valid networks")
+              sys.exit(1)
+
+          with open(dst, "w", encoding="utf-8") as f:
+              for net in merged:
+                  f.write(f"{net}\n")
+
           print(
-              f"OK: APNIC CN IPv6: "
-              f"source={len(networks6)} "
-              f"aggregated={len(merged6)}"
+              f"OK: RIPEstat CN IPv4: "
+              f"source={len(networks)} "
+              f"aggregated={len(merged)}"
           )
+          PY
+          }
+
+          validate_ripestat_routing() {
+            local input="$1"
+
+            python3 - "$input" <<'PY'
+          import sys
+          import json
+
+          src = sys.argv[1]
+
+          try:
+              with open(src, "r", encoding="utf-8") as f:
+                  data = json.load(f)
+          except Exception as e:
+              print(f"WARN: RIPEstat CN routing stats unavailable: {e}")
+              sys.exit(0)
+
+          payload = data.get("data", {})
+          stats = payload.get("stats", [])
+
+          if not stats:
+              print("WARN: RIPEstat CN routing stats unavailable")
+              sys.exit(0)
+
+          latest = stats[-1]
+
+          ris = latest.get("v4_prefixes_ris")
+          registered = latest.get("v4_prefixes_stats")
+
+          if isinstance(ris, int) and ris > 0:
+              print(f"RIPEstat CN routing prefixes={ris}")
+          else:
+              print("WARN: RIPEstat CN BGP IPv4 prefix count unavailable")
+
+          if isinstance(registered, int) and registered > 0:
+              print(f"RIPEstat CN registered prefixes={registered}")
+          else:
+              print(
+                  "WARN: RIPEstat CN registration IPv4 "
+                  "prefix count unavailable"
+              )
+
+          sys.exit(0)
           PY
           }
 
@@ -379,216 +374,280 @@ jobs:
 
               while IFS= read -r cidr; do
                 [ -z "$cidr" ] && continue
-
-                echo \
-                  "add list=\"$list_name\" address=$cidr"
-
+                echo "add list=\"$list_name\" address=$cidr"
               done < "$input"
-
             } > "$output"
           }
 
           echo
           echo "========================================"
-          echo "Download Core Sources"
+          echo "ASN Cross Check"
+          echo "========================================"
+
+          ASN_RAW="$WORKDIR/asn-china.raw"
+          ASN_FINAL="$WORKDIR/asn-china.final"
+
+          download \
+            "$ASN_CHINA/IPv4.China.list" \
+            "$ASN_RAW"
+
+          ASN_SOURCE_COUNT=$(source_count "$ASN_RAW")
+
+          echo "ASN-China IPv4 source=$ASN_SOURCE_COUNT"
+
+          normalize \
+            "$ASN_RAW" \
+            "$ASN_FINAL" \
+            ipv4 \
+            ASN-China \
+            5000 \
+            15000
+
+          ASN_COUNT=$(wc -l < "$ASN_FINAL")
+
+          echo "ASN-China prefixes: $ASN_COUNT"
+
+          echo
+          echo "========================================"
+          echo "China IPv4"
           echo "========================================"
 
           CN_GAO="$WORKDIR/cn-gaoyifan.txt"
-          CN_CHNROUTES2="$WORKDIR/cn-chnroutes2.txt"
-          CN_SURGE="$WORKDIR/cn-surge.txt"
-          CN_CHNLIST="$WORKDIR/cn-chniplist.rsc"
-          CN_APNIC="$WORKDIR/cn-apnic.txt"
-          CN_APNIC4="$WORKDIR/cn-apnic4.txt"
-          CN_APNIC6="$WORKDIR/cn-apnic6.txt"
-          CN_ASN="$WORKDIR/cn-asn.txt"
-
-          CN6_GAO="$WORKDIR/cn6-gaoyifan.txt"
-          CN6_SURGE="$WORKDIR/cn6-surge.txt"
+          CN_META="$WORKDIR/cn-metowolf.txt"
+          CN_17MON="$WORKDIR/cn-17mon.txt"
+          CN_APNIC_RAW="$WORKDIR/cn-apnic.raw"
+          CN_RIPE_RAW="$WORKDIR/cn-ripestat.raw"
+          CN_RIPE_STATS="$WORKDIR/cn-ripestat-stats.json"
+          CN_RAW="$WORKDIR/cn.raw"
+          CN_FINAL="$WORKDIR/cn.final"
+          CN_ASN_EXTRA="$WORKDIR/cn-asn-extra.txt"
+          CN_ALL="$WORKDIR/cn-all.txt"
+          CN_ALL_FINAL="$WORKDIR/cn-all.final"
 
           download \
             "$GAOYIFAN/china.txt" \
             "$CN_GAO"
 
           download \
-            "$CHNROUTES2/chnroutes.txt" \
-            "$CN_CHNROUTES2"
+            "$METOWOLF/special/china.txt" \
+            "$CN_META"
 
           download \
-            "$SURGE/china_ip.txt" \
-            "$CN_SURGE"
-
-          download \
-            "$CHN_IPLIST/cn.rsc" \
-            "$CN_CHNLIST"
+            "$MON17/china_ip_list.txt" \
+            "$CN_17MON"
 
           download \
             "$APNIC_STATS/delegated-apnic-latest" \
-            "$CN_APNIC"
+            "$WORKDIR/delegated-apnic-latest"
 
           download \
-            "$ASN_CHINA/IPv4.China.list" \
-            "$CN_ASN"
+            "$RIPESTAT_CN" \
+            "$WORKDIR/ripestat-cn.json"
 
           download \
-            "$GAOYIFAN/china6.txt" \
-            "$CN6_GAO"
+            "$RIPESTAT_STATS" \
+            "$CN_RIPE_STATS"
 
-          download \
-            "$SURGE/china_ip_ipv6.txt" \
-            "$CN6_SURGE"
+          CN_GAO_COUNT=$(source_count "$CN_GAO")
+          CN_META_COUNT=$(source_count "$CN_META")
+          CN_17MON_COUNT=$(source_count "$CN_17MON")
 
-          parse_apnic \
-            "$CN_APNIC" \
-            "$CN_APNIC4" \
-            "$CN_APNIC6"
+          echo "gaoyifan CN IPv4 source=$CN_GAO_COUNT"
+          echo "metowolf CN IPv4 source=$CN_META_COUNT"
+          echo "17mon CN IPv4 source=$CN_17MON_COUNT"
 
-          echo
-          echo "========================================"
-          echo "Normalize Core Sources"
-          echo "========================================"
+          if [ "$CN_GAO_COUNT" -lt 3000 ] || [ "$CN_GAO_COUNT" -gt 7000 ]; then
+            echo "ERROR: abnormal gaoyifan CN IPv4 source size"
+            exit 1
+          fi
 
-          normalize \
+          if [ "$CN_META_COUNT" -lt 3000 ] || [ "$CN_META_COUNT" -gt 8000 ]; then
+            echo "ERROR: abnormal metowolf CN IPv4 source size"
+            exit 1
+          fi
+
+          if [ "$CN_17MON_COUNT" -lt 5000 ] || [ "$CN_17MON_COUNT" -gt 10000 ]; then
+            echo "ERROR: abnormal 17mon CN IPv4 source size"
+            exit 1
+          fi
+
+          parse_apnic_cn_ipv4 \
+            "$WORKDIR/delegated-apnic-latest" \
+            "$CN_APNIC_RAW"
+
+          parse_ripestat_cn_ipv4 \
+            "$WORKDIR/ripestat-cn.json" \
+            "$CN_RIPE_RAW"
+
+          validate_ripestat_routing "$CN_RIPE_STATS"
+
+          CN_APNIC_COUNT=$(wc -l < "$CN_APNIC_RAW")
+          CN_RIPE_COUNT=$(wc -l < "$CN_RIPE_RAW")
+
+          echo "APNIC CN IPv4 prefixes: $CN_APNIC_COUNT"
+          echo "RIPEstat CN IPv4 prefixes: $CN_RIPE_COUNT"
+
+          if [ "$CN_APNIC_COUNT" -lt 1000 ] || [ "$CN_APNIC_COUNT" -gt 30000 ]; then
+            echo "ERROR: abnormal APNIC CN IPv4 source size"
+            exit 1
+          fi
+
+          if [ "$CN_RIPE_COUNT" -lt 1000 ] || [ "$CN_RIPE_COUNT" -gt 30000 ]; then
+            echo "ERROR: abnormal RIPEstat CN IPv4 source size"
+            exit 1
+          fi
+
+          cat \
             "$CN_GAO" \
-            "$WORKDIR/gaoyifan.final" \
-            ipv4 \
-            GAOYIFAN
+            "$CN_META" \
+            "$CN_17MON" \
+            "$CN_APNIC_RAW" \
+            "$CN_RIPE_RAW" \
+            > "$CN_RAW"
 
-          normalize \
-            "$CN_CHNROUTES2" \
-            "$WORKDIR/chnroutes2.final" \
-            ipv4 \
-            CHNROUTES2
-
-          normalize \
-            "$CN_SURGE" \
-            "$WORKDIR/surge.final" \
-            ipv4 \
-            SURGE
-
-          normalize \
-            "$CN_CHNLIST" \
-            "$WORKDIR/chniplist.final" \
-            ipv4 \
-            CHN-IPLIST
-
-          normalize \
-            "$CN_APNIC4" \
-            "$WORKDIR/apnic.final" \
-            ipv4 \
-            APNIC
-
-          normalize \
-            "$CN_ASN" \
-            "$WORKDIR/asn.final" \
-            ipv4 \
-            ASN-China
-
-          normalize \
-            "$CN6_GAO" \
-            "$WORKDIR/gaoyifan6.final" \
-            ipv6 \
-            GAOYIFAN6
-
-          normalize \
-            "$CN6_SURGE" \
-            "$WORKDIR/surge6.final" \
-            ipv6 \
-            SURGE6
-
-          normalize \
-            "$CN_APNIC6" \
-            "$WORKDIR/apnic6.final" \
-            ipv6 \
-            APNIC6
-
-          echo
-          echo "========================================"
-          echo "Build CN Core"
-          echo "========================================"
-
-          cat \
-            "$WORKDIR/gaoyifan.final" \
-            "$WORKDIR/chnroutes2.final" \
-            "$WORKDIR/surge.final" \
-            "$WORKDIR/chniplist.final" \
-            "$WORKDIR/apnic.final" \
-            > "$WORKDIR/cn-core.raw"
-
-          normalize \
-            "$WORKDIR/cn-core.raw" \
-            "$WORKDIR/cn-core.final" \
-            ipv4 \
-            CN-CORE
-
-          cat \
-            "$WORKDIR/gaoyifan6.final" \
-            "$WORKDIR/surge6.final" \
-            "$WORKDIR/apnic6.final" \
-            > "$WORKDIR/cn6-core.raw"
-
-          normalize \
-            "$WORKDIR/cn6-core.raw" \
-            "$WORKDIR/cn6-core.final" \
-            ipv6 \
-            CN6-CORE
-
-          CN_CORE_COUNT=$(
-            wc -l < "$WORKDIR/cn-core.final"
-          )
-
-          CN6_CORE_COUNT=$(
-            wc -l < "$WORKDIR/cn6-core.final"
-          )
-
-          echo "CN core prefixes: $CN_CORE_COUNT"
-          echo "CN6 core prefixes: $CN6_CORE_COUNT"
-
-          echo
-          echo "========================================"
-          echo "ASN Auxiliary"
-          echo "========================================"
-
-          ASN_COUNT=$(
-            wc -l < "$WORKDIR/asn.final"
-          )
-
-          echo "ASN-China prefixes: $ASN_COUNT"
-          echo "ASN-China is auxiliary only."
-          echo "ASN-China prefixes are NOT directly added to CN."
-
-          echo
-          echo "========================================"
-          echo "Add Local Direct Prefixes"
-          echo "========================================"
-
-          cat \
-            "$WORKDIR/cn-core.final" \
-            > "$WORKDIR/cn-final.raw"
-
-          cat >> "$WORKDIR/cn-final.raw" <<'EOF'
+          cat >> "$CN_RAW" <<'EOF'
           10.10.10.0/25
           172.16.100.0/28
-          10.0.0.0/8
-          172.16.0.0/12
-          192.168.0.0/16
-          100.64.0.0/10
           EOF
 
           normalize \
-            "$WORKDIR/cn-final.raw" \
-            "$WORKDIR/cn-final.final" \
+            "$CN_RAW" \
+            "$CN_FINAL" \
             ipv4 \
-            CN-FINAL
+            CN \
+            4500 \
+            10000
+
+          CN_COUNT=$(wc -l < "$CN_FINAL")
+
+          echo "CN primary prefixes: $CN_COUNT"
+
+          echo
+          echo "========================================"
+          echo "ASN Intersection"
+          echo "========================================"
+
+          python3 - "$CN_FINAL" "$ASN_FINAL" "$CN_ASN_EXTRA" <<'PY'
+          import sys
+          import ipaddress
+
+          cn_file = sys.argv[1]
+          asn_file = sys.argv[2]
+          extra_file = sys.argv[3]
+
+          cn = []
+          asn = []
+
+          with open(cn_file) as f:
+              for line in f:
+                  line = line.strip()
+                  if line:
+                      cn.append(ipaddress.ip_network(line))
+
+          with open(asn_file) as f:
+              for line in f:
+                  line = line.strip()
+                  if line:
+                      asn.append(ipaddress.ip_network(line))
+
+          extra = []
+
+          for a in asn:
+              covered = False
+
+              for c in cn:
+                  if a.subnet_of(c) or c.subnet_of(a):
+                      covered = True
+                      break
+
+              if not covered:
+                  extra.append(a)
+
+          extra = list(ipaddress.collapse_addresses(extra))
+
+          with open(extra_file, "w") as f:
+              for net in extra:
+                  f.write(f"{net}\n")
+
+          print(
+              f"ASN prefixes not overlapping CN primary: {len(extra)}"
+          )
+          PY
+
+          echo
+          echo "========================================"
+          echo "ASN Candidate Validation"
+          echo "========================================"
+
+          ASN_EXTRA_COUNT=$(wc -l < "$CN_ASN_EXTRA")
+
+          echo "ASN candidate prefixes: $ASN_EXTRA_COUNT"
+
+          if [ "$ASN_EXTRA_COUNT" -gt 5000 ]; then
+            echo "ERROR: ASN candidate supplement unexpectedly large"
+            exit 1
+          fi
+
+          cat \
+            "$CN_FINAL" \
+            "$CN_ASN_EXTRA" \
+            > "$CN_ALL"
+
+          normalize \
+            "$CN_ALL" \
+            "$CN_ALL_FINAL" \
+            ipv4 \
+            CN-FINAL \
+            4500 \
+            12000
+
+          CN_FINAL_COUNT=$(wc -l < "$CN_ALL_FINAL")
+
+          echo "CN final prefixes: $CN_FINAL_COUNT"
+
+          if ! grep -q '^10.10.10.0/25$' "$CN_ALL_FINAL"; then
+            echo "ERROR: 10.10.10.0/25 missing from CN"
+            exit 1
+          fi
+
+          if ! grep -q '^172.16.100.0/28$' "$CN_ALL_FINAL"; then
+            echo "ERROR: 172.16.100.0/28 missing from CN"
+            exit 1
+          fi
 
           export_rsc \
             CN \
-            "$WORKDIR/cn-final.final" \
+            "$CN_ALL_FINAL" \
             data/cn.rsc \
             false
 
+          echo
+          echo "========================================"
+          echo "China IPv6"
+          echo "========================================"
+
+          CN6_RAW="$WORKDIR/cn6.raw"
+          CN6_FINAL="$WORKDIR/cn6.final"
+
+          download \
+            "$GAOYIFAN/china6.txt" \
+            "$CN6_RAW"
+
+          normalize \
+            "$CN6_RAW" \
+            "$CN6_FINAL" \
+            ipv6 \
+            CN6 \
+            500 \
+            3000
+
+          CN6_COUNT=$(wc -l < "$CN6_FINAL")
+
+          echo "CN IPv6 prefixes: $CN6_COUNT"
+
           export_rsc \
             CN6 \
-            "$WORKDIR/cn6-core.final" \
+            "$CN6_FINAL" \
             data/cn6.rsc \
             true
 
@@ -615,6 +674,24 @@ jobs:
             [DRPENG]="data/drpeng.rsc"
           )
 
+          declare -A ISP4_MIN=(
+            [China_Telecom]=3000
+            [China_Unicom]=3000
+            [China_Mobile]=800
+            [CERNET]=30
+            [CSTNET]=10
+            [DRPENG]=10
+          )
+
+          declare -A ISP4_MAX=(
+            [China_Telecom]=5000
+            [China_Unicom]=5000
+            [China_Mobile]=2000
+            [CERNET]=300
+            [CSTNET]=300
+            [DRPENG]=200
+          )
+
           for name in \
             China_Telecom \
             China_Unicom \
@@ -634,7 +711,9 @@ jobs:
               "$source" \
               "$final" \
               ipv4 \
-              "$name"
+              "$name" \
+              "${ISP4_MIN[$name]}" \
+              "${ISP4_MAX[$name]}"
 
             export_rsc \
               "$name" \
@@ -664,6 +743,22 @@ jobs:
             [CSTNET6]="data/cstnet6.rsc"
           )
 
+          declare -A ISP6_MIN=(
+            [China_Telecom6]=500
+            [China_Unicom6]=800
+            [China_Mobile6]=50
+            [CERNET6]=30
+            [CSTNET6]=1
+          )
+
+          declare -A ISP6_MAX=(
+            [China_Telecom6]=1500
+            [China_Unicom6]=2000
+            [China_Mobile6]=500
+            [CERNET6]=300
+            [CSTNET6]=100
+          )
+
           for name in \
             China_Telecom6 \
             China_Unicom6 \
@@ -682,7 +777,9 @@ jobs:
               "$source" \
               "$final" \
               ipv6 \
-              "$name"
+              "$name" \
+              "${ISP6_MIN[$name]}" \
+              "${ISP6_MAX[$name]}"
 
             export_rsc \
               "$name" \
@@ -702,28 +799,23 @@ jobs:
 
           echo
           echo "========================================"
-          echo "Remove Unsupported Lists"
+          echo "Remove unsupported lists"
           echo "========================================"
 
           rm -f \
             data/cbnnet.rsc \
             data/cbnnet6.rsc \
             data/cietnet.rsc \
-            data/cietnet6.rsc \
-            data/drpeng6.rsc
+            data/cietnet6.rsc
 
           echo
           echo "========================================"
-          echo "Generated Files"
+          echo "Generated files"
           echo "========================================"
 
           for file in data/*.rsc; do
-            count=$(
-              grep -c '^add list=' "$file" || true
-            )
-
-            printf \
-              '%-20s %6d prefixes\n' \
+            count=$(grep -c '^add list=' "$file" || true)
+            printf '%-20s %6d prefixes\n' \
               "$(basename "$file")" \
               "$count"
           done
@@ -733,24 +825,25 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo
-          echo "========================================"
-          echo "Validate Generated Files"
-          echo "========================================"
-
           required=(
             data/cn.rsc
             data/cn6.rsc
+
             data/telecom.rsc
             data/telecom6.rsc
+
             data/unicom.rsc
             data/unicom6.rsc
+
             data/cmcc.rsc
             data/cmcc6.rsc
+
             data/cernet.rsc
             data/cernet6.rsc
+
             data/cstnet.rsc
             data/cstnet6.rsc
+
             data/drpeng.rsc
           )
 
@@ -761,193 +854,40 @@ jobs:
             fi
           done
 
-          echo "Required files OK."
+          if grep -RniE \
+            '(^|address=)(0\.0\.0\.0/0|::/0|127\.0\.0\.0/8|::1/128|224\.0\.0\.0/4|ff00::/8)' \
+            data/*.rsc
+          then
+            echo "ERROR: invalid special/catch-all prefix detected"
+            exit 1
+          fi
 
-          echo
-          echo "========================================"
-          echo "Validate CIDR"
-          echo "========================================"
+          if grep -RniE \
+            '(^|address=)(192\.168\.0\.0/16|fc00::/7|fe80::/10)' \
+            data/*.rsc
+          then
+            echo "ERROR: unexpected private/link-local prefix detected"
+            exit 1
+          fi
 
-          python3 - <<'PY'
-          import glob
-          import ipaddress
+          if grep -RniE \
+            'address=(10\.0\.0\.0/8|172\.16\.0\.0/12|192\.168\.0\.0/16)' \
+            data/*.rsc
+          then
+            echo "ERROR: unexpected RFC1918 aggregate detected"
+            exit 1
+          fi
 
-          for filename in glob.glob("data/*.rsc"):
+          if ! grep -q 'address=10.10.10.0/25' data/cn.rsc; then
+            echo "ERROR: 10.10.10.0/25 missing from CN"
+            exit 1
+          fi
 
-              with open(
-                  filename,
-                  encoding="utf-8"
-              ) as f:
+          if ! grep -q 'address=172.16.100.0/28' data/cn.rsc; then
+            echo "ERROR: 172.16.100.0/28 missing from CN"
+            exit 1
+          fi
 
-                  for lineno, line in enumerate(f, 1):
-
-                      if "address=" not in line:
-                          continue
-
-                      value = line.split(
-                          "address=",
-                          1
-                      )[1].strip()
-
-                      try:
-                          ipaddress.ip_network(
-                              value,
-                              strict=False
-                          )
-
-                      except ValueError:
-                          raise SystemExit(
-                              f"ERROR: invalid CIDR "
-                              f"{filename}:{lineno}: "
-                              f"{value}"
-                          )
-
-          print("CIDR validation passed.")
-          PY
-
-          echo
-          echo "========================================"
-          echo "Validate Address Families"
-          echo "========================================"
-
-          python3 - <<'PY'
-          import ipaddress
-
-          ipv4_files = {
-              "cn.rsc",
-              "telecom.rsc",
-              "unicom.rsc",
-              "cmcc.rsc",
-              "cernet.rsc",
-              "cstnet.rsc",
-              "drpeng.rsc",
-          }
-
-          ipv6_files = {
-              "cn6.rsc",
-              "telecom6.rsc",
-              "unicom6.rsc",
-              "cmcc6.rsc",
-              "cernet6.rsc",
-              "cstnet6.rsc",
-          }
-
-          for filename in ipv4_files | ipv6_files:
-
-              path = "data/" + filename
-              expected = 4 if filename in ipv4_files else 6
-
-              with open(
-                  path,
-                  encoding="utf-8"
-              ) as f:
-
-                  for lineno, line in enumerate(f, 1):
-
-                      if "address=" not in line:
-                          continue
-
-                      value = line.split(
-                          "address=",
-                          1
-                      )[1].strip()
-
-                      net = ipaddress.ip_network(
-                          value,
-                          strict=False
-                      )
-
-                      if net.version != expected:
-                          raise SystemExit(
-                              f"ERROR: address family "
-                              f"mismatch "
-                              f"{path}:{lineno}: "
-                              f"{net}"
-                          )
-
-          print("Address-family validation passed.")
-          PY
-
-          echo
-          echo "========================================"
-          echo "Validate CN Local Networks"
-          echo "========================================"
-
-          python3 - <<'PY'
-          import ipaddress
-
-          filename = "data/cn.rsc"
-
-          required = [
-              ipaddress.ip_network("10.10.10.0/25"),
-              ipaddress.ip_network("172.16.100.0/28"),
-              ipaddress.ip_network("10.0.0.0/8"),
-              ipaddress.ip_network("172.16.0.0/12"),
-              ipaddress.ip_network("192.168.0.0/16"),
-              ipaddress.ip_network("100.64.0.0/10"),
-          ]
-
-          networks = []
-
-          with open(
-              filename,
-              encoding="utf-8"
-          ) as f:
-
-              for line in f:
-
-                  if "address=" not in line:
-                      continue
-
-                  value = line.split(
-                      "address=",
-                      1
-                  )[1].strip()
-
-                  networks.append(
-                      ipaddress.ip_network(
-                          value,
-                          strict=False
-                      )
-                  )
-
-          for target in required:
-
-              if not any(
-                  target.subnet_of(net)
-                  for net in networks
-              ):
-                  raise SystemExit(
-                      f"ERROR: {target} "
-                      "is not covered by CN"
-                  )
-
-              print(
-                  f"OK: {target}"
-              )
-
-          print("CN local-network validation passed.")
-          PY
-
-          echo
-          echo "========================================"
-          echo "Validation Summary"
-          echo "========================================"
-
-          for file in data/*.rsc; do
-
-            count=$(
-              grep -c '^add list=' "$file" || true
-            )
-
-            printf \
-              '%-20s %6d prefixes\n' \
-              "$(basename "$file")" \
-              "$count"
-
-          done
-
-          echo
           echo "Validation passed."
 
       - name: Commit and Push
@@ -955,14 +895,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          git config \
-            --local \
-            user.email \
+          git config --local user.email \
             "github-actions[bot]@users.noreply.github.com"
 
-          git config \
-            --local \
-            user.name \
+          git config --local user.name \
             "github-actions[bot]"
 
           git add data/*.rsc
