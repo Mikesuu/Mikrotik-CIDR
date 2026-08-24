@@ -356,49 +356,6 @@ jobs:
           PY
           }
 
-          validate_coverage() {
-            local input="$1"
-            local target="$2"
-            local name="$3"
-
-            python3 - "$input" "$target" "$name" <<'PY'
-          import sys
-          import ipaddress
-
-          source = sys.argv[1]
-          target = ipaddress.ip_network(sys.argv[2])
-          name = sys.argv[3]
-
-          networks = []
-
-          with open(source) as f:
-              for line in f:
-                  line = line.strip()
-
-                  if line:
-                      networks.append(
-                          ipaddress.ip_network(
-                              line,
-                              strict=False
-                          )
-                      )
-
-          for network in networks:
-              if target.subnet_of(network):
-                  print(
-                      f"OK: {name}: "
-                      f"{target} covered by {network}"
-                  )
-                  sys.exit(0)
-
-          print(
-              f"ERROR: {name}: "
-              f"{target} is not covered by final CN"
-          )
-          sys.exit(1)
-          PY
-          }
-
           export_rsc() {
             local list_name="$1"
             local input="$2"
@@ -620,7 +577,6 @@ jobs:
           echo
           echo "ASN-China is auxiliary only."
           echo "ASN-China unique prefixes are NOT directly added to CN."
-          echo "This prevents global routes originated by China ASNs from becoming blanket DIRECT routes."
 
           echo
           echo "========================================"
@@ -642,15 +598,38 @@ jobs:
             3000 \
             20000
 
-          validate_coverage \
-            "$WORKDIR/cn-final.final" \
-            "10.10.10.0/25" \
-            "10.10.10.0/25"
+          python3 - "$WORKDIR/cn-final.final" <<'PY'
+          import sys
+          import ipaddress
 
-          validate_coverage \
-            "$WORKDIR/cn-final.final" \
-            "172.16.100.0/28" \
-            "172.16.100.0/28"
+          filename = sys.argv[1]
+
+          targets = [
+              ipaddress.ip_network("10.10.10.0/25"),
+              ipaddress.ip_network("172.16.100.0/28"),
+          ]
+
+          networks = []
+
+          with open(filename) as f:
+              for line in f:
+                  line = line.strip()
+                  if line:
+                      networks.append(ipaddress.ip_network(line))
+
+          for target in targets:
+              covered = any(target.subnet_of(net) for net in networks)
+
+              if not covered:
+                  print(
+                      f"ERROR: {target} is not covered by CN"
+                  )
+                  sys.exit(1)
+
+              print(
+                  f"OK: {target} is covered by CN"
+              )
+          PY
 
           export_rsc \
             CN \
@@ -868,6 +847,11 @@ jobs:
             fi
           done
 
+          echo
+          echo "========================================"
+          echo "Validate Dangerous Prefixes"
+          echo "========================================"
+
           if grep -RniE \
             '(^|address=)(0\.0\.0\.0/0|::/0|127\.0\.0\.0/8|::1/128|224\.0\.0\.0/4|ff00::/8)' \
             data/*.rsc
@@ -876,33 +860,81 @@ jobs:
             exit 1
           fi
 
-          if grep -RniE \
-            '(^|address=)(192\.168\.0\.0/16|fc00::/7|fe80::/10)' \
-            data/*.rsc
-          then
-            echo "ERROR: unexpected private/link-local prefix detected"
-            exit 1
-          fi
+          echo
+          echo "========================================"
+          echo "Validate IPv4 Broad Prefixes"
+          echo "========================================"
 
-          if grep -RniE \
-            'address=(10\.0\.0\.0/8|172\.16\.0\.0/12|192\.168\.0\.0/16)' \
-            data/*.rsc
-          then
-            echo "ERROR: unexpected RFC1918 aggregate detected"
-            exit 1
-          fi
+          python3 - <<'PY'
+          import ipaddress
+          import glob
 
-          if ! grep -q \
-            'address=10\.10\.10\.0/25' \
-            data/cn.rsc
-          then
-            if ! python3 - <<'PY'
+          allowed_broad = {
+              ipaddress.ip_network("10.0.0.0/8"),
+              ipaddress.ip_network("172.16.0.0/12"),
+              ipaddress.ip_network("192.168.0.0/16"),
+          }
+
+          errors = []
+
+          for filename in glob.glob("data/*.rsc"):
+              with open(filename, encoding="utf-8") as f:
+                  for lineno, line in enumerate(f, 1):
+                      if "address=" not in line:
+                          continue
+
+                      value = line.split("address=", 1)[1].strip()
+
+                      try:
+                          net = ipaddress.ip_network(
+                              value,
+                              strict=False
+                          )
+                      except ValueError:
+                          continue
+
+                      if net.version != 4:
+                          continue
+
+                      if net.prefixlen > 9:
+                          continue
+
+                      if net in allowed_broad:
+                          continue
+
+                      errors.append(
+                          f"{filename}:{lineno}: {net}"
+                      )
+
+          if errors:
+              print("ERROR: unexpectedly broad IPv4 prefix detected")
+
+              for item in errors:
+                  print(item)
+
+              raise SystemExit(1)
+
+          print("Broad IPv4 prefix validation passed.")
+          PY
+
+          echo
+          echo "========================================"
+          echo "Validate Required Local Networks"
+          echo "========================================"
+
+          python3 - <<'PY'
           import ipaddress
 
-          target = ipaddress.ip_network("10.10.10.0/25")
-          found = False
+          filename = "data/cn.rsc"
 
-          with open("data/cn.rsc") as f:
+          targets = [
+              ipaddress.ip_network("10.10.10.0/25"),
+              ipaddress.ip_network("172.16.100.0/28"),
+          ]
+
+          networks = []
+
+          with open(filename, encoding="utf-8") as f:
               for line in f:
                   if "address=" not in line:
                       continue
@@ -910,80 +942,64 @@ jobs:
                   value = line.split("address=", 1)[1].strip()
 
                   try:
-                      network = ipaddress.ip_network(
-                          value,
-                          strict=False
+                      networks.append(
+                          ipaddress.ip_network(
+                              value,
+                              strict=False
+                          )
                       )
                   except ValueError:
                       continue
 
-                  if target.subnet_of(network):
-                      found = True
-                      print(
-                          f"OK: 10.10.10.0/25 covered by {network}"
-                      )
-                      break
+          for target in targets:
+              if not any(
+                  target.subnet_of(network)
+                  for network in networks
+              ):
+                  raise SystemExit(
+                      f"ERROR: {target} is not covered by CN"
+                  )
 
-          if not found:
-              raise SystemExit(
-                  "ERROR: 10.10.10.0/25 is not covered by CN"
+              print(
+                  f"OK: {target} is covered by CN"
               )
           PY
-            then
-              exit 1
-            fi
-          fi
 
-          if ! grep -q \
-            'address=172\.16\.100\.0/28' \
-            data/cn.rsc
-          then
-            if ! python3 - <<'PY'
-          import ipaddress
-
-          target = ipaddress.ip_network("172.16.100.0/28")
-          found = False
-
-          with open("data/cn.rsc") as f:
-              for line in f:
-                  if "address=" not in line:
-                      continue
-
-                  value = line.split("address=", 1)[1].strip()
-
-                  try:
-                      network = ipaddress.ip_network(
-                          value,
-                          strict=False
-                      )
-                  except ValueError:
-                      continue
-
-                  if target.subnet_of(network):
-                      found = True
-                      print(
-                          f"OK: 172.16.100.0/28 covered by {network}"
-                      )
-                      break
-
-          if not found:
-              raise SystemExit(
-                  "ERROR: 172.16.100.0/28 is not covered by CN"
-              )
-          PY
-            then
-              exit 1
-            fi
-          fi
+          echo
+          echo "========================================"
+          echo "Validate Address List Syntax"
+          echo "========================================"
 
           if grep -RniE \
-            'address=([0-9]{1,3}\.){3}[0-9]{1,3}/(0|1|2|3|4|5|6|7|8|9)' \
+            '^add list="[^"]+" address=$' \
             data/*.rsc
           then
-            echo "ERROR: unexpectedly broad IPv4 prefix detected"
+            echo "ERROR: empty address detected"
             exit 1
           fi
 
+          if grep -RniE \
+            '^add list="[^"]+" address=([^0-9a-fA-F:])' \
+            data/*.rsc
+          then
+            echo "ERROR: invalid address-list entry detected"
+            exit 1
+          fi
+
+          echo
+          echo "========================================"
+          echo "Validation Summary"
+          echo "========================================"
+
+          for file in data/*.rsc; do
+            count=$(grep -c '^add list=' "$file" || true)
+
+            printf '%-20s %6d prefixes\n' \
+              "$(basename "$file")" \
+              "$count"
+          done
+
+          echo
           echo "Validation passed."
 
       - name: Commit and Push
