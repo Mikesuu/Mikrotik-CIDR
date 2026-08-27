@@ -1,6 +1,7 @@
 /ipv6 firewall address-list
 remove [find list="telecom6"]
 add list="telecom6" address=2001:250:2::/48
+add list="telecom6" address=2001:250:4::/48
 add list="telecom6" address=2001:250:205::/48
 add list="telecom6" address=2001:250:206::/47
 add list="telecom6" address=2001:250:208::/46
@@ -205,9 +206,7 @@ add list="telecom6" address=2001:250:7430::/48
 add list="telecom6" address=2001:250:7801::/48
 add list="telecom6" address=2001:250:7802::/47
 add list="telecom6" address=2001:250:7804::/46
-add list="telecom6" address=2001:250:7808::/48
-add list="telecom6" address=2001:250:780a::/47
-add list="telecom6" address=2001:250:780c::/46
+add list="telecom6" address=2001:250:7808::/45
 add list="telecom6" address=2001:250:7810::/46
 add list="telecom6" address=2001:250:7814::/47
 add list="telecom6" address=2001:250:7817::/48

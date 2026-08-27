@@ -2128,7 +2128,6 @@ add list="CN6" address=2a0a:d681:fd00::/40
 add list="CN6" address=2a0a:d682::/33
 add list="CN6" address=2a0a:d682:8000::/34
 add list="CN6" address=2a0a:d682:c000::/36
-add list="CN6" address=2a0a:d682:e000::/35
 add list="CN6" address=2a0a:d683::/32
 add list="CN6" address=2a0a:d684::/32
 add list="CN6" address=2a0a:d685::/40

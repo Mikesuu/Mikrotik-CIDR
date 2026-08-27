@@ -2,6 +2,7 @@
 remove [find list="cernet6"]
 add list="cernet6" address=2001:250::/30
 add list="cernet6" address=2001:255::/32
+add list="cernet6" address=2001:7fa:5::/48
 add list="cernet6" address=2001:c68::/32
 add list="cernet6" address=2001:da8::/32
 add list="cernet6" address=2001:daa:1::/48
