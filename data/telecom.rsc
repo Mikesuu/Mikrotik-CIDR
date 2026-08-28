@@ -310,7 +310,8 @@ add list="telecom" address=49.221.128.0/19
 add list="telecom" address=49.239.192.0/18
 add list="telecom" address=54.222.46.0/23
 add list="telecom" address=58.24.0.0/15
-add list="telecom" address=58.30.0.0/17
+add list="telecom" address=58.30.0.0/19
+add list="telecom" address=58.30.64.0/18
 add list="telecom" address=58.30.128.0/19
 add list="telecom" address=58.30.192.0/18
 add list="telecom" address=58.31.0.0/16
@@ -2372,7 +2373,7 @@ add list="telecom" address=163.61.178.0/23
 add list="telecom" address=163.61.202.0/23
 add list="telecom" address=163.61.215.0/24
 add list="telecom" address=163.227.40.0/23
-add list="telecom" address=166.0.97.0/24
+add list="telecom" address=163.228.102.0/24
 add list="telecom" address=166.111.0.0/18
 add list="telecom" address=166.111.128.0/17
 add list="telecom" address=167.139.0.0/16
@@ -2570,7 +2571,9 @@ add list="telecom" address=202.55.0.0/23
 add list="telecom" address=202.55.4.0/24
 add list="telecom" address=202.55.18.0/23
 add list="telecom" address=202.55.20.0/22
-add list="telecom" address=202.55.24.0/21
+add list="telecom" address=202.55.24.0/22
+add list="telecom" address=202.55.28.0/23
+add list="telecom" address=202.55.31.0/24
 add list="telecom" address=202.57.196.0/22
 add list="telecom" address=202.57.200.0/23
 add list="telecom" address=202.57.202.0/24
@@ -2830,7 +2833,6 @@ add list="telecom" address=203.3.80.0/21
 add list="telecom" address=203.3.112.0/21
 add list="telecom" address=203.6.224.0/20
 add list="telecom" address=203.8.25.0/24
-add list="telecom" address=203.8.30.0/24
 add list="telecom" address=203.12.91.0/24
 add list="telecom" address=203.12.93.0/24
 add list="telecom" address=203.12.95.0/24
@@ -3025,6 +3027,8 @@ add list="telecom" address=203.195.128.0/17
 add list="telecom" address=203.196.2.0/23
 add list="telecom" address=203.196.7.0/24
 add list="telecom" address=203.202.236.0/23
+add list="telecom" address=203.205.64.0/20
+add list="telecom" address=203.205.80.0/21
 add list="telecom" address=203.205.88.0/22
 add list="telecom" address=203.205.92.0/23
 add list="telecom" address=203.207.200.0/22
@@ -3146,8 +3150,6 @@ add list="telecom" address=210.47.128.0/20
 add list="telecom" address=210.47.144.0/21
 add list="telecom" address=210.47.160.0/19
 add list="telecom" address=210.47.192.0/18
-add list="telecom" address=210.48.140.0/23
-add list="telecom" address=210.48.142.0/24
 add list="telecom" address=210.72.224.0/21
 add list="telecom" address=210.72.233.0/24
 add list="telecom" address=210.72.234.0/23
@@ -3268,12 +3270,6 @@ add list="telecom" address=211.99.24.0/21
 add list="telecom" address=211.99.103.0/24
 add list="telecom" address=211.99.104.0/21
 add list="telecom" address=211.99.128.0/20
-add list="telecom" address=211.99.145.0/24
-add list="telecom" address=211.99.146.0/23
-add list="telecom" address=211.99.148.0/22
-add list="telecom" address=211.99.152.0/22
-add list="telecom" address=211.99.156.0/24
-add list="telecom" address=211.99.158.0/23
 add list="telecom" address=211.99.160.0/20
 add list="telecom" address=211.99.176.0/21
 add list="telecom" address=211.99.184.0/22
@@ -3317,6 +3313,7 @@ add list="telecom" address=211.150.124.0/23
 add list="telecom" address=211.150.128.0/24
 add list="telecom" address=211.151.0.0/19
 add list="telecom" address=211.151.84.0/23
+add list="telecom" address=211.151.171.0/24
 add list="telecom" address=211.151.180.0/23
 add list="telecom" address=211.151.207.0/24
 add list="telecom" address=211.152.32.0/19
@@ -3417,7 +3414,9 @@ add list="telecom" address=218.20.0.0/16
 add list="telecom" address=218.21.0.0/17
 add list="telecom" address=218.22.0.0/15
 add list="telecom" address=218.30.0.0/19
-add list="telecom" address=218.30.32.0/21
+add list="telecom" address=218.30.32.0/22
+add list="telecom" address=218.30.36.0/23
+add list="telecom" address=218.30.38.0/24
 add list="telecom" address=218.30.40.0/22
 add list="telecom" address=218.30.45.0/24
 add list="telecom" address=218.30.46.0/23
@@ -3512,8 +3511,7 @@ add list="telecom" address=218.240.16.0/20
 add list="telecom" address=218.240.128.0/19
 add list="telecom" address=218.240.167.0/24
 add list="telecom" address=218.240.168.0/24
-add list="telecom" address=218.240.177.0/24
-add list="telecom" address=218.240.178.0/23
+add list="telecom" address=218.240.176.0/22
 add list="telecom" address=218.240.182.0/24
 add list="telecom" address=218.240.185.0/24
 add list="telecom" address=218.240.186.0/23

@@ -2121,10 +2121,7 @@ add list="CN6" address=2a0a:d681:e100::/40
 add list="CN6" address=2a0a:d681:e200::/39
 add list="CN6" address=2a0a:d681:e400::/38
 add list="CN6" address=2a0a:d681:e800::/37
-add list="CN6" address=2a0a:d681:f000::/37
-add list="CN6" address=2a0a:d681:f800::/39
-add list="CN6" address=2a0a:d681:fa00::/40
-add list="CN6" address=2a0a:d681:fd00::/40
+add list="CN6" address=2a0a:d681:f000::/36
 add list="CN6" address=2a0a:d682::/33
 add list="CN6" address=2a0a:d682:8000::/34
 add list="CN6" address=2a0a:d682:c000::/36
