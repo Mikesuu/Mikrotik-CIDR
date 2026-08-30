@@ -2033,6 +2033,7 @@ add list="telecom" address=122.248.56.0/22
 add list="telecom" address=123.49.192.0/23
 add list="telecom" address=123.49.240.0/24
 add list="telecom" address=123.49.242.0/23
+add list="telecom" address=123.49.245.0/24
 add list="telecom" address=123.52.0.0/14
 add list="telecom" address=123.58.16.0/23
 add list="telecom" address=123.58.19.0/24
@@ -3515,7 +3516,6 @@ add list="telecom" address=218.241.112.0/24
 add list="telecom" address=218.242.0.0/16
 add list="telecom" address=218.244.0.0/19
 add list="telecom" address=218.244.160.0/19
-add list="telecom" address=218.245.1.0/24
 add list="telecom" address=218.245.2.0/23
 add list="telecom" address=218.245.4.0/22
 add list="telecom" address=218.245.8.0/21
