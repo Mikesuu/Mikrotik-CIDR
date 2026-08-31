@@ -6497,6 +6497,7 @@ add list="CN" address=204.217.163.0/24
 add list="CN" address=205.168.23.120/29
 add list="CN" address=205.198.19.0/24
 add list="CN" address=205.252.239.0/24
+add list="CN" address=206.109.70.0/23
 add list="CN" address=206.109.75.0/24
 add list="CN" address=206.232.68.0/22
 add list="CN" address=206.232.72.0/22
