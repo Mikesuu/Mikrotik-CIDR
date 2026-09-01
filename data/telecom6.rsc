@@ -659,7 +659,6 @@ add list="telecom6" address=2407:9f00::/32
 add list="telecom6" address=2407:b380:8000::/48
 add list="telecom6" address=2407:c080:1730::/44
 add list="telecom6" address=2407:c080:1800::/37
-add list="telecom6" address=2407:d9c0::/32
 add list="telecom6" address=2409:27fa::/48
 add list="telecom6" address=2409:27fa:f000::/48
 add list="telecom6" address=2409:27fb::/48
