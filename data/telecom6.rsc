@@ -530,7 +530,6 @@ add list="telecom6" address=2401:ce00:d400::/38
 add list="telecom6" address=2401:ce00:d800::/37
 add list="telecom6" address=2401:d0e0:3::/48
 add list="telecom6" address=2401:d780::/32
-add list="telecom6" address=2401:fa00:40::/48
 add list="telecom6" address=2402:840:d000::/48
 add list="telecom6" address=2402:840:e000::/46
 add list="telecom6" address=2402:840:f000::/38
