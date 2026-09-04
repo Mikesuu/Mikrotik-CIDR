@@ -35,6 +35,7 @@ add list="cmcc6" address=2402:6e80::/32
 add list="cmcc6" address=2402:8bc0::/32
 add list="cmcc6" address=2402:9a80::/32
 add list="cmcc6" address=2402:e880::/48
+add list="cmcc6" address=2402:f140:ff23::/48
 add list="cmcc6" address=2402:f140:ff24::/48
 add list="cmcc6" address=2403:7580::/44
 add list="cmcc6" address=2403:7580:10::/46

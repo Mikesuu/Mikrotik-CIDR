@@ -4701,6 +4701,7 @@ add list="CN" address=163.0.0.0/16
 add list="CN" address=163.47.4.0/22
 add list="CN" address=163.52.28.0/23
 add list="CN" address=163.52.76.0/23
+add list="CN" address=163.52.108.0/23
 add list="CN" address=163.53.0.0/20
 add list="CN" address=163.53.36.0/22
 add list="CN" address=163.53.40.0/21

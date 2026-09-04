@@ -670,7 +670,6 @@ add list="CN6" address=2401:f320::/32
 add list="CN6" address=2401:f3e0::/32
 add list="CN6" address=2401:f7c0::/32
 add list="CN6" address=2401:f860::/32
-add list="CN6" address=2401:fa00:40::/48
 add list="CN6" address=2401:fa80::/32
 add list="CN6" address=2401:fb80::/32
 add list="CN6" address=2401:fc60::/32
@@ -804,6 +803,7 @@ add list="CN6" address=2402:71c0::/32
 add list="CN6" address=2402:7240::/32
 add list="CN6" address=2402:72a0::/32
 add list="CN6" address=2402:72c0::/32
+add list="CN6" address=2402:73e0::/32
 add list="CN6" address=2402:7540::/32
 add list="CN6" address=2402:75c0::/32
 add list="CN6" address=2402:7740::/32

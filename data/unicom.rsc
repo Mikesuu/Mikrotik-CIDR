@@ -127,6 +127,7 @@ add list="unicom" address=42.247.24.0/22
 add list="unicom" address=42.247.28.0/24
 add list="unicom" address=42.247.31.0/24
 add list="unicom" address=42.247.44.0/24
+add list="unicom" address=43.193.65.0/24
 add list="unicom" address=43.195.0.0/20
 add list="unicom" address=43.195.16.0/22
 add list="unicom" address=43.195.20.0/23
@@ -261,6 +262,10 @@ add list="unicom" address=49.114.16.0/23
 add list="unicom" address=49.116.232.0/24
 add list="unicom" address=49.117.128.0/24
 add list="unicom" address=49.239.192.0/18
+add list="unicom" address=52.82.164.0/22
+add list="unicom" address=52.82.184.0/23
+add list="unicom" address=52.82.188.0/23
+add list="unicom" address=52.82.190.0/24
 add list="unicom" address=54.222.46.0/23
 add list="unicom" address=58.16.0.0/13
 add list="unicom" address=58.42.243.0/24
@@ -1658,7 +1663,6 @@ add list="unicom" address=123.4.0.0/14
 add list="unicom" address=123.8.0.0/13
 add list="unicom" address=123.49.192.0/23
 add list="unicom" address=123.49.194.0/24
-add list="unicom" address=123.49.245.0/24
 add list="unicom" address=123.58.32.0/23
 add list="unicom" address=123.58.34.0/24
 add list="unicom" address=123.58.36.0/24
@@ -2788,6 +2792,7 @@ add list="unicom" address=218.67.128.0/17
 add list="unicom" address=218.68.0.0/15
 add list="unicom" address=218.70.11.0/24
 add list="unicom" address=218.70.107.0/24
+add list="unicom" address=218.70.110.0/24
 add list="unicom" address=218.75.128.0/21
 add list="unicom" address=218.75.136.0/23
 add list="unicom" address=218.75.139.0/24
@@ -2941,7 +2946,6 @@ add list="unicom" address=218.94.104.0/24
 add list="unicom" address=218.94.107.0/24
 add list="unicom" address=218.94.111.0/24
 add list="unicom" address=218.94.129.0/24
-add list="unicom" address=218.94.142.0/24
 add list="unicom" address=218.94.144.0/24
 add list="unicom" address=218.94.147.0/24
 add list="unicom" address=218.94.151.0/24
@@ -3417,6 +3421,8 @@ add list="unicom" address=222.175.158.0/24
 add list="unicom" address=222.177.124.0/24
 add list="unicom" address=222.178.193.0/24
 add list="unicom" address=222.178.211.0/24
+add list="unicom" address=222.178.228.0/24
+add list="unicom" address=222.180.59.0/24
 add list="unicom" address=222.184.49.0/24
 add list="unicom" address=222.184.228.0/24
 add list="unicom" address=222.184.234.0/24
