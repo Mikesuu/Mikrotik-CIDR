@@ -1223,7 +1223,7 @@ add list="China_Unicom6" address=240a:a000::/27
 add list="China_Unicom6" address=240a:a020::/30
 add list="China_Unicom6" address=240a:a024::/31
 add list="China_Unicom6" address=240a:a026::/32
-add list="China_Unicom6" address=240a:a027::/48
+add list="China_Unicom6" address=240a:a027::/47
 add list="China_Unicom6" address=240a:a027:3::/48
 add list="China_Unicom6" address=240a:a027:4::/46
 add list="China_Unicom6" address=240a:a027:8::/45
