@@ -1,3 +1,4 @@
+/ip firewall address-list remove [/ip firewall address-list find list="China_Unicom"]
 /ip firewall address-list
 add list="China_Unicom" address=1.1.8.0/24
 add list="China_Unicom" address=1.2.4.0/24

@@ -1,3 +1,4 @@
+/ipv6 firewall address-list remove [/ipv6 firewall address-list find list="China_Unicom6"]
 /ipv6 firewall address-list
 add list="China_Unicom6" address=2001:250:2::/48
 add list="China_Unicom6" address=2001:250:4::/48

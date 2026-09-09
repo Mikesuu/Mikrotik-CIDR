@@ -1,3 +1,4 @@
+/ip firewall address-list remove [/ip firewall address-list find list="CN"]
 /ip firewall address-list
 add list="CN" address=1.0.1.0/24
 add list="CN" address=1.0.2.0/23

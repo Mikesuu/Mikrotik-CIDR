@@ -1,3 +1,4 @@
+/ip firewall address-list remove [/ip firewall address-list find list="DRPENG"]
 /ip firewall address-list
 add list="DRPENG" address=60.195.252.0/22
 add list="DRPENG" address=115.182.0.0/19

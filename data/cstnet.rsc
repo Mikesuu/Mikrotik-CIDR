@@ -1,3 +1,4 @@
+/ip firewall address-list remove [/ip firewall address-list find list="CSTNET"]
 /ip firewall address-list
 add list="CSTNET" address=1.8.1.0/24
 add list="CSTNET" address=1.8.8.0/24

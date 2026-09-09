@@ -1,3 +1,4 @@
+/ip firewall address-list remove [/ip firewall address-list find list="CERNET"]
 /ip firewall address-list
 add list="CERNET" address=1.51.0.0/16
 add list="CERNET" address=1.184.0.0/15

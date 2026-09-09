@@ -1,3 +1,4 @@
+/ipv6 firewall address-list remove [/ipv6 firewall address-list find list="China_Mobile6"]
 /ipv6 firewall address-list
 add list="China_Mobile6" address=2001:dc7:3::/48
 add list="China_Mobile6" address=2400:9020:f012::/47

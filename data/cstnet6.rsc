@@ -1,3 +1,4 @@
+/ipv6 firewall address-list remove [/ipv6 firewall address-list find list="CSTNET6"]
 /ipv6 firewall address-list
 add list="CSTNET6" address=2001:cc0::/32
 add list="CSTNET6" address=2001:dcc:501::/48

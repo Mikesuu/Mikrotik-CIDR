@@ -1,3 +1,4 @@
+/ip firewall address-list remove [/ip firewall address-list find list="China_Telecom"]
 /ip firewall address-list
 add list="China_Telecom" address=1.12.14.0/23
 add list="China_Telecom" address=1.12.16.0/20
