@@ -236,7 +236,7 @@ jobs:
               base_cmd="/ipv6 firewall address-list"
 
             {
-              echo "$base_cmd remove [$base_cmd find list=\"$list_name\"]"
+              echo "$base_cmd remove [find where list=\"$list_name\"]"
               echo "$base_cmd"
 
               while IFS= read -r cidr; do
@@ -364,6 +364,6 @@ jobs:
           if git diff --staged --quiet; then
             exit 0
           else
-            git commit -m "Auto update MikroTik IP lists with uppercase names and auto-remove step"
+            git commit -m "Optimize rsc export syntax with bulk context & find-where"
             git push origin main
           fi
