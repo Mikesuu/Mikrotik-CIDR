@@ -1,5 +1,4 @@
 /ipv6 firewall address-list
-remove [find list="China_Telecom6"]
 add list="China_Telecom6" address=2001:250:2::/48
 add list="China_Telecom6" address=2001:250:4::/48
 add list="China_Telecom6" address=2001:250:205::/48

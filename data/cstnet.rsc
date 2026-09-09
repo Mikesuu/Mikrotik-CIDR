@@ -1,5 +1,4 @@
 /ip firewall address-list
-remove [find list="CSTNET"]
 add list="CSTNET" address=1.8.1.0/24
 add list="CSTNET" address=1.8.8.0/24
 add list="CSTNET" address=42.247.33.0/24

@@ -1,5 +1,4 @@
 /ip firewall address-list
-remove [find list="China_Telecom"]
 add list="China_Telecom" address=1.12.14.0/23
 add list="China_Telecom" address=1.12.16.0/20
 add list="China_Telecom" address=1.12.32.0/23

@@ -1,5 +1,4 @@
 /ip firewall address-list
-remove [find list="CERNET"]
 add list="CERNET" address=1.51.0.0/16
 add list="CERNET" address=1.184.0.0/15
 add list="CERNET" address=42.201.32.0/19

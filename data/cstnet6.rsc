@@ -1,5 +1,4 @@
 /ipv6 firewall address-list
-remove [find list="CSTNET6"]
 add list="CSTNET6" address=2001:cc0::/32
 add list="CSTNET6" address=2001:dcc:501::/48
 add list="CSTNET6" address=2400:9580:300::/48

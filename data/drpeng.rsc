@@ -1,5 +1,4 @@
 /ip firewall address-list
-remove [find list="DRPENG"]
 add list="DRPENG" address=60.195.252.0/22
 add list="DRPENG" address=115.182.0.0/19
 add list="DRPENG" address=115.182.32.0/22

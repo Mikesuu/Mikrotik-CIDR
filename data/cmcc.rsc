@@ -1,5 +1,4 @@
 /ip firewall address-list
-remove [find list="China_Mobile"]
 add list="China_Mobile" address=1.2.4.0/24
 add list="China_Mobile" address=1.119.0.0/17
 add list="China_Mobile" address=1.119.178.0/23

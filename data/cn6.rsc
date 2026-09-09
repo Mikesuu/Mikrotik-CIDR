@@ -1,5 +1,4 @@
 /ipv6 firewall address-list
-remove [find list="CN6"]
 add list="CN6" address=2001:250::/30
 add list="CN6" address=2001:254::/31
 add list="CN6" address=2001:256::/32
