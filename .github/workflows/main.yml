@@ -31,22 +31,19 @@ jobs:
 
           GAOYIFAN="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
           CHNROUTES2="https://raw.githubusercontent.com/misakaio/chnroutes2/master"
-          SURGE="https://ruleset.skk.moe/Clash/ip"
-          ASN_CHINA="https://raw.githubusercontent.com/missuo/ASN-China/main"
-          APNIC_STATS="https://ftp.apnic.net/apnic/stats/apnic"
 
           download() {
             curl -fsSL --retry 5 --retry-delay 2 --connect-timeout 15 -A "Mozilla/5.0" "$1" -o "$2"
             [ -s "$2" ] || exit 1
           }
 
+          download_soft() {
+            curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 -A "Mozilla/5.0" "$1" -o "$2" || touch "$2"
+          }
+
           download "$GAOYIFAN/china.txt" WORKDIR/cn-gaoyifan.txt
           download "$CHNROUTES2/chnroutes.txt" WORKDIR/cn-chnroutes2.txt
-          download "$SURGE/china_ip.txt" WORKDIR/cn-surge.txt
-          download "$APNIC_STATS/delegated-apnic-latest" WORKDIR/cn-apnic.txt
-          download "$ASN_CHINA/IPv4.China.list" WORKDIR/cn-asn.txt
-          download "$GAOYIFAN/china6.txt" WORKDIR/cn6-gaoyifan.txt
-          download "$SURGE/china_ip_ipv6.txt" WORKDIR/cn6-surge.txt
+          download_soft "$GAOYIFAN/china6.txt" WORKDIR/cn6-gaoyifan.txt
 
           cat << 'EOF' > process.py
           import sys, ipaddress, os
@@ -55,10 +52,12 @@ jobs:
               nets = []
               forbidden_v4 = [
                   ipaddress.ip_network("0.0.0.0/8"),
-                  ipaddress.ip_network("1.0.0.0/24"),
-                  ipaddress.ip_network("15.0.0.0/8"),
+                  ipaddress.ip_network("10.0.0.0/8"),
                   ipaddress.ip_network("127.0.0.0/8"),
                   ipaddress.ip_network("169.254.0.0/16"),
+                  ipaddress.ip_network("172.16.0.0/12"),
+                  ipaddress.ip_network("192.168.0.0/16"),
+                  ipaddress.ip_network("100.64.0.0/10"),
                   ipaddress.ip_network("224.0.0.0/4"),
                   ipaddress.ip_network("240.0.0.0/4")
               ]
@@ -80,13 +79,13 @@ jobs:
                                   net = ipaddress.ip_network(t, strict=False)
 
                                   if family == "ipv4":
-                                      if net.version != 4:
+                                      if net.version != 4 or net.prefixlen == 32:
                                           continue
                                       if any(net.overlaps(bad) for bad in forbidden_v4):
                                           continue
 
                                   elif family == "ipv6":
-                                      if net.version != 6:
+                                      if net.version != 6 or net.prefixlen == 128:
                                           continue
 
                                   nets.append(net)
@@ -101,128 +100,14 @@ jobs:
                       f.write(f"{net}\n")
 
           cmd = sys.argv[1]
-
           if cmd == "norm":
               normalize(sys.argv[2], sys.argv[3], sys.argv[4])
-
-          elif cmd == "apnic":
-              nets4, nets6 = [], []
-
-              with open(sys.argv[2], 'r', encoding='utf-8-sig', errors='ignore') as f:
-                  for line in f:
-                      if line.startswith('#') or '|CN|' not in line:
-                          continue
-
-                      p = line.strip().split('|')
-
-                      if len(p) >= 7 and p[0] == 'apnic' and p[1] == 'CN':
-                          try:
-                              if p[2] == 'ipv4':
-                                  f_ip = ipaddress.ip_address(p[3])
-                                  cnt = int(p[4])
-                                  l_ip = ipaddress.ip_address(int(f_ip) + cnt - 1)
-                                  nets4.extend(
-                                      ipaddress.summarize_address_range(f_ip, l_ip)
-                                  )
-
-                              elif p[2] == 'ipv6':
-                                  nets6.append(
-                                      ipaddress.ip_network(
-                                          f"{p[3]}/{p[4]}",
-                                          strict=False
-                                      )
-                                  )
-
-                          except Exception:
-                              pass
-
-              with open(sys.argv[3], 'w') as f:
-                  for n in ipaddress.collapse_addresses(nets4):
-                      f.write(f"{n}\n")
-
-              with open(sys.argv[4], 'w') as f:
-                  for n in ipaddress.collapse_addresses(nets6):
-                      f.write(f"{n}\n")
           EOF
 
-          python3 process.py apnic \
-            WORKDIR/cn-apnic.txt \
-            WORKDIR/cn-apnic4.txt \
-            WORKDIR/cn-apnic6.txt
+          cat WORKDIR/cn-gaoyifan.txt WORKDIR/cn-chnroutes2.txt > WORKDIR/cn-combined.raw
 
-          python3 process.py norm \
-            WORKDIR/cn-gaoyifan.txt \
-            WORKDIR/gaoyifan.v4.final \
-            ipv4
-
-          python3 process.py norm \
-            WORKDIR/cn-chnroutes2.txt \
-            WORKDIR/chnroutes2.v4.final \
-            ipv4
-
-          python3 process.py norm \
-            WORKDIR/cn-surge.txt \
-            WORKDIR/surge.v4.final \
-            ipv4
-
-          python3 process.py norm \
-            WORKDIR/cn-asn.txt \
-            WORKDIR/asn.v4.final \
-            ipv4
-
-          python3 process.py norm \
-            WORKDIR/cn-apnic4.txt \
-            WORKDIR/apnic.v4.final \
-            ipv4
-
-          python3 process.py norm \
-            WORKDIR/cn6-gaoyifan.txt \
-            WORKDIR/gaoyifan6.v6.final \
-            ipv6
-
-          python3 process.py norm \
-            WORKDIR/cn6-surge.txt \
-            WORKDIR/surge6.v6.final \
-            ipv6
-
-          python3 process.py norm \
-            WORKDIR/cn-apnic6.txt \
-            WORKDIR/apnic6.v6.final \
-            ipv6
-
-          cat \
-            WORKDIR/gaoyifan.v4.final \
-            WORKDIR/chnroutes2.v4.final \
-            WORKDIR/surge.v4.final \
-            WORKDIR/asn.v4.final \
-            WORKDIR/apnic.v4.final \
-            > WORKDIR/cn-core.raw
-
-          python3 process.py norm \
-            WORKDIR/cn-core.raw \
-            WORKDIR/cn-core.final \
-            ipv4
-
-          cat WORKDIR/cn-core.final > WORKDIR/cn-final.raw
-
-          printf "10.0.0.0/8\n172.16.0.0/12\n192.168.0.0/16\n" \
-            >> WORKDIR/cn-final.raw
-
-          python3 process.py norm \
-            WORKDIR/cn-final.raw \
-            WORKDIR/cn-final.final \
-            ipv4
-
-          cat \
-            WORKDIR/gaoyifan6.v6.final \
-            WORKDIR/surge6.v6.final \
-            WORKDIR/apnic6.v6.final \
-            > WORKDIR/cn6-core.raw
-
-          python3 process.py norm \
-            WORKDIR/cn6-core.raw \
-            WORKDIR/cn6-final.final \
-            ipv6
+          python3 process.py norm WORKDIR/cn-combined.raw WORKDIR/cn-final.final ipv4
+          python3 process.py norm WORKDIR/cn6-gaoyifan.txt WORKDIR/cn6-final.final ipv6
 
           export_rsc() {
             local list_name="$1"
@@ -231,125 +116,48 @@ jobs:
             local ipv6="$4"
 
             local base_cmd="/ip firewall address-list"
-
-            [ "$ipv6" = "true" ] && \
-              base_cmd="/ipv6 firewall address-list"
+            [ "$ipv6" = "true" ] && base_cmd="/ipv6 firewall address-list"
 
             {
               echo "$base_cmd remove [find where list=\"$list_name\"]"
               echo "$base_cmd"
-
               while IFS= read -r cidr; do
-                [ -n "$cidr" ] && \
-                  echo "add list=\"$list_name\" address=$cidr"
+                [ -n "$cidr" ] && echo "add list=\"$list_name\" address=$cidr"
               done < "$input"
-
             } > "$output"
           }
 
-          export_rsc \
-            "CN" \
-            WORKDIR/cn-final.final \
-            data/cn.rsc \
-            false
+          export_rsc "CN" WORKDIR/cn-final.final data/cn.rsc false
+          export_rsc "CN6" WORKDIR/cn6-final.final data/cn6.rsc true
 
-          export_rsc \
-            "CN6" \
-            WORKDIR/cn6-final.final \
-            data/cn6.rsc \
-            true
-
-          ISPS_KEYS=(
-            "China_Telecom"
-            "China_Unicom"
-            "China_Mobile"
-            "CERNET"
-            "CSTNET"
-            "DRPENG"
-          )
-
-          ISPS_VALS=(
-            "chinanet.txt"
-            "unicom.txt"
-            "cmcc.txt"
-            "cernet.txt"
-            "cstnet.txt"
-            "drpeng.txt"
-          )
-
-          ISPS_FILES=(
-            "telecom"
-            "unicom"
-            "cmcc"
-            "cernet"
-            "cstnet"
-            "drpeng"
-          )
+          ISPS_KEYS=("China_Telecom" "China_Unicom" "China_Mobile" "CERNET" "CSTNET" "DRPENG")
+          ISPS_VALS=("chinanet.txt" "unicom.txt" "cmcc.txt" "cernet.txt" "cstnet.txt" "drpeng.txt")
+          ISPS_FILES=("telecom" "unicom" "cmcc" "cernet" "cstnet" "drpeng")
 
           for i in "${!ISPS_KEYS[@]}"; do
             list_name="${ISPS_KEYS[$i]}"
             file="${ISPS_VALS[$i]}"
             out_file="${ISPS_FILES[$i]}"
 
-            download \
-              "$GAOYIFAN/$file" \
-              "WORKDIR/$out_file.txt"
+            download_soft "$GAOYIFAN/$file" "WORKDIR/$out_file.txt"
 
-            python3 process.py norm \
-              "WORKDIR/$out_file.txt" \
-              "WORKDIR/$out_file.final" \
-              ipv4
-
-            export_rsc \
-              "$list_name" \
-              "WORKDIR/$out_file.final" \
-              "data/$out_file.rsc" \
-              false
+            python3 process.py norm "WORKDIR/$out_file.txt" "WORKDIR/$out_file.final" ipv4
+            export_rsc "$list_name" "WORKDIR/$out_file.final" "data/$out_file.rsc" false
           done
 
-          ISPS6_KEYS=(
-            "China_Telecom6"
-            "China_Unicom6"
-            "China_Mobile6"
-            "CERNET6"
-            "CSTNET6"
-          )
-
-          ISPS6_VALS=(
-            "chinanet6.txt"
-            "unicom6.txt"
-            "cmcc6.txt"
-            "cernet6.txt"
-            "cstnet6.txt"
-          )
-
-          ISPS6_FILES=(
-            "telecom6"
-            "unicom6"
-            "cmcc6"
-            "cernet6"
-            "cstnet6"
-          )
+          ISPS6_KEYS=("China_Telecom6" "China_Unicom6" "China_Mobile6" "CERNET6" "CSTNET6")
+          ISPS6_VALS=("chinanet6.txt" "unicom6.txt" "cmcc6.txt" "cernet6.txt" "cstnet6.txt")
+          ISPS6_FILES=("telecom6" "unicom6" "cmcc6" "cernet6" "cstnet6")
 
           for i in "${!ISPS6_KEYS[@]}"; do
             list_name="${ISPS6_KEYS[$i]}"
             file="${ISPS6_VALS[$i]}"
             out_file="${ISPS6_FILES[$i]}"
 
-            download \
-              "$GAOYIFAN/$file" \
-              "WORKDIR/$out_file.txt"
+            download_soft "$GAOYIFAN/$file" "WORKDIR/$out_file.txt"
 
-            python3 process.py norm \
-              "WORKDIR/$out_file.txt" \
-              "WORKDIR/$out_file.final" \
-              ipv6
-
-            export_rsc \
-              "$list_name" \
-              "WORKDIR/$out_file.final" \
-              "data/$out_file.rsc" \
-              true
+            python3 process.py norm "WORKDIR/$out_file.txt" "WORKDIR/$out_file.final" ipv6
+            export_rsc "$list_name" "WORKDIR/$out_file.final" "data/$out_file.rsc" true
           done
 
       - name: Commit & Push
@@ -364,6 +172,6 @@ jobs:
           if git diff --staged --quiet; then
             exit 0
           else
-            git commit -m "Optimize rsc export syntax with bulk context & find-where"
+            git commit -m "Update RouterOS v7 IP lists"
             git push origin main
           fi
