@@ -847,6 +847,4 @@ add list="China_Telecom6" address=2c0f:f7a8:805f::/48
 add list="China_Telecom6" address=2c0f:f7a8:8150::/48
 add list="China_Telecom6" address=2c0f:f7a8:815f::/48
 add list="China_Telecom6" address=2c0f:f7a8:8211::/48
-add list="China_Telecom6" address=2c0f:f7a8:9020::/48
 add list="China_Telecom6" address=2c0f:f7a8:9041::/48
-add list="China_Telecom6" address=2c0f:f7a8:9220::/48
