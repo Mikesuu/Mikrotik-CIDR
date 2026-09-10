@@ -28,6 +28,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p data WORKDIR
+          rm -f data/*.rsc
 
           GAOYIFAN="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
           CHNROUTES2="https://raw.githubusercontent.com/misakaio/chnroutes2/master"
@@ -37,13 +38,14 @@ jobs:
             [ -s "$2" ] || exit 1
           }
 
-          download_soft() {
-            curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 -A "Mozilla/5.0" "$1" -o "$2" || touch "$2"
+          download_safe() {
+            curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 -A "Mozilla/5.0" "$1" -o "$2" || true
+            [ -s "$2" ] || touch "$2"
           }
 
           download "$GAOYIFAN/china.txt" WORKDIR/cn-gaoyifan.txt
           download "$CHNROUTES2/chnroutes.txt" WORKDIR/cn-chnroutes2.txt
-          download_soft "$GAOYIFAN/china6.txt" WORKDIR/cn6-gaoyifan.txt
+          download_safe "$GAOYIFAN/china6.txt" WORKDIR/cn6-gaoyifan.txt
 
           cat << 'EOF' > process.py
           import sys, ipaddress, os
@@ -121,41 +123,41 @@ jobs:
             {
               echo "$base_cmd remove [find where list=\"$list_name\"]"
               echo "$base_cmd"
-              while IFS= read -r cidr; do
-                [ -n "$cidr" ] && echo "add list=\"$list_name\" address=$cidr"
-              done < "$input"
+              if [ -f "$input" ]; then
+                while IFS= read -r cidr; do
+                  [ -n "$cidr" ] && echo "add list=\"$list_name\" address=$cidr"
+                done < "$input"
+              fi
             } > "$output"
           }
 
           export_rsc "CN" WORKDIR/cn-final.final data/cn.rsc false
           export_rsc "CN6" WORKDIR/cn6-final.final data/cn6.rsc true
 
-          ISPS_KEYS=("China_Telecom" "China_Unicom" "China_Mobile" "CERNET" "CSTNET" "DRPENG")
-          ISPS_VALS=("chinanet.txt" "unicom.txt" "cmcc.txt" "cernet.txt" "cstnet.txt" "drpeng.txt")
-          ISPS_FILES=("telecom" "unicom" "cmcc" "cernet" "cstnet" "drpeng")
+          ISPS_KEYS=("China_Telecom" "China_Unicom" "China_Mobile" "CERNET" "CSTNET" "DRPENG" "CBNNET" "CIETNET")
+          ISPS_VALS=("chinanet.txt" "unicom.txt" "cmcc.txt" "cernet.txt" "cstnet.txt" "drpeng.txt" "cbn.txt" "ciet.txt")
+          ISPS_FILES=("telecom" "unicom" "cmcc" "cernet" "cstnet" "drpeng" "cbnnet" "cietnet")
 
           for i in "${!ISPS_KEYS[@]}"; do
             list_name="${ISPS_KEYS[$i]}"
             file="${ISPS_VALS[$i]}"
             out_file="${ISPS_FILES[$i]}"
 
-            download_soft "$GAOYIFAN/$file" "WORKDIR/$out_file.txt"
-
+            download_safe "$GAOYIFAN/$file" "WORKDIR/$out_file.txt"
             python3 process.py norm "WORKDIR/$out_file.txt" "WORKDIR/$out_file.final" ipv4
             export_rsc "$list_name" "WORKDIR/$out_file.final" "data/$out_file.rsc" false
           done
 
-          ISPS6_KEYS=("China_Telecom6" "China_Unicom6" "China_Mobile6" "CERNET6" "CSTNET6")
-          ISPS6_VALS=("chinanet6.txt" "unicom6.txt" "cmcc6.txt" "cernet6.txt" "cstnet6.txt")
-          ISPS6_FILES=("telecom6" "unicom6" "cmcc6" "cernet6" "cstnet6")
+          ISPS6_KEYS=("China_Telecom6" "China_Unicom6" "China_Mobile6" "CERNET6" "CSTNET6" "DRPENG6" "CBNNET6" "CIETNET6")
+          ISPS6_VALS=("chinanet6.txt" "unicom6.txt" "cmcc6.txt" "cernet6.txt" "cstnet6.txt" "drpeng6.txt" "cbn6.txt" "ciet6.txt")
+          ISPS6_FILES=("telecom6" "unicom6" "cmcc6" "cernet6" "cstnet6" "drpeng6" "cbnnet6" "cietnet6")
 
           for i in "${!ISPS6_KEYS[@]}"; do
             list_name="${ISPS6_KEYS[$i]}"
             file="${ISPS6_VALS[$i]}"
             out_file="${ISPS6_FILES[$i]}"
 
-            download_soft "$GAOYIFAN/$file" "WORKDIR/$out_file.txt"
-
+            download_safe "$GAOYIFAN/$file" "WORKDIR/$out_file.txt"
             python3 process.py norm "WORKDIR/$out_file.txt" "WORKDIR/$out_file.final" ipv6
             export_rsc "$list_name" "WORKDIR/$out_file.final" "data/$out_file.rsc" true
           done
@@ -172,6 +174,6 @@ jobs:
           if git diff --staged --quiet; then
             exit 0
           else
-            git commit -m "Update RouterOS v7 IP lists"
+            git commit -m "Force generate all 18 rsc files"
             git push origin main
           fi
