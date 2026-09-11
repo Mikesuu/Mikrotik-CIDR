@@ -3104,6 +3104,7 @@ add list="CN6" address=2408:4004::/30
 add list="CN6" address=2408:4008::/29
 add list="CN6" address=2408:4010::/30
 add list="CN6" address=2408:4014::/31
+add list="CN6" address=2408:4016:1::/48
 add list="CN6" address=2408:4016:2::/47
 add list="CN6" address=2408:4016:4::/46
 add list="CN6" address=2408:4016:8::/45
