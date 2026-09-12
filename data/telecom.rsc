@@ -146,6 +146,7 @@ add list="China_Telecom" address=43.180.0.0/19
 add list="China_Telecom" address=43.180.128.0/18
 add list="China_Telecom" address=43.180.224.0/20
 add list="China_Telecom" address=43.193.65.0/24
+add list="China_Telecom" address=43.196.232.0/22
 add list="China_Telecom" address=43.224.58.0/23
 add list="China_Telecom" address=43.225.76.0/22
 add list="China_Telecom" address=43.225.180.0/22
@@ -310,7 +311,14 @@ add list="China_Telecom" address=52.82.184.0/23
 add list="China_Telecom" address=52.82.188.0/23
 add list="China_Telecom" address=52.82.190.0/24
 add list="China_Telecom" address=54.222.46.0/23
-add list="China_Telecom" address=54.222.50.0/24
+add list="China_Telecom" address=54.222.48.0/21
+add list="China_Telecom" address=54.222.65.0/24
+add list="China_Telecom" address=54.222.89.0/24
+add list="China_Telecom" address=54.222.96.0/23
+add list="China_Telecom" address=54.222.100.0/22
+add list="China_Telecom" address=54.222.104.0/21
+add list="China_Telecom" address=54.222.112.0/22
+add list="China_Telecom" address=54.222.116.0/23
 add list="China_Telecom" address=58.24.0.0/15
 add list="China_Telecom" address=58.30.0.0/19
 add list="China_Telecom" address=58.30.64.0/18
@@ -1664,6 +1672,7 @@ add list="China_Telecom" address=118.228.244.0/23
 add list="China_Telecom" address=118.228.246.0/24
 add list="China_Telecom" address=118.228.248.0/21
 add list="China_Telecom" address=118.229.16.0/20
+add list="China_Telecom" address=118.229.40.0/22
 add list="China_Telecom" address=118.229.96.0/19
 add list="China_Telecom" address=118.229.128.0/17
 add list="China_Telecom" address=118.230.96.0/19
@@ -3790,7 +3799,6 @@ add list="China_Telecom" address=222.64.0.0/11
 add list="China_Telecom" address=222.126.135.0/24
 add list="China_Telecom" address=222.126.136.0/23
 add list="China_Telecom" address=222.126.145.0/24
-add list="China_Telecom" address=222.126.189.0/24
 add list="China_Telecom" address=222.126.190.0/23
 add list="China_Telecom" address=222.126.198.0/23
 add list="China_Telecom" address=222.126.204.0/22
