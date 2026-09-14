@@ -103,5 +103,6 @@ add list="CERNET6" address=240b:e008::/29
 add list="CERNET6" address=240b:e010::/32
 add list="CERNET6" address=240c:c000::/20
 add list="CERNET6" address=240d:4000::/21
+add list="CERNET6" address=2620:57:4004::/48
 add list="CERNET6" address=2a0e:aa06:49f::/48
 add list="CERNET6" address=2a0e:b107:740::/44
