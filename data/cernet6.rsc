@@ -2,7 +2,6 @@
 /ipv6 firewall address-list
 add list="CERNET6" address=2001:250::/30
 add list="CERNET6" address=2001:255::/32
-add list="CERNET6" address=2001:c68::/32
 add list="CERNET6" address=2001:da8::/32
 add list="CERNET6" address=2001:daa:1::/48
 add list="CERNET6" address=2001:daa:2::/47
@@ -103,6 +102,5 @@ add list="CERNET6" address=240b:e008::/29
 add list="CERNET6" address=240b:e010::/32
 add list="CERNET6" address=240c:c000::/20
 add list="CERNET6" address=240d:4000::/21
-add list="CERNET6" address=2620:57:4004::/48
 add list="CERNET6" address=2a0e:aa06:49f::/48
 add list="CERNET6" address=2a0e:b107:740::/44
