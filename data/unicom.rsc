@@ -1109,7 +1109,6 @@ add list="China_Unicom" address=153.34.0.0/15
 add list="China_Unicom" address=153.36.0.0/15
 add list="China_Unicom" address=153.99.0.0/16
 add list="China_Unicom" address=153.101.0.0/16
-add list="China_Unicom" address=154.84.180.0/24
 add list="China_Unicom" address=154.89.32.0/21
 add list="China_Unicom" address=154.89.40.0/22
 add list="China_Unicom" address=154.89.45.0/24
