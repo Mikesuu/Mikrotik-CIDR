@@ -2967,6 +2967,7 @@ add list="CN" address=107.148.6.0/24
 add list="CN" address=107.151.212.0/24
 add list="CN" address=107.190.229.0/24
 add list="CN" address=108.186.72.0/24
+add list="CN" address=109.66.22.0/23
 add list="CN" address=109.244.0.0/16
 add list="CN" address=110.6.0.0/15
 add list="CN" address=110.16.0.0/14
