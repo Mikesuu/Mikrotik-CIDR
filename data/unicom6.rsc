@@ -666,6 +666,7 @@ add list="China_Unicom6" address=2408:8a23:4000::/34
 add list="China_Unicom6" address=2408:8a24:4000::/34
 add list="China_Unicom6" address=2408:8a26:c000::/34
 add list="China_Unicom6" address=2408:8a27:4000::/35
+add list="China_Unicom6" address=2409:2003:10::/44
 add list="China_Unicom6" address=2409:27fa::/48
 add list="China_Unicom6" address=2409:27fa:f000::/48
 add list="China_Unicom6" address=2409:27fb::/48
