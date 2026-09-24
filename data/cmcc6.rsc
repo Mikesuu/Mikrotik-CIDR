@@ -75,7 +75,6 @@ add list="China_Mobile6" address=240a:2001::/40
 add list="China_Mobile6" address=240a:2001:200::/39
 add list="China_Mobile6" address=240a:2001:400::/38
 add list="China_Mobile6" address=240a:2001:800::/37
-add list="China_Mobile6" address=240a:2001:1111::/48
 add list="China_Mobile6" address=240a:2001:2000::/35
 add list="China_Mobile6" address=240a:2001:4000::/34
 add list="China_Mobile6" address=240a:2001:8000::/33
