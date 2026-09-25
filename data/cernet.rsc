@@ -34,6 +34,7 @@ add list="CERNET" address=115.156.0.0/15
 add list="CERNET" address=115.158.0.0/16
 add list="CERNET" address=116.13.0.0/16
 add list="CERNET" address=116.56.0.0/15
+add list="CERNET" address=116.255.128.0/24
 add list="CERNET" address=118.202.0.0/15
 add list="CERNET" address=118.228.0.0/15
 add list="CERNET" address=118.230.0.0/16
