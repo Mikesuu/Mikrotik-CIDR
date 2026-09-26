@@ -2251,6 +2251,7 @@ add list="CN6" address=2406:840:9880::/41
 add list="CN6" address=2406:840:9900::/42
 add list="CN6" address=2406:840:9940::/43
 add list="CN6" address=2406:840:9960::/47
+add list="CN6" address=2406:840:9963::/48
 add list="CN6" address=2406:840:9965::/48
 add list="CN6" address=2406:840:9968::/46
 add list="CN6" address=2406:840:996d::/48
