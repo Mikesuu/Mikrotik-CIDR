@@ -1096,6 +1096,7 @@ add list="China_Unicom" address=140.210.224.0/20
 add list="China_Unicom" address=143.20.70.0/23
 add list="China_Unicom" address=144.36.147.0/24
 add list="China_Unicom" address=144.48.64.0/22
+add list="China_Unicom" address=144.249.165.0/24
 add list="China_Unicom" address=146.196.68.0/22
 add list="China_Unicom" address=146.196.116.0/22
 add list="China_Unicom" address=150.129.136.0/22
