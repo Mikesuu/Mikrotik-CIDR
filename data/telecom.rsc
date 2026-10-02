@@ -1,6 +1,16 @@
 /ip firewall address-list remove [find where list="China_Telecom"]
 /ip firewall address-list
-add list="China_Telecom" address=1.12.0.0/14
+add list="China_Telecom" address=1.12.14.0/23
+add list="China_Telecom" address=1.12.16.0/20
+add list="China_Telecom" address=1.12.32.0/23
+add list="China_Telecom" address=1.12.36.0/22
+add list="China_Telecom" address=1.12.40.0/21
+add list="China_Telecom" address=1.12.48.0/20
+add list="China_Telecom" address=1.12.64.0/18
+add list="China_Telecom" address=1.12.128.0/17
+add list="China_Telecom" address=1.13.0.0/16
+add list="China_Telecom" address=1.14.128.0/17
+add list="China_Telecom" address=1.15.0.0/16
 add list="China_Telecom" address=1.48.0.0/15
 add list="China_Telecom" address=1.50.0.0/16
 add list="China_Telecom" address=1.68.0.0/14
@@ -210,6 +220,8 @@ add list="China_Telecom" address=43.247.100.0/22
 add list="China_Telecom" address=43.247.176.0/20
 add list="China_Telecom" address=43.247.244.0/22
 add list="China_Telecom" address=43.248.76.0/22
+add list="China_Telecom" address=43.248.97.0/24
+add list="China_Telecom" address=43.248.103.0/24
 add list="China_Telecom" address=43.248.116.0/24
 add list="China_Telecom" address=43.248.140.0/24
 add list="China_Telecom" address=43.248.142.0/24
@@ -1779,6 +1791,7 @@ add list="China_Telecom" address=139.9.240.0/21
 add list="China_Telecom" address=139.9.248.0/22
 add list="China_Telecom" address=139.159.0.0/19
 add list="China_Telecom" address=139.159.32.0/22
+add list="China_Telecom" address=139.159.107.0/24
 add list="China_Telecom" address=139.159.108.0/22
 add list="China_Telecom" address=139.159.112.0/22
 add list="China_Telecom" address=139.159.164.0/22

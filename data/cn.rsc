@@ -3071,7 +3071,6 @@ add list="CN" address=111.235.156.0/22
 add list="CN" address=111.235.160.0/19
 add list="CN" address=112.0.0.0/10
 add list="CN" address=112.64.0.0/14
-add list="CN" address=112.73.232.0/24
 add list="CN" address=112.74.0.0/15
 add list="CN" address=112.80.0.0/12
 add list="CN" address=112.96.0.0/13
@@ -4040,7 +4039,6 @@ add list="CN" address=156.107.160.0/23
 add list="CN" address=156.107.170.0/24
 add list="CN" address=156.107.179.0/24
 add list="CN" address=156.107.181.0/24
-add list="CN" address=156.227.239.0/24
 add list="CN" address=156.232.9.0/24
 add list="CN" address=156.232.10.0/23
 add list="CN" address=157.0.0.0/16
