@@ -3327,7 +3327,11 @@ add list="CN6" address=2a0a:d684::/32
 add list="CN6" address=2a0a:d685::/40
 add list="CN6" address=2a0a:d685:100::/41
 add list="CN6" address=2a0a:d685:180::/42
-add list="CN6" address=2a0a:d685:1c0::/43
+add list="CN6" address=2a0a:d685:1c0::/44
+add list="CN6" address=2a0a:d685:1d1::/48
+add list="CN6" address=2a0a:d685:1d2::/47
+add list="CN6" address=2a0a:d685:1d4::/46
+add list="CN6" address=2a0a:d685:1d8::/45
 add list="CN6" address=2a0a:d685:1e2::/47
 add list="CN6" address=2a0a:d685:1e4::/46
 add list="CN6" address=2a0a:d685:1e8::/45
