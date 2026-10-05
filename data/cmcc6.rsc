@@ -28,6 +28,7 @@ add list="China_Mobile6" address=2402:1440:2000::/35
 add list="China_Mobile6" address=2402:1440:4000::/34
 add list="China_Mobile6" address=2402:1440:8000::/33
 add list="China_Mobile6" address=2402:5ec0::/36
+add list="China_Mobile6" address=2402:5ec0:1000::/40
 add list="China_Mobile6" address=2402:5ec0:1f00::/40
 add list="China_Mobile6" address=2402:5ec0:2000::/35
 add list="China_Mobile6" address=2402:5ec0:4000::/34
@@ -39,6 +40,7 @@ add list="China_Mobile6" address=2402:e880::/48
 add list="China_Mobile6" address=2402:f140:ff20::/46
 add list="China_Mobile6" address=2402:f140:ff24::/48
 add list="China_Mobile6" address=2403:7580::/32
+add list="China_Mobile6" address=2403:a200:a3ff::/48
 add list="China_Mobile6" address=2403:b400::/32
 add list="China_Mobile6" address=2403:c980::/32
 add list="China_Mobile6" address=2404:7240:6000::/48
