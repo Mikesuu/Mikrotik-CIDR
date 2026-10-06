@@ -976,7 +976,6 @@ add list="CN" address=64.96.5.0/24
 add list="CN" address=64.188.38.0/23
 add list="CN" address=64.188.40.0/22
 add list="CN" address=64.188.44.0/24
-add list="CN" address=65.111.16.0/22
 add list="CN" address=66.102.240.0/21
 add list="CN" address=66.102.248.0/23
 add list="CN" address=66.102.251.0/24
