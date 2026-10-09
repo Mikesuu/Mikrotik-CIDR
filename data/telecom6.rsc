@@ -428,12 +428,10 @@ add list="China_Telecom6" address=2a04:f580:8290::/48
 add list="China_Telecom6" address=2a04:f580:9010::/48
 add list="China_Telecom6" address=2a04:f580:9012::/47
 add list="China_Telecom6" address=2a04:f580:9020::/48
-add list="China_Telecom6" address=2a04:f580:9030::/48
 add list="China_Telecom6" address=2a04:f580:9040::/48
 add list="China_Telecom6" address=2a04:f580:9050::/48
 add list="China_Telecom6" address=2a04:f580:9060::/48
 add list="China_Telecom6" address=2a04:f580:9070::/48
-add list="China_Telecom6" address=2a04:f580:9080::/48
 add list="China_Telecom6" address=2a04:f580:9210::/48
 add list="China_Telecom6" address=2a04:f580:9212::/47
 add list="China_Telecom6" address=2a04:f580:9220::/48
