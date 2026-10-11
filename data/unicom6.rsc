@@ -73,7 +73,6 @@ add list="China_Unicom6" address=2401:ce00:b000::/37
 add list="China_Unicom6" address=2401:ce00:bc00::/38
 add list="China_Unicom6" address=2401:ce00:d000::/38
 add list="China_Unicom6" address=2401:ce00:e000::/35
-add list="China_Unicom6" address=2402:18a0::/32
 add list="China_Unicom6" address=2402:34e0::/32
 add list="China_Unicom6" address=2402:5920::/48
 add list="China_Unicom6" address=2402:5ec0:1000::/39

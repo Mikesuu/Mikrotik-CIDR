@@ -1010,6 +1010,7 @@ add list="CN" address=47.87.0.0/20
 add list="CN" address=47.87.16.0/21
 add list="CN" address=47.87.32.0/19
 add list="CN" address=47.87.64.0/21
+add list="CN" address=47.87.72.0/24
 add list="CN" address=47.87.80.0/20
 add list="CN" address=47.87.96.0/19
 add list="CN" address=47.87.128.0/20
@@ -3991,6 +3992,7 @@ add list="CN" address=123.49.208.0/20
 add list="CN" address=123.49.224.0/20
 add list="CN" address=123.49.240.0/24
 add list="CN" address=123.49.242.0/23
+add list="CN" address=123.49.245.0/24
 add list="CN" address=123.49.248.0/21
 add list="CN" address=123.50.160.0/19
 add list="CN" address=123.52.0.0/14
