@@ -68,8 +68,7 @@ add list="China_Mobile" address=43.247.88.0/22
 add list="China_Mobile" address=43.248.0.0/24
 add list="China_Mobile" address=43.248.2.0/23
 add list="China_Mobile" address=43.248.98.0/24
-add list="China_Mobile" address=43.248.116.0/23
-add list="China_Mobile" address=43.248.119.0/24
+add list="China_Mobile" address=43.248.116.0/22
 add list="China_Mobile" address=43.248.128.0/22
 add list="China_Mobile" address=43.248.132.0/23
 add list="China_Mobile" address=43.248.137.0/24
