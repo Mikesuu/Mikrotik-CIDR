@@ -782,7 +782,6 @@ add list="China_Mobile" address=211.99.120.0/23
 add list="China_Mobile" address=211.99.160.0/22
 add list="China_Mobile" address=211.99.188.0/22
 add list="China_Mobile" address=211.99.216.0/24
-add list="China_Mobile" address=211.101.199.0/24
 add list="China_Mobile" address=211.102.208.0/20
 add list="China_Mobile" address=211.103.0.0/17
 add list="China_Mobile" address=211.136.0.0/13
