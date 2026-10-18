@@ -3061,6 +3061,7 @@ add list="CN6" address=2407:fd80::/32
 add list="CN6" address=2408:4000::/28
 add list="CN6" address=2408:4010::/30
 add list="CN6" address=2408:4014::/31
+add list="CN6" address=2408:4016:1::/48
 add list="CN6" address=2408:4016:2::/47
 add list="CN6" address=2408:4016:4::/46
 add list="CN6" address=2408:4016:8::/45
