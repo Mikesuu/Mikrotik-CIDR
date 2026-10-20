@@ -2323,7 +2323,9 @@ add list="China_Telecom" address=211.160.166.0/23
 add list="China_Telecom" address=211.160.168.0/24
 add list="China_Telecom" address=211.160.171.0/24
 add list="China_Telecom" address=211.160.172.0/22
-add list="China_Telecom" address=211.160.176.0/21
+add list="China_Telecom" address=211.160.176.0/23
+add list="China_Telecom" address=211.160.179.0/24
+add list="China_Telecom" address=211.160.180.0/22
 add list="China_Telecom" address=211.160.184.0/23
 add list="China_Telecom" address=211.160.186.0/24
 add list="China_Telecom" address=211.160.188.0/22
