@@ -8,4 +8,3 @@ add list="CSTNET6" address=2401:8d00:3::/48
 add list="CSTNET6" address=2401:8d00:7::/48
 add list="CSTNET6" address=2401:8d00:12::/48
 add list="CSTNET6" address=2401:de00::/32
-add list="CSTNET6" address=2620:57:4004::/47

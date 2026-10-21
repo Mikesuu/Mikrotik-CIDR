@@ -16,9 +16,6 @@ add list="China_Mobile6" address=2401:2a00:f000::/43
 add list="China_Mobile6" address=2401:8be0::/48
 add list="China_Mobile6" address=2401:9a00::/44
 add list="China_Mobile6" address=2401:9a00:10::/46
-add list="China_Mobile6" address=2401:c020:6::/48
-add list="China_Mobile6" address=2401:c020:8::/47
-add list="China_Mobile6" address=2401:c020:14::/48
 add list="China_Mobile6" address=2402:1440:30::/48
 add list="China_Mobile6" address=2402:1440:200::/39
 add list="China_Mobile6" address=2402:1440:400::/38
