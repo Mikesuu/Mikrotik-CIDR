@@ -152,6 +152,7 @@ add list="China_Telecom6" address=2401:1d40:3100::/40
 add list="China_Telecom6" address=2401:1d40:3200::/39
 add list="China_Telecom6" address=2401:1d40:3400::/38
 add list="China_Telecom6" address=2401:1d40:3800::/37
+add list="China_Telecom6" address=2401:2780::/32
 add list="China_Telecom6" address=2401:3480::/36
 add list="China_Telecom6" address=2401:3480:2000::/48
 add list="China_Telecom6" address=2401:3480:3000::/36
