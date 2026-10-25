@@ -2700,7 +2700,6 @@ add list="CN" address=103.186.162.0/24
 add list="CN" address=103.186.228.0/23
 add list="CN" address=103.189.92.0/23
 add list="CN" address=103.189.152.0/22
-add list="CN" address=103.189.197.0/24
 add list="CN" address=103.190.20.0/23
 add list="CN" address=103.190.71.0/24
 add list="CN" address=103.190.104.0/23
