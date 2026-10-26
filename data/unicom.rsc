@@ -299,7 +299,6 @@ add list="China_Unicom" address=74.114.51.0/24
 add list="China_Unicom" address=82.38.46.0/23
 add list="China_Unicom" address=82.38.80.0/23
 add list="China_Unicom" address=87.82.58.0/24
-add list="China_Unicom" address=87.254.207.0/24
 add list="China_Unicom" address=101.16.0.0/12
 add list="China_Unicom" address=101.52.204.0/22
 add list="China_Unicom" address=101.52.212.0/22
@@ -1214,7 +1213,6 @@ add list="China_Unicom" address=163.142.0.0/16
 add list="China_Unicom" address=163.177.0.0/16
 add list="China_Unicom" address=163.179.0.0/16
 add list="China_Unicom" address=163.204.0.0/16
-add list="China_Unicom" address=163.223.72.0/23
 add list="China_Unicom" address=165.101.70.0/24
 add list="China_Unicom" address=171.34.0.0/15
 add list="China_Unicom" address=171.36.0.0/14
