@@ -1009,15 +1009,7 @@ add list="CN" address=47.77.112.0/23
 add list="CN" address=47.77.128.0/17
 add list="CN" address=47.78.0.0/15
 add list="CN" address=47.80.0.0/14
-add list="CN" address=47.84.0.0/16
-add list="CN" address=47.85.0.0/17
-add list="CN" address=47.85.128.0/23
-add list="CN" address=47.85.131.0/24
-add list="CN" address=47.85.132.0/22
-add list="CN" address=47.85.136.0/21
-add list="CN" address=47.85.144.0/20
-add list="CN" address=47.85.160.0/19
-add list="CN" address=47.85.192.0/18
+add list="CN" address=47.84.0.0/15
 add list="CN" address=47.86.0.0/16
 add list="CN" address=47.87.0.0/20
 add list="CN" address=47.87.16.0/21

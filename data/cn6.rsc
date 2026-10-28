@@ -2653,7 +2653,6 @@ add list="CN6" address=2406:840:fee0::/45
 add list="CN6" address=2406:840:fee8::/46
 add list="CN6" address=2406:840:feec::/48
 add list="CN6" address=2406:840:feee::/47
-add list="CN6" address=2406:840:feff::/48
 add list="CN6" address=2406:840:ff00::/40
 add list="CN6" address=2406:880::/32
 add list="CN6" address=2406:8c0::/32
