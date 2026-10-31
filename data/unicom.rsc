@@ -1,7 +1,6 @@
 /ip firewall address-list remove [find where list="China_Unicom"]
 /ip firewall address-list
 add list="China_Unicom" address=1.1.8.0/24
-add list="China_Unicom" address=1.2.4.0/24
 add list="China_Unicom" address=1.24.0.0/13
 add list="China_Unicom" address=1.45.0.0/16
 add list="China_Unicom" address=1.56.0.0/13
@@ -733,8 +732,7 @@ add list="China_Unicom" address=116.66.50.0/24
 add list="China_Unicom" address=116.66.53.0/24
 add list="China_Unicom" address=116.76.0.0/15
 add list="China_Unicom" address=116.78.0.0/16
-add list="China_Unicom" address=116.90.80.0/24
-add list="China_Unicom" address=116.90.82.0/23
+add list="China_Unicom" address=116.90.80.0/22
 add list="China_Unicom" address=116.95.0.0/16
 add list="China_Unicom" address=116.112.0.0/14
 add list="China_Unicom" address=116.116.0.0/15
@@ -1404,7 +1402,6 @@ add list="China_Unicom" address=205.198.19.0/24
 add list="China_Unicom" address=206.109.70.0/23
 add list="China_Unicom" address=207.254.180.0/24
 add list="China_Unicom" address=210.2.1.0/24
-add list="China_Unicom" address=210.2.4.0/24
 add list="China_Unicom" address=210.5.128.0/20
 add list="China_Unicom" address=210.5.145.0/24
 add list="China_Unicom" address=210.5.146.0/23
