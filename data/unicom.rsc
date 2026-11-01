@@ -1399,7 +1399,7 @@ add list="China_Unicom" address=203.207.224.0/19
 add list="China_Unicom" address=203.212.0.0/21
 add list="China_Unicom" address=203.212.8.0/22
 add list="China_Unicom" address=205.198.19.0/24
-add list="China_Unicom" address=206.109.70.0/23
+add list="China_Unicom" address=206.109.71.0/24
 add list="China_Unicom" address=207.254.180.0/24
 add list="China_Unicom" address=210.2.1.0/24
 add list="China_Unicom" address=210.5.128.0/20
