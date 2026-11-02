@@ -8,8 +8,8 @@ add list="China_Unicom6" address=2001:4510:1480::/41
 add list="China_Unicom6" address=2001:4511:1480::/41
 add list="China_Unicom6" address=2400:5280:f803::/48
 add list="China_Unicom6" address=2400:73e0::/32
+add list="China_Unicom6" address=2400:79c0:1604::/48
 add list="China_Unicom6" address=2400:89c0:1010::/44
-add list="China_Unicom6" address=2400:8fc0:571::/48
 add list="China_Unicom6" address=2400:a860:2::/48
 add list="China_Unicom6" address=2400:b700::/48
 add list="China_Unicom6" address=2400:cb80:e2e::/47
