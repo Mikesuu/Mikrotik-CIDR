@@ -6,6 +6,8 @@ add list="China_Telecom6" address=2001:dc7:cd00::/46
 add list="China_Telecom6" address=2001:dc7:cd1a::/48
 add list="China_Telecom6" address=2001:dd8:1::/48
 add list="China_Telecom6" address=2001:4510:400::/40
+add list="China_Telecom6" address=2400:3200::/48
+add list="China_Telecom6" address=2400:3200:baba::/48
 add list="China_Telecom6" address=2400:5280:f803::/48
 add list="China_Telecom6" address=2400:5a00::/32
 add list="China_Telecom6" address=2400:6600:1::/48
@@ -94,6 +96,7 @@ add list="China_Telecom6" address=2400:9380:9ec0::/44
 add list="China_Telecom6" address=2400:9380:9fc0::/44
 add list="China_Telecom6" address=2400:9600:8800::/48
 add list="China_Telecom6" address=2400:9620::/32
+add list="China_Telecom6" address=2400:b200:4100::/46
 add list="China_Telecom6" address=2400:b620::/48
 add list="China_Telecom6" address=2400:b700::/48
 add list="China_Telecom6" address=2400:be00::/48
@@ -176,9 +179,10 @@ add list="China_Telecom6" address=2401:4a80::/32
 add list="China_Telecom6" address=2401:5c20:10::/48
 add list="China_Telecom6" address=2401:71c0::/48
 add list="China_Telecom6" address=2401:7d40::/32
-add list="China_Telecom6" address=2401:7e00:fff8::/45
+add list="China_Telecom6" address=2401:7e00::/32
 add list="China_Telecom6" address=2401:a140:1::/48
 add list="China_Telecom6" address=2401:a540::/32
+add list="China_Telecom6" address=2401:b180:4100::/48
 add list="China_Telecom6" address=2401:b680::/32
 add list="China_Telecom6" address=2401:be00::/48
 add list="China_Telecom6" address=2401:ca00::/32
@@ -306,6 +310,9 @@ add list="China_Telecom6" address=2407:9f00::/32
 add list="China_Telecom6" address=2407:b380:8000::/48
 add list="China_Telecom6" address=2407:c080:1730::/44
 add list="China_Telecom6" address=2407:c080:1800::/37
+add list="China_Telecom6" address=2408:4009:500::/48
+add list="China_Telecom6" address=2408:4016:3::/48
+add list="China_Telecom6" address=2408:4016:4::/46
 add list="China_Telecom6" address=2409:27fa::/48
 add list="China_Telecom6" address=2409:27fa:f000::/48
 add list="China_Telecom6" address=2409:27fb::/48
