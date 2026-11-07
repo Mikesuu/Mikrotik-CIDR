@@ -9,7 +9,6 @@ add list="China_Mobile" address=8.132.107.0/24
 add list="China_Mobile" address=8.137.134.0/24
 add list="China_Mobile" address=8.138.71.0/24
 add list="China_Mobile" address=8.152.181.0/24
-add list="China_Mobile" address=8.155.199.0/24
 add list="China_Mobile" address=16.2.142.0/23
 add list="China_Mobile" address=27.0.160.0/21
 add list="China_Mobile" address=36.128.0.0/10
