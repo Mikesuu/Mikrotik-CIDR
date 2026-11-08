@@ -131,7 +131,7 @@
 
           ISPS6_KEYS=("China_Telecom6" "China_Unicom6" "China_Mobile6" "CERNET6" "CSTNET6" "DRPENG6" "CBNNET6" "CIETNET6")
           ISPS6_VALS=("chinanet6.txt" "unicom6.txt" "cmcc6.txt" "cernet6.txt" "cstnet6.txt" "drpeng6.txt" "cbn6.txt" "ciet6.txt")
-          ISPS6_FILES=("telecom6" "unicom6" "cmcc6" "cernet6" "cstnet6" "drpeng6" "cbnnet6" "ciet6")
+          ISPS6_FILES=("telecom6" "unicom6" "cmcc6" "cernet6" "cstnet6" "drpeng6" "cbnnet6" "cietnet6")
 
           for i in "${!ISPS6_KEYS[@]}"; do
             list_name="${ISPS6_KEYS[$i]}"
