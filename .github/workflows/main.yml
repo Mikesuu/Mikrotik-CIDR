@@ -1,4 +1,29 @@
-- name: Generate IP Lists
+name: Generate MikroTik v7 IP Lists
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Generate IP Lists
         shell: bash
         run: |
           set -euo pipefail
@@ -130,7 +155,7 @@
           done
 
           ISPS6_KEYS=("China_Telecom6" "China_Unicom6" "China_Mobile6" "CERNET6" "CSTNET6" "DRPENG6" "CBNNET6" "CIETNET6")
-          ISPS6_VALS=("chinanet6.txt" "unicom6.txt" "cmcc6.txt" "cernet6.txt" "cstnet6.txt" "drpeng6.txt" "cbn6.txt" "ciet6.txt")
+          ISPS6_VALS=("chinanet6.txt" "unicom6.txt" "cmcc6.txt" "cernet6.txt" "cstnet6.txt" "drpeng6.txt" "cbn6.txt" "ciet.txt")
           ISPS6_FILES=("telecom6" "unicom6" "cmcc6" "cernet6" "cstnet6" "drpeng6" "cbnnet6" "cietnet6")
 
           for i in "${!ISPS6_KEYS[@]}"; do
@@ -142,3 +167,19 @@
             python3 process.py norm "WORKDIR/$out_file.txt" "WORKDIR/$out_file.final" ipv6
             export_rsc "$list_name" "WORKDIR/$out_file.final" "data/$out_file.rsc" true
           done
+
+      - name: Commit & Push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add data/*.rsc
+
+          if git diff --staged --quiet; then
+            exit 0
+          else
+            git commit -m "Force generate all 18 rsc files"
+            git push origin main
+          fi
