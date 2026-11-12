@@ -1967,7 +1967,13 @@ add list="CN6" address=2406:840:424::/46
 add list="CN6" address=2406:840:428::/45
 add list="CN6" address=2406:840:430::/44
 add list="CN6" address=2406:840:440::/42
-add list="CN6" address=2406:840:480::/41
+add list="CN6" address=2406:840:481::/48
+add list="CN6" address=2406:840:482::/47
+add list="CN6" address=2406:840:484::/46
+add list="CN6" address=2406:840:488::/45
+add list="CN6" address=2406:840:490::/44
+add list="CN6" address=2406:840:4a0::/43
+add list="CN6" address=2406:840:4c0::/42
 add list="CN6" address=2406:840:500::/42
 add list="CN6" address=2406:840:541::/48
 add list="CN6" address=2406:840:542::/47
