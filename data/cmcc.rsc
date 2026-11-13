@@ -242,8 +242,6 @@ add list="China_Mobile" address=103.60.164.0/22
 add list="China_Mobile" address=103.60.236.0/22
 add list="China_Mobile" address=103.61.60.0/22
 add list="China_Mobile" address=103.65.224.0/23
-add list="China_Mobile" address=103.74.125.0/24
-add list="China_Mobile" address=103.74.126.0/24
 add list="China_Mobile" address=103.78.228.0/22
 add list="China_Mobile" address=103.79.24.0/23
 add list="China_Mobile" address=103.79.27.0/24
@@ -581,8 +579,6 @@ add list="China_Mobile" address=122.200.104.0/22
 add list="China_Mobile" address=122.200.120.0/22
 add list="China_Mobile" address=123.49.194.0/24
 add list="China_Mobile" address=123.49.231.0/24
-add list="China_Mobile" address=123.49.244.0/24
-add list="China_Mobile" address=123.49.246.0/23
 add list="China_Mobile" address=123.58.0.0/20
 add list="China_Mobile" address=123.58.18.0/24
 add list="China_Mobile" address=123.58.32.0/23
@@ -833,11 +829,7 @@ add list="China_Mobile" address=211.151.44.0/23
 add list="China_Mobile" address=211.151.48.0/20
 add list="China_Mobile" address=211.151.64.0/18
 add list="China_Mobile" address=211.151.128.0/18
-add list="China_Mobile" address=211.151.192.0/20
-add list="China_Mobile" address=211.151.208.0/21
-add list="China_Mobile" address=211.151.216.0/23
-add list="China_Mobile" address=211.151.219.0/24
-add list="China_Mobile" address=211.151.220.0/22
+add list="China_Mobile" address=211.151.192.0/19
 add list="China_Mobile" address=211.151.224.0/23
 add list="China_Mobile" address=211.151.228.0/22
 add list="China_Mobile" address=211.151.232.0/21
@@ -877,9 +869,7 @@ add list="China_Mobile" address=218.240.169.0/24
 add list="China_Mobile" address=218.240.170.0/23
 add list="China_Mobile" address=218.240.180.0/23
 add list="China_Mobile" address=218.240.183.0/24
-add list="China_Mobile" address=218.245.0.0/22
-add list="China_Mobile" address=218.245.4.0/23
-add list="China_Mobile" address=218.245.6.0/24
+add list="China_Mobile" address=218.245.0.0/21
 add list="China_Mobile" address=218.245.18.0/23
 add list="China_Mobile" address=218.246.0.0/20
 add list="China_Mobile" address=218.246.16.0/22

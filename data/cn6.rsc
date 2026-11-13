@@ -3309,8 +3309,7 @@ add list="CN6" address=2a0a:d685:220::/43
 add list="CN6" address=2a0a:d685:240::/42
 add list="CN6" address=2a0a:d685:280::/41
 add list="CN6" address=2a0a:d685:400::/40
-add list="CN6" address=2a0a:d685:500::/48
-add list="CN6" address=2a0a:d685:502::/47
+add list="CN6" address=2a0a:d685:500::/46
 add list="CN6" address=2a0a:d685:504::/48
 add list="CN6" address=2a0a:d685:506::/47
 add list="CN6" address=2a0a:d685:508::/48
