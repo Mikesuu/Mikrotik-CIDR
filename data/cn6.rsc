@@ -2299,7 +2299,9 @@ add list="CN6" address=2406:840:e0ce::/48
 add list="CN6" address=2406:840:e0d0::/44
 add list="CN6" address=2406:840:e0e4::/48
 add list="CN6" address=2406:840:e0e6::/47
-add list="CN6" address=2406:840:e0e8::/45
+add list="CN6" address=2406:840:e0e9::/48
+add list="CN6" address=2406:840:e0ea::/47
+add list="CN6" address=2406:840:e0ec::/46
 add list="CN6" address=2406:840:e0f0::/44
 add list="CN6" address=2406:840:e100::/45
 add list="CN6" address=2406:840:e108::/46
