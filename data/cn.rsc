@@ -2067,7 +2067,6 @@ add list="CN" address=103.116.92.0/22
 add list="CN" address=103.116.120.0/22
 add list="CN" address=103.116.128.0/22
 add list="CN" address=103.116.138.0/23
-add list="CN" address=103.116.150.0/24
 add list="CN" address=103.116.184.0/22
 add list="CN" address=103.116.220.0/22
 add list="CN" address=103.116.224.0/21
@@ -2378,6 +2377,7 @@ add list="CN" address=103.178.240.0/23
 add list="CN" address=103.179.76.0/22
 add list="CN" address=103.180.108.0/24
 add list="CN" address=103.180.226.0/23
+add list="CN" address=103.181.165.0/24
 add list="CN" address=103.181.234.0/23
 add list="CN" address=103.183.26.0/23
 add list="CN" address=103.183.66.0/23
@@ -3580,7 +3580,6 @@ add list="CN" address=122.8.58.0/23
 add list="CN" address=122.8.60.0/23
 add list="CN" address=122.8.63.0/24
 add list="CN" address=122.8.80.0/23
-add list="CN" address=122.8.116.0/22
 add list="CN" address=122.8.192.0/18
 add list="CN" address=122.9.0.0/16
 add list="CN" address=122.10.129.0/24
@@ -3682,6 +3681,7 @@ add list="CN" address=123.49.232.0/22
 add list="CN" address=123.49.236.0/24
 add list="CN" address=123.49.240.0/24
 add list="CN" address=123.49.242.0/23
+add list="CN" address=123.49.245.0/24
 add list="CN" address=123.49.248.0/21
 add list="CN" address=123.50.160.0/19
 add list="CN" address=123.52.0.0/14
@@ -3838,6 +3838,8 @@ add list="CN" address=134.49.240.0/22
 add list="CN" address=134.175.0.0/16
 add list="CN" address=135.84.80.0/22
 add list="CN" address=136.143.176.0/23
+add list="CN" address=136.143.186.0/23
+add list="CN" address=136.143.188.0/22
 add list="CN" address=137.59.59.0/24
 add list="CN" address=137.59.88.0/22
 add list="CN" address=138.252.72.0/23
@@ -3917,7 +3919,7 @@ add list="CN" address=140.246.0.0/16
 add list="CN" address=140.249.0.0/16
 add list="CN" address=140.250.0.0/16
 add list="CN" address=140.255.0.0/16
-add list="CN" address=141.229.20.0/23
+add list="CN" address=141.229.21.0/24
 add list="CN" address=142.86.204.0/22
 add list="CN" address=142.86.208.0/20
 add list="CN" address=142.86.224.0/20
@@ -5917,6 +5919,7 @@ add list="CN" address=203.223.16.0/23
 add list="CN" address=203.223.19.0/24
 add list="CN" address=203.223.20.0/22
 add list="CN" address=204.77.130.0/24
+add list="CN" address=204.141.42.0/23
 add list="CN" address=205.198.19.0/24
 add list="CN" address=207.57.167.0/24
 add list="CN" address=207.57.168.0/24
