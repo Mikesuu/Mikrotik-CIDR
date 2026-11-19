@@ -2251,7 +2251,8 @@ add list="CN6" address=2406:840:96a0::/43
 add list="CN6" address=2406:840:96c0::/42
 add list="CN6" address=2406:840:9809::/48
 add list="CN6" address=2406:840:980a::/47
-add list="CN6" address=2406:840:980c::/46
+add list="CN6" address=2406:840:980d::/48
+add list="CN6" address=2406:840:980e::/47
 add list="CN6" address=2406:840:9811::/48
 add list="CN6" address=2406:840:9812::/47
 add list="CN6" address=2406:840:9814::/46
@@ -2273,7 +2274,10 @@ add list="CN6" address=2406:840:9965::/48
 add list="CN6" address=2406:840:9968::/46
 add list="CN6" address=2406:840:996d::/48
 add list="CN6" address=2406:840:996e::/47
-add list="CN6" address=2406:840:9970::/44
+add list="CN6" address=2406:840:9970::/46
+add list="CN6" address=2406:840:9974::/47
+add list="CN6" address=2406:840:9976::/48
+add list="CN6" address=2406:840:9978::/45
 add list="CN6" address=2406:840:9981::/48
 add list="CN6" address=2406:840:9982::/47
 add list="CN6" address=2406:840:9984::/46
@@ -2302,9 +2306,7 @@ add list="CN6" address=2406:840:e0ce::/48
 add list="CN6" address=2406:840:e0d0::/44
 add list="CN6" address=2406:840:e0e4::/48
 add list="CN6" address=2406:840:e0e6::/47
-add list="CN6" address=2406:840:e0e9::/48
-add list="CN6" address=2406:840:e0ea::/47
-add list="CN6" address=2406:840:e0ec::/46
+add list="CN6" address=2406:840:e0e8::/45
 add list="CN6" address=2406:840:e0f0::/44
 add list="CN6" address=2406:840:e100::/45
 add list="CN6" address=2406:840:e108::/46
@@ -2633,6 +2635,7 @@ add list="CN6" address=2406:840:fee0::/45
 add list="CN6" address=2406:840:fee8::/46
 add list="CN6" address=2406:840:feec::/48
 add list="CN6" address=2406:840:feee::/47
+add list="CN6" address=2406:840:feff::/48
 add list="CN6" address=2406:840:ff20::/43
 add list="CN6" address=2406:840:ff40::/42
 add list="CN6" address=2406:840:ff80::/41
@@ -3065,7 +3068,6 @@ add list="CN6" address=2408:4004::/30
 add list="CN6" address=2408:4008::/29
 add list="CN6" address=2408:4010::/30
 add list="CN6" address=2408:4014::/31
-add list="CN6" address=2408:4016:1::/48
 add list="CN6" address=2408:4016:2::/47
 add list="CN6" address=2408:4016:4::/46
 add list="CN6" address=2408:4016:8::/45
