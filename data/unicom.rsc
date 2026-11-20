@@ -713,6 +713,7 @@ add list="China_Unicom" address=116.144.0.0/14
 add list="China_Unicom" address=116.148.0.0/15
 add list="China_Unicom" address=116.153.0.0/16
 add list="China_Unicom" address=116.154.0.0/15
+add list="China_Unicom" address=116.157.0.0/16
 add list="China_Unicom" address=116.162.0.0/16
 add list="China_Unicom" address=116.163.0.0/18
 add list="China_Unicom" address=116.165.0.0/16
@@ -744,9 +745,7 @@ add list="China_Unicom" address=116.198.96.0/19
 add list="China_Unicom" address=116.198.144.0/20
 add list="China_Unicom" address=116.198.160.0/20
 add list="China_Unicom" address=116.198.176.0/21
-add list="China_Unicom" address=116.242.0.0/17
-add list="China_Unicom" address=116.242.128.0/18
-add list="China_Unicom" address=116.242.192.0/19
+add list="China_Unicom" address=116.242.0.0/16
 add list="China_Unicom" address=116.255.128.0/17
 add list="China_Unicom" address=117.8.0.0/13
 add list="China_Unicom" address=117.48.156.0/23
