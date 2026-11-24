@@ -957,6 +957,7 @@ add list="CN6" address=2402:8260:6000::/35
 add list="CN6" address=2402:8260:8000::/33
 add list="CN6" address=2402:8300::/32
 add list="CN6" address=2402:8380::/32
+add list="CN6" address=2402:8420::/32
 add list="CN6" address=2402:85c0::/32
 add list="CN6" address=2402:8800::/32
 add list="CN6" address=2402:8840::/32
