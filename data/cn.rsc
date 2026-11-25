@@ -2140,7 +2140,6 @@ add list="CN" address=103.132.80.0/22
 add list="CN" address=103.132.104.0/21
 add list="CN" address=103.132.112.0/21
 add list="CN" address=103.132.120.0/22
-add list="CN" address=103.132.161.0/24
 add list="CN" address=103.132.165.0/24
 add list="CN" address=103.132.166.0/23
 add list="CN" address=103.132.188.0/22
@@ -4811,11 +4810,7 @@ add list="CN" address=202.148.32.0/20
 add list="CN" address=202.148.64.0/18
 add list="CN" address=202.149.32.0/19
 add list="CN" address=202.149.160.0/19
-add list="CN" address=202.149.224.0/20
-add list="CN" address=202.149.240.0/21
-add list="CN" address=202.149.248.0/22
-add list="CN" address=202.149.252.0/23
-add list="CN" address=202.149.255.0/24
+add list="CN" address=202.149.224.0/19
 add list="CN" address=202.150.16.0/20
 add list="CN" address=202.150.32.0/20
 add list="CN" address=202.150.56.0/22
