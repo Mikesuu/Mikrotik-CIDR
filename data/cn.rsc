@@ -1070,7 +1070,6 @@ add list="CN" address=101.144.0.0/12
 add list="CN" address=101.192.0.0/18
 add list="CN" address=101.192.68.0/22
 add list="CN" address=101.192.84.0/22
-add list="CN" address=101.192.88.0/21
 add list="CN" address=101.192.132.0/22
 add list="CN" address=101.192.164.0/22
 add list="CN" address=101.192.168.0/21
@@ -2469,11 +2468,7 @@ add list="CN" address=103.201.192.0/18
 add list="CN" address=103.202.0.0/19
 add list="CN" address=103.202.32.0/20
 add list="CN" address=103.202.56.0/21
-add list="CN" address=103.202.64.0/22
-add list="CN" address=103.202.68.0/23
-add list="CN" address=103.202.72.0/21
-add list="CN" address=103.202.80.0/20
-add list="CN" address=103.202.96.0/19
+add list="CN" address=103.202.64.0/18
 add list="CN" address=103.202.128.0/20
 add list="CN" address=103.202.144.0/22
 add list="CN" address=103.202.152.0/21
@@ -3909,7 +3904,7 @@ add list="CN" address=140.246.0.0/16
 add list="CN" address=140.249.0.0/16
 add list="CN" address=140.250.0.0/16
 add list="CN" address=140.255.0.0/16
-add list="CN" address=141.229.21.0/24
+add list="CN" address=141.229.84.0/23
 add list="CN" address=142.86.204.0/22
 add list="CN" address=142.86.208.0/20
 add list="CN" address=142.86.224.0/20
@@ -4810,7 +4805,11 @@ add list="CN" address=202.148.32.0/20
 add list="CN" address=202.148.64.0/18
 add list="CN" address=202.149.32.0/19
 add list="CN" address=202.149.160.0/19
-add list="CN" address=202.149.224.0/19
+add list="CN" address=202.149.224.0/20
+add list="CN" address=202.149.240.0/21
+add list="CN" address=202.149.248.0/22
+add list="CN" address=202.149.252.0/23
+add list="CN" address=202.149.255.0/24
 add list="CN" address=202.150.16.0/20
 add list="CN" address=202.150.32.0/20
 add list="CN" address=202.150.56.0/22
@@ -5852,6 +5851,7 @@ add list="CN" address=203.160.192.0/19
 add list="CN" address=203.161.0.0/22
 add list="CN" address=203.161.183.0/24
 add list="CN" address=203.161.192.0/19
+add list="CN" address=203.162.166.0/23
 add list="CN" address=203.166.160.0/19
 add list="CN" address=203.167.28.0/22
 add list="CN" address=203.168.0.0/19
