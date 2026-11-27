@@ -1,106 +1,106 @@
 /ipv6 firewall address-list remove [find where list="CERNET6"]
 /ipv6 firewall address-list
-add list="CERNET6" address=2001:250::/30
-add list="CERNET6" address=2001:255::/32
-add list="CERNET6" address=2001:da8::/32
-add list="CERNET6" address=2001:daa:1::/48
-add list="CERNET6" address=2001:daa:2::/47
-add list="CERNET6" address=2001:daa:4::/47
-add list="CERNET6" address=2001:daa:6::/48
-add list="CERNET6" address=2001:daa:9::/48
-add list="CERNET6" address=2001:dd9::/48
-add list="CERNET6" address=2001:df5:7800::/48
-add list="CERNET6" address=2400:6000::/32
-add list="CERNET6" address=2400:89c0:1130::/44
-add list="CERNET6" address=2400:89c0:2100::/48
-add list="CERNET6" address=2400:89c0:2200::/48
-add list="CERNET6" address=2400:89c0:6100::/48
-add list="CERNET6" address=2400:a980::/29
-add list="CERNET6" address=2400:b600::/32
-add list="CERNET6" address=2401:1d40::/48
-add list="CERNET6" address=2401:1d40:2::/47
-add list="CERNET6" address=2401:1d40:4::/46
-add list="CERNET6" address=2401:1d40:8::/45
-add list="CERNET6" address=2401:1d40:10::/44
-add list="CERNET6" address=2401:1d40:20::/43
-add list="CERNET6" address=2401:1d40:40::/42
-add list="CERNET6" address=2401:1d40:80::/42
-add list="CERNET6" address=2401:1d40:c0::/43
-add list="CERNET6" address=2401:1d40:e0::/44
-add list="CERNET6" address=2401:1d40:f0::/45
-add list="CERNET6" address=2401:1d40:100::/40
-add list="CERNET6" address=2401:1d40:200::/39
-add list="CERNET6" address=2401:1d40:400::/38
-add list="CERNET6" address=2401:1d40:800::/38
-add list="CERNET6" address=2401:1d40:c00::/39
-add list="CERNET6" address=2401:1d40:e00::/40
-add list="CERNET6" address=2401:1d40:f00::/43
-add list="CERNET6" address=2401:1d40:f20::/47
-add list="CERNET6" address=2401:1d40:f22::/48
-add list="CERNET6" address=2401:1d40:f25::/48
-add list="CERNET6" address=2401:1d40:f26::/47
-add list="CERNET6" address=2401:1d40:f28::/45
-add list="CERNET6" address=2401:1d40:f30::/44
-add list="CERNET6" address=2401:1d40:f40::/42
-add list="CERNET6" address=2401:1d40:f80::/41
-add list="CERNET6" address=2401:1d40:1000::/36
-add list="CERNET6" address=2401:1d40:4000::/34
-add list="CERNET6" address=2401:1d40:8000::/33
-add list="CERNET6" address=2401:34a0::/31
-add list="CERNET6" address=2401:be00::/32
-add list="CERNET6" address=2401:cc00::/32
-add list="CERNET6" address=2401:ec00::/32
-add list="CERNET6" address=2402:2000::/32
-add list="CERNET6" address=2402:4b80::/32
-add list="CERNET6" address=2402:7d80:240::/48
-add list="CERNET6" address=2402:e480::/32
-add list="CERNET6" address=2402:e740::/32
-add list="CERNET6" address=2402:e7c0::/38
-add list="CERNET6" address=2402:e7c0:440::/42
-add list="CERNET6" address=2402:e7c0:480::/41
-add list="CERNET6" address=2402:e7c0:500::/40
-add list="CERNET6" address=2402:e7c0:600::/39
-add list="CERNET6" address=2402:e7c0:840::/42
-add list="CERNET6" address=2402:e7c0:880::/41
-add list="CERNET6" address=2402:e7c0:900::/40
-add list="CERNET6" address=2402:e7c0:a00::/39
-add list="CERNET6" address=2402:e7c0:1000::/36
-add list="CERNET6" address=2402:e7c0:2000::/35
-add list="CERNET6" address=2402:e7c0:4000::/34
-add list="CERNET6" address=2402:e7c0:8000::/33
-add list="CERNET6" address=2402:f000::/32
-add list="CERNET6" address=2403:3140::/32
-add list="CERNET6" address=2403:4300::/32
-add list="CERNET6" address=2403:8c00::/32
-add list="CERNET6" address=2403:9b00:6000::/48
-add list="CERNET6" address=2403:a200:9999::/48
-add list="CERNET6" address=2403:ac00::/32
-add list="CERNET6" address=2403:d400::/32
-add list="CERNET6" address=2404:f4c0:f000::/44
-add list="CERNET6" address=2405:d900::/32
-add list="CERNET6" address=2406:280::/32
-add list="CERNET6" address=2406:3340::/32
-add list="CERNET6" address=2406:e3c0::/32
-add list="CERNET6" address=240a:a000::/29
-add list="CERNET6" address=240a:a008::/30
-add list="CERNET6" address=240a:a00c::/31
-add list="CERNET6" address=240a:a00e::/48
-add list="CERNET6" address=240a:a00e:100::/40
-add list="CERNET6" address=240a:a00f::/32
-add list="CERNET6" address=240a:a010::/28
-add list="CERNET6" address=240a:a020::/27
-add list="CERNET6" address=240a:a040::/26
-add list="CERNET6" address=240a:a080::/25
-add list="CERNET6" address=240a:a100::/24
-add list="CERNET6" address=240a:a200::/23
-add list="CERNET6" address=240a:a400::/22
-add list="CERNET6" address=240a:a800::/21
-add list="CERNET6" address=240b:e001::/32
-add list="CERNET6" address=240b:e002::/31
-add list="CERNET6" address=240b:e004::/30
-add list="CERNET6" address=240b:e008::/29
-add list="CERNET6" address=240b:e010::/32
-add list="CERNET6" address=240c:c000::/20
-add list="CERNET6" address=240d:4000::/21
-add list="CERNET6" address=2a0e:aa06:49f::/48
-add list="CERNET6" address=2a0e:b107:740::/44
+:do { add list="CERNET6" address=2001:250::/30 } on-error={}
+:do { add list="CERNET6" address=2001:255::/32 } on-error={}
+:do { add list="CERNET6" address=2001:da8::/32 } on-error={}
+:do { add list="CERNET6" address=2001:daa:1::/48 } on-error={}
+:do { add list="CERNET6" address=2001:daa:2::/47 } on-error={}
+:do { add list="CERNET6" address=2001:daa:4::/47 } on-error={}
+:do { add list="CERNET6" address=2001:daa:6::/48 } on-error={}
+:do { add list="CERNET6" address=2001:daa:9::/48 } on-error={}
+:do { add list="CERNET6" address=2001:dd9::/48 } on-error={}
+:do { add list="CERNET6" address=2001:df5:7800::/48 } on-error={}
+:do { add list="CERNET6" address=2400:6000::/32 } on-error={}
+:do { add list="CERNET6" address=2400:89c0:1130::/44 } on-error={}
+:do { add list="CERNET6" address=2400:89c0:2100::/48 } on-error={}
+:do { add list="CERNET6" address=2400:89c0:2200::/48 } on-error={}
+:do { add list="CERNET6" address=2400:89c0:6100::/48 } on-error={}
+:do { add list="CERNET6" address=2400:a980::/29 } on-error={}
+:do { add list="CERNET6" address=2400:b600::/32 } on-error={}
+:do { add list="CERNET6" address=2401:1d40::/48 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:2::/47 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:4::/46 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:8::/45 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:10::/44 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:20::/43 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:40::/42 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:80::/42 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:c0::/43 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:e0::/44 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:f0::/45 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:100::/40 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:200::/39 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:400::/38 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:800::/38 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:c00::/39 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:e00::/40 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:f00::/43 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:f20::/47 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:f22::/48 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:f25::/48 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:f26::/47 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:f28::/45 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:f30::/44 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:f40::/42 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:f80::/41 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:1000::/36 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:4000::/34 } on-error={}
+:do { add list="CERNET6" address=2401:1d40:8000::/33 } on-error={}
+:do { add list="CERNET6" address=2401:34a0::/31 } on-error={}
+:do { add list="CERNET6" address=2401:be00::/32 } on-error={}
+:do { add list="CERNET6" address=2401:cc00::/32 } on-error={}
+:do { add list="CERNET6" address=2401:ec00::/32 } on-error={}
+:do { add list="CERNET6" address=2402:2000::/32 } on-error={}
+:do { add list="CERNET6" address=2402:4b80::/32 } on-error={}
+:do { add list="CERNET6" address=2402:7d80:240::/48 } on-error={}
+:do { add list="CERNET6" address=2402:e480::/32 } on-error={}
+:do { add list="CERNET6" address=2402:e740::/32 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0::/38 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0:440::/42 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0:480::/41 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0:500::/40 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0:600::/39 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0:840::/42 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0:880::/41 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0:900::/40 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0:a00::/39 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0:1000::/36 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0:2000::/35 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0:4000::/34 } on-error={}
+:do { add list="CERNET6" address=2402:e7c0:8000::/33 } on-error={}
+:do { add list="CERNET6" address=2402:f000::/32 } on-error={}
+:do { add list="CERNET6" address=2403:3140::/32 } on-error={}
+:do { add list="CERNET6" address=2403:4300::/32 } on-error={}
+:do { add list="CERNET6" address=2403:8c00::/32 } on-error={}
+:do { add list="CERNET6" address=2403:9b00:6000::/48 } on-error={}
+:do { add list="CERNET6" address=2403:a200:9999::/48 } on-error={}
+:do { add list="CERNET6" address=2403:ac00::/32 } on-error={}
+:do { add list="CERNET6" address=2403:d400::/32 } on-error={}
+:do { add list="CERNET6" address=2404:f4c0:f000::/44 } on-error={}
+:do { add list="CERNET6" address=2405:d900::/32 } on-error={}
+:do { add list="CERNET6" address=2406:280::/32 } on-error={}
+:do { add list="CERNET6" address=2406:3340::/32 } on-error={}
+:do { add list="CERNET6" address=2406:e3c0::/32 } on-error={}
+:do { add list="CERNET6" address=240a:a000::/29 } on-error={}
+:do { add list="CERNET6" address=240a:a008::/30 } on-error={}
+:do { add list="CERNET6" address=240a:a00c::/31 } on-error={}
+:do { add list="CERNET6" address=240a:a00e::/48 } on-error={}
+:do { add list="CERNET6" address=240a:a00e:100::/40 } on-error={}
+:do { add list="CERNET6" address=240a:a00f::/32 } on-error={}
+:do { add list="CERNET6" address=240a:a010::/28 } on-error={}
+:do { add list="CERNET6" address=240a:a020::/27 } on-error={}
+:do { add list="CERNET6" address=240a:a040::/26 } on-error={}
+:do { add list="CERNET6" address=240a:a080::/25 } on-error={}
+:do { add list="CERNET6" address=240a:a100::/24 } on-error={}
+:do { add list="CERNET6" address=240a:a200::/23 } on-error={}
+:do { add list="CERNET6" address=240a:a400::/22 } on-error={}
+:do { add list="CERNET6" address=240a:a800::/21 } on-error={}
+:do { add list="CERNET6" address=240b:e001::/32 } on-error={}
+:do { add list="CERNET6" address=240b:e002::/31 } on-error={}
+:do { add list="CERNET6" address=240b:e004::/30 } on-error={}
+:do { add list="CERNET6" address=240b:e008::/29 } on-error={}
+:do { add list="CERNET6" address=240b:e010::/32 } on-error={}
+:do { add list="CERNET6" address=240c:c000::/20 } on-error={}
+:do { add list="CERNET6" address=240d:4000::/21 } on-error={}
+:do { add list="CERNET6" address=2a0e:aa06:49f::/48 } on-error={}
+:do { add list="CERNET6" address=2a0e:b107:740::/44 } on-error={}

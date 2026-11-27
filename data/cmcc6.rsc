@@ -1,159 +1,159 @@
 /ipv6 firewall address-list remove [find where list="China_Mobile6"]
 /ipv6 firewall address-list
-add list="China_Mobile6" address=2001:dc7:3::/48
-add list="China_Mobile6" address=2001:dc7:fffb::/48
-add list="China_Mobile6" address=2400:9020:f012::/47
-add list="China_Mobile6" address=2400:95e0::/48
-add list="China_Mobile6" address=2400:a860:1::/48
-add list="China_Mobile6" address=2400:a860:2::/47
-add list="China_Mobile6" address=2400:a860:4::/46
-add list="China_Mobile6" address=2400:a860:8::/47
-add list="China_Mobile6" address=2400:ae00:1981::/48
-add list="China_Mobile6" address=2400:ee00:ffec::/46
-add list="China_Mobile6" address=2400:ee00:fff0::/44
-add list="China_Mobile6" address=2401:1320::/32
-add list="China_Mobile6" address=2401:2a00:f000::/43
-add list="China_Mobile6" address=2401:8be0::/48
-add list="China_Mobile6" address=2401:9a00::/44
-add list="China_Mobile6" address=2401:9a00:10::/46
-add list="China_Mobile6" address=2402:1440:30::/48
-add list="China_Mobile6" address=2402:1440:200::/39
-add list="China_Mobile6" address=2402:1440:400::/38
-add list="China_Mobile6" address=2402:1440:800::/37
-add list="China_Mobile6" address=2402:1440:1000::/36
-add list="China_Mobile6" address=2402:1440:2000::/35
-add list="China_Mobile6" address=2402:1440:4000::/34
-add list="China_Mobile6" address=2402:1440:8000::/33
-add list="China_Mobile6" address=2402:5ec0::/36
-add list="China_Mobile6" address=2402:5ec0:1000::/40
-add list="China_Mobile6" address=2402:5ec0:1f00::/40
-add list="China_Mobile6" address=2402:5ec0:2000::/35
-add list="China_Mobile6" address=2402:5ec0:4000::/34
-add list="China_Mobile6" address=2402:5ec0:8000::/33
-add list="China_Mobile6" address=2402:6e80::/32
-add list="China_Mobile6" address=2402:8bc0::/32
-add list="China_Mobile6" address=2402:9a80::/32
-add list="China_Mobile6" address=2402:e880::/48
-add list="China_Mobile6" address=2402:f140:ff20::/46
-add list="China_Mobile6" address=2402:f140:ff24::/48
-add list="China_Mobile6" address=2403:7580::/44
-add list="China_Mobile6" address=2403:7580:10::/46
-add list="China_Mobile6" address=2403:a200:a3ff::/48
-add list="China_Mobile6" address=2403:b400::/32
-add list="China_Mobile6" address=2403:c980::/32
-add list="China_Mobile6" address=2404:7240:6000::/48
-add list="China_Mobile6" address=2404:e280::/47
-add list="China_Mobile6" address=2405:80:10::/48
-add list="China_Mobile6" address=2405:80:13::/48
-add list="China_Mobile6" address=2405:6c0:1::/48
-add list="China_Mobile6" address=2405:6c0:2::/48
-add list="China_Mobile6" address=2405:6c0:4::/48
-add list="China_Mobile6" address=2405:6f00:c101::/48
-add list="China_Mobile6" address=2405:6f00:c102::/48
-add list="China_Mobile6" address=2405:6f00:c170::/47
-add list="China_Mobile6" address=2405:6f00:c602::/48
-add list="China_Mobile6" address=2405:b7c0::/32
-add list="China_Mobile6" address=2406:52c0::/32
-add list="China_Mobile6" address=2406:5340:6666::/48
-add list="China_Mobile6" address=2406:5340:8888::/48
-add list="China_Mobile6" address=2406:d440:210::/44
-add list="China_Mobile6" address=2407:23c0::/48
-add list="China_Mobile6" address=2407:2840::/48
-add list="China_Mobile6" address=2407:37c0::/32
-add list="China_Mobile6" address=2407:6c40:1210::/48
-add list="China_Mobile6" address=2407:8f40:2::/48
-add list="China_Mobile6" address=2407:c080:1800::/37
-add list="China_Mobile6" address=2409:27fc::/48
-add list="China_Mobile6" address=2409:8000::/20
-add list="China_Mobile6" address=240a:2000:100::/40
-add list="China_Mobile6" address=240a:2000:200::/39
-add list="China_Mobile6" address=240a:2000:400::/38
-add list="China_Mobile6" address=240a:2000:800::/37
-add list="China_Mobile6" address=240a:2000:1000::/36
-add list="China_Mobile6" address=240a:2000:2000::/35
-add list="China_Mobile6" address=240a:2000:4000::/34
-add list="China_Mobile6" address=240a:2000:8000::/33
-add list="China_Mobile6" address=240a:2001::/40
-add list="China_Mobile6" address=240a:2001:200::/39
-add list="China_Mobile6" address=240a:2001:400::/38
-add list="China_Mobile6" address=240a:2001:800::/37
-add list="China_Mobile6" address=240a:2001:2000::/35
-add list="China_Mobile6" address=240a:2001:4000::/34
-add list="China_Mobile6" address=240a:2001:8000::/33
-add list="China_Mobile6" address=240a:2002::/31
-add list="China_Mobile6" address=240a:2004::/30
-add list="China_Mobile6" address=240a:2008::/29
-add list="China_Mobile6" address=240a:2010::/28
-add list="China_Mobile6" address=240a:2020::/27
-add list="China_Mobile6" address=240a:2040::/26
-add list="China_Mobile6" address=240a:2080::/25
-add list="China_Mobile6" address=240a:4020:83a::/48
-add list="China_Mobile6" address=240a:4020:883a::/48
-add list="China_Mobile6" address=240a:4021:83a::/48
-add list="China_Mobile6" address=240a:4021:883a::/48
-add list="China_Mobile6" address=240a:4090:50::/48
-add list="China_Mobile6" address=240a:4090:120::/48
-add list="China_Mobile6" address=240a:4090:250::/48
-add list="China_Mobile6" address=240a:4090:1000::/39
-add list="China_Mobile6" address=240a:4090:1200::/40
-add list="China_Mobile6" address=240a:4090:2010::/48
-add list="China_Mobile6" address=240a:4090:2041::/48
-add list="China_Mobile6" address=240a:4090:2061::/48
-add list="China_Mobile6" address=240a:4090:3000::/39
-add list="China_Mobile6" address=240a:4090:3200::/40
-add list="China_Mobile6" address=240a:4090:5000::/39
-add list="China_Mobile6" address=240a:4090:5200::/40
-add list="China_Mobile6" address=240a:4090:7000::/39
-add list="China_Mobile6" address=240a:4090:7200::/40
-add list="China_Mobile6" address=240a:40b0:83a::/48
-add list="China_Mobile6" address=240a:40b0:283a::/48
-add list="China_Mobile6" address=240a:40b0:483a::/48
-add list="China_Mobile6" address=240a:40b0:683a::/48
-add list="China_Mobile6" address=240a:40c0:8000::/43
-add list="China_Mobile6" address=240a:40c0:a000::/43
-add list="China_Mobile6" address=240a:40c0:c000::/43
-add list="China_Mobile6" address=240a:40c0:e000::/43
-add list="China_Mobile6" address=240a:40c1::/43
-add list="China_Mobile6" address=240a:40c1:2000::/43
-add list="China_Mobile6" address=240a:40c1:4000::/43
-add list="China_Mobile6" address=240a:40c1:6000::/43
-add list="China_Mobile6" address=240a:40c1:8000::/43
-add list="China_Mobile6" address=240a:40c1:a000::/43
-add list="China_Mobile6" address=240a:40c1:c000::/43
-add list="China_Mobile6" address=240a:40c1:e000::/43
-add list="China_Mobile6" address=240a:40c2::/43
-add list="China_Mobile6" address=240a:40c2:2000::/43
-add list="China_Mobile6" address=240a:40c2:4000::/43
-add list="China_Mobile6" address=240a:40c2:6000::/43
-add list="China_Mobile6" address=240a:40c2:8000::/43
-add list="China_Mobile6" address=240a:40c2:a000::/43
-add list="China_Mobile6" address=240a:40c2:c000::/43
-add list="China_Mobile6" address=240a:40c2:e000::/43
-add list="China_Mobile6" address=240a:40c3::/43
-add list="China_Mobile6" address=240a:40c3:2000::/43
-add list="China_Mobile6" address=240a:40c3:4000::/43
-add list="China_Mobile6" address=240a:40c3:6000::/43
-add list="China_Mobile6" address=240a:40c3:8000::/43
-add list="China_Mobile6" address=240a:40c3:a000::/43
-add list="China_Mobile6" address=240a:40c3:c000::/43
-add list="China_Mobile6" address=240a:40c3:e000::/43
-add list="China_Mobile6" address=240a:40c4::/43
-add list="China_Mobile6" address=240a:40c4:2000::/43
-add list="China_Mobile6" address=240a:40c4:4000::/43
-add list="China_Mobile6" address=240a:4280::/26
-add list="China_Mobile6" address=240a:42c0::/27
-add list="China_Mobile6" address=240a:42e0::/28
-add list="China_Mobile6" address=240a:42f0::/29
-add list="China_Mobile6" address=240a:42f8::/30
-add list="China_Mobile6" address=240a:c000::/25
-add list="China_Mobile6" address=240a:c080::/26
-add list="China_Mobile6" address=240a:c0c1::/32
-add list="China_Mobile6" address=240a:c0c2::/31
-add list="China_Mobile6" address=240a:c0c4::/30
-add list="China_Mobile6" address=240a:c0c8::/29
-add list="China_Mobile6" address=240a:c0d0::/28
-add list="China_Mobile6" address=240a:c0e0::/27
-add list="China_Mobile6" address=240a:c100::/24
-add list="China_Mobile6" address=240a:c200::/23
-add list="China_Mobile6" address=240a:c400::/22
-add list="China_Mobile6" address=240a:c800::/21
+:do { add list="China_Mobile6" address=2001:dc7:3::/48 } on-error={}
+:do { add list="China_Mobile6" address=2001:dc7:fffb::/48 } on-error={}
+:do { add list="China_Mobile6" address=2400:9020:f012::/47 } on-error={}
+:do { add list="China_Mobile6" address=2400:95e0::/48 } on-error={}
+:do { add list="China_Mobile6" address=2400:a860:1::/48 } on-error={}
+:do { add list="China_Mobile6" address=2400:a860:2::/47 } on-error={}
+:do { add list="China_Mobile6" address=2400:a860:4::/46 } on-error={}
+:do { add list="China_Mobile6" address=2400:a860:8::/47 } on-error={}
+:do { add list="China_Mobile6" address=2400:ae00:1981::/48 } on-error={}
+:do { add list="China_Mobile6" address=2400:ee00:ffec::/46 } on-error={}
+:do { add list="China_Mobile6" address=2400:ee00:fff0::/44 } on-error={}
+:do { add list="China_Mobile6" address=2401:1320::/32 } on-error={}
+:do { add list="China_Mobile6" address=2401:2a00:f000::/43 } on-error={}
+:do { add list="China_Mobile6" address=2401:8be0::/48 } on-error={}
+:do { add list="China_Mobile6" address=2401:9a00::/44 } on-error={}
+:do { add list="China_Mobile6" address=2401:9a00:10::/46 } on-error={}
+:do { add list="China_Mobile6" address=2402:1440:30::/48 } on-error={}
+:do { add list="China_Mobile6" address=2402:1440:200::/39 } on-error={}
+:do { add list="China_Mobile6" address=2402:1440:400::/38 } on-error={}
+:do { add list="China_Mobile6" address=2402:1440:800::/37 } on-error={}
+:do { add list="China_Mobile6" address=2402:1440:1000::/36 } on-error={}
+:do { add list="China_Mobile6" address=2402:1440:2000::/35 } on-error={}
+:do { add list="China_Mobile6" address=2402:1440:4000::/34 } on-error={}
+:do { add list="China_Mobile6" address=2402:1440:8000::/33 } on-error={}
+:do { add list="China_Mobile6" address=2402:5ec0::/36 } on-error={}
+:do { add list="China_Mobile6" address=2402:5ec0:1000::/40 } on-error={}
+:do { add list="China_Mobile6" address=2402:5ec0:1f00::/40 } on-error={}
+:do { add list="China_Mobile6" address=2402:5ec0:2000::/35 } on-error={}
+:do { add list="China_Mobile6" address=2402:5ec0:4000::/34 } on-error={}
+:do { add list="China_Mobile6" address=2402:5ec0:8000::/33 } on-error={}
+:do { add list="China_Mobile6" address=2402:6e80::/32 } on-error={}
+:do { add list="China_Mobile6" address=2402:8bc0::/32 } on-error={}
+:do { add list="China_Mobile6" address=2402:9a80::/32 } on-error={}
+:do { add list="China_Mobile6" address=2402:e880::/48 } on-error={}
+:do { add list="China_Mobile6" address=2402:f140:ff20::/46 } on-error={}
+:do { add list="China_Mobile6" address=2402:f140:ff24::/48 } on-error={}
+:do { add list="China_Mobile6" address=2403:7580::/44 } on-error={}
+:do { add list="China_Mobile6" address=2403:7580:10::/46 } on-error={}
+:do { add list="China_Mobile6" address=2403:a200:a3ff::/48 } on-error={}
+:do { add list="China_Mobile6" address=2403:b400::/32 } on-error={}
+:do { add list="China_Mobile6" address=2403:c980::/32 } on-error={}
+:do { add list="China_Mobile6" address=2404:7240:6000::/48 } on-error={}
+:do { add list="China_Mobile6" address=2404:e280::/47 } on-error={}
+:do { add list="China_Mobile6" address=2405:80:10::/48 } on-error={}
+:do { add list="China_Mobile6" address=2405:80:13::/48 } on-error={}
+:do { add list="China_Mobile6" address=2405:6c0:1::/48 } on-error={}
+:do { add list="China_Mobile6" address=2405:6c0:2::/48 } on-error={}
+:do { add list="China_Mobile6" address=2405:6c0:4::/48 } on-error={}
+:do { add list="China_Mobile6" address=2405:6f00:c101::/48 } on-error={}
+:do { add list="China_Mobile6" address=2405:6f00:c102::/48 } on-error={}
+:do { add list="China_Mobile6" address=2405:6f00:c170::/47 } on-error={}
+:do { add list="China_Mobile6" address=2405:6f00:c602::/48 } on-error={}
+:do { add list="China_Mobile6" address=2405:b7c0::/32 } on-error={}
+:do { add list="China_Mobile6" address=2406:52c0::/32 } on-error={}
+:do { add list="China_Mobile6" address=2406:5340:6666::/48 } on-error={}
+:do { add list="China_Mobile6" address=2406:5340:8888::/48 } on-error={}
+:do { add list="China_Mobile6" address=2406:d440:210::/44 } on-error={}
+:do { add list="China_Mobile6" address=2407:23c0::/48 } on-error={}
+:do { add list="China_Mobile6" address=2407:2840::/48 } on-error={}
+:do { add list="China_Mobile6" address=2407:37c0::/32 } on-error={}
+:do { add list="China_Mobile6" address=2407:6c40:1210::/48 } on-error={}
+:do { add list="China_Mobile6" address=2407:8f40:2::/48 } on-error={}
+:do { add list="China_Mobile6" address=2407:c080:1800::/37 } on-error={}
+:do { add list="China_Mobile6" address=2409:27fc::/48 } on-error={}
+:do { add list="China_Mobile6" address=2409:8000::/20 } on-error={}
+:do { add list="China_Mobile6" address=240a:2000:100::/40 } on-error={}
+:do { add list="China_Mobile6" address=240a:2000:200::/39 } on-error={}
+:do { add list="China_Mobile6" address=240a:2000:400::/38 } on-error={}
+:do { add list="China_Mobile6" address=240a:2000:800::/37 } on-error={}
+:do { add list="China_Mobile6" address=240a:2000:1000::/36 } on-error={}
+:do { add list="China_Mobile6" address=240a:2000:2000::/35 } on-error={}
+:do { add list="China_Mobile6" address=240a:2000:4000::/34 } on-error={}
+:do { add list="China_Mobile6" address=240a:2000:8000::/33 } on-error={}
+:do { add list="China_Mobile6" address=240a:2001::/40 } on-error={}
+:do { add list="China_Mobile6" address=240a:2001:200::/39 } on-error={}
+:do { add list="China_Mobile6" address=240a:2001:400::/38 } on-error={}
+:do { add list="China_Mobile6" address=240a:2001:800::/37 } on-error={}
+:do { add list="China_Mobile6" address=240a:2001:2000::/35 } on-error={}
+:do { add list="China_Mobile6" address=240a:2001:4000::/34 } on-error={}
+:do { add list="China_Mobile6" address=240a:2001:8000::/33 } on-error={}
+:do { add list="China_Mobile6" address=240a:2002::/31 } on-error={}
+:do { add list="China_Mobile6" address=240a:2004::/30 } on-error={}
+:do { add list="China_Mobile6" address=240a:2008::/29 } on-error={}
+:do { add list="China_Mobile6" address=240a:2010::/28 } on-error={}
+:do { add list="China_Mobile6" address=240a:2020::/27 } on-error={}
+:do { add list="China_Mobile6" address=240a:2040::/26 } on-error={}
+:do { add list="China_Mobile6" address=240a:2080::/25 } on-error={}
+:do { add list="China_Mobile6" address=240a:4020:83a::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:4020:883a::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:4021:83a::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:4021:883a::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:50::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:120::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:250::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:1000::/39 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:1200::/40 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:2010::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:2041::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:2061::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:3000::/39 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:3200::/40 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:5000::/39 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:5200::/40 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:7000::/39 } on-error={}
+:do { add list="China_Mobile6" address=240a:4090:7200::/40 } on-error={}
+:do { add list="China_Mobile6" address=240a:40b0:83a::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:40b0:283a::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:40b0:483a::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:40b0:683a::/48 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c0:8000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c0:a000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c0:c000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c0:e000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c1::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c1:2000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c1:4000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c1:6000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c1:8000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c1:a000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c1:c000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c1:e000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c2::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c2:2000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c2:4000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c2:6000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c2:8000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c2:a000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c2:c000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c2:e000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c3::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c3:2000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c3:4000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c3:6000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c3:8000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c3:a000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c3:c000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c3:e000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c4::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c4:2000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:40c4:4000::/43 } on-error={}
+:do { add list="China_Mobile6" address=240a:4280::/26 } on-error={}
+:do { add list="China_Mobile6" address=240a:42c0::/27 } on-error={}
+:do { add list="China_Mobile6" address=240a:42e0::/28 } on-error={}
+:do { add list="China_Mobile6" address=240a:42f0::/29 } on-error={}
+:do { add list="China_Mobile6" address=240a:42f8::/30 } on-error={}
+:do { add list="China_Mobile6" address=240a:c000::/25 } on-error={}
+:do { add list="China_Mobile6" address=240a:c080::/26 } on-error={}
+:do { add list="China_Mobile6" address=240a:c0c1::/32 } on-error={}
+:do { add list="China_Mobile6" address=240a:c0c2::/31 } on-error={}
+:do { add list="China_Mobile6" address=240a:c0c4::/30 } on-error={}
+:do { add list="China_Mobile6" address=240a:c0c8::/29 } on-error={}
+:do { add list="China_Mobile6" address=240a:c0d0::/28 } on-error={}
+:do { add list="China_Mobile6" address=240a:c0e0::/27 } on-error={}
+:do { add list="China_Mobile6" address=240a:c100::/24 } on-error={}
+:do { add list="China_Mobile6" address=240a:c200::/23 } on-error={}
+:do { add list="China_Mobile6" address=240a:c400::/22 } on-error={}
+:do { add list="China_Mobile6" address=240a:c800::/21 } on-error={}
