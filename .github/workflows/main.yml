@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: generate-mikrotik-rsc
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,7 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -27,8 +31,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p data WORKDIR
-          rm -f data/*.rsc
+          mkdir -p data WORKDIR TMP_DATA
 
           GAOYIFAN="https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists"
           CHNROUTES2="https://raw.githubusercontent.com/misakaio/chnroutes2/master"
@@ -38,8 +41,8 @@ jobs:
             local url="$1"
             local output="$2"
             curl -fsSL --retry 5 --retry-delay 5 --connect-timeout 20 --max-time 30 -A "Mozilla/5.0" "$url" -o "$output"
-            [ -s "$output" ] || exit 1
-            sleep 1
+            [ -s "$output" ] || { echo "ERROR: Empty or failed download: $url"; exit 1; }
+            sleep 0.2
           }
 
           download_safe() {
@@ -47,12 +50,12 @@ jobs:
             local output="$2"
             curl -fsSL --retry 3 --retry-delay 3 --connect-timeout 15 --max-time 25 -A "Mozilla/5.0" "$url" -o "$output" || true
             [ -s "$output" ] || touch "$output"
-            sleep 1
+            sleep 0.2
           }
 
           download "$GAOYIFAN/china.txt" WORKDIR/cn-gaoyifan.txt
+          download "$GAOYIFAN/china6.txt" WORKDIR/cn6-gaoyifan.txt
           download "$CHNROUTES2/chnroutes.txt" WORKDIR/cn-chnroutes2.txt
-          download_safe "$GAOYIFAN/china6.txt" WORKDIR/cn6-gaoyifan.txt
           download_safe "$IPVERSE/139341/ipv4-aggregated.txt" WORKDIR/as139341.txt
           download_safe "$IPVERSE/132203/ipv4-aggregated.txt" WORKDIR/as132203.txt
           download_safe "$IPVERSE/139341/ipv6-aggregated.txt" WORKDIR/as139341-v6.txt
@@ -66,13 +69,28 @@ jobs:
               forbidden_v4 = [
                   ipaddress.ip_network("0.0.0.0/8"),
                   ipaddress.ip_network("10.0.0.0/8"),
+                  ipaddress.ip_network("100.64.0.0/10"),
                   ipaddress.ip_network("127.0.0.0/8"),
                   ipaddress.ip_network("169.254.0.0/16"),
                   ipaddress.ip_network("172.16.0.0/12"),
+                  ipaddress.ip_network("192.0.0.0/24"),
+                  ipaddress.ip_network("192.0.2.0/24"),
                   ipaddress.ip_network("192.168.0.0/16"),
-                  ipaddress.ip_network("100.64.0.0/10"),
+                  ipaddress.ip_network("198.18.0.0/15"),
+                  ipaddress.ip_network("198.51.100.0/24"),
+                  ipaddress.ip_network("203.0.113.0/24"),
                   ipaddress.ip_network("224.0.0.0/4"),
-                  ipaddress.ip_network("240.0.0.0/4")
+                  ipaddress.ip_network("240.0.0.0/4"),
+              ]
+
+              forbidden_v6 = [
+                  ipaddress.ip_network("::/128"),
+                  ipaddress.ip_network("::1/128"),
+                  ipaddress.ip_network("::ffff:0:0/96"),
+                  ipaddress.ip_network("2001:db8::/32"),
+                  ipaddress.ip_network("fc00::/7"),
+                  ipaddress.ip_network("fe80::/10"),
+                  ipaddress.ip_network("ff00::/8"),
               ]
 
               if os.path.exists(src):
@@ -100,6 +118,8 @@ jobs:
                                   elif family == "ipv6":
                                       if net.version != 6 or net.prefixlen == 128:
                                           continue
+                                      if any(net.overlaps(bad) for bad in forbidden_v6):
+                                          continue
 
                                   nets.append(net)
 
@@ -123,6 +143,9 @@ jobs:
           python3 process.py norm WORKDIR/cn-combined.raw WORKDIR/cn-final.final ipv4
           python3 process.py norm WORKDIR/cn6-combined.raw WORKDIR/cn6-final.final ipv6
 
+          [ "$(wc -l < WORKDIR/cn-final.final)" -ge 3000 ] || { echo "ERROR: CN IPv4 count too small"; exit 1; }
+          [ "$(wc -l < WORKDIR/cn6-final.final)" -ge 1000 ] || { echo "ERROR: CN IPv6 count too small"; exit 1; }
+
           export_rsc() {
             local list_name="$1"
             local input="$2"
@@ -137,42 +160,74 @@ jobs:
               echo "$base_cmd"
               if [ -f "$input" ]; then
                 while IFS= read -r cidr; do
-                  [ -n "$cidr" ] && echo "add list=\"$list_name\" address=$cidr"
+                  [ -n "$cidr" ] && echo ":do { add list=\"$list_name\" address=$cidr } on-error={}"
                 done < "$input"
               fi
             } > "$output"
           }
 
-          export_rsc "CN" WORKDIR/cn-final.final data/cn.rsc false
-          export_rsc "CN6" WORKDIR/cn6-final.final data/cn6.rsc true
+          export_rsc "CN" WORKDIR/cn-final.final TMP_DATA/cn.rsc false
+          export_rsc "CN6" WORKDIR/cn6-final.final TMP_DATA/cn6.rsc true
 
-          ISPS_KEYS=("China_Telecom" "China_Unicom" "China_Mobile" "CERNET" "CSTNET" "DRPENG" "CBNNET" "CIETNET")
-          ISPS_VALS=("chinanet.txt" "unicom.txt" "cmcc.txt" "cernet.txt" "cstnet.txt" "drpeng.txt" "cbn.txt" "ciet.txt")
-          ISPS_FILES=("telecom" "unicom" "cmcc" "cernet" "cstnet" "drpeng" "cbnnet" "cietnet")
+          ISPS_KEYS=("China_Telecom" "China_Unicom" "China_Mobile" "CERNET" "CSTNET")
+          ISPS_VALS=("chinanet.txt" "unicom.txt" "cmcc.txt" "cernet.txt" "cstnet.txt")
+          ISPS_FILES=("telecom" "unicom" "cmcc" "cernet" "cstnet")
+          ISPS_MIN=(500 200 200 10 5)
 
           for i in "${!ISPS_KEYS[@]}"; do
             list_name="${ISPS_KEYS[$i]}"
             file="${ISPS_VALS[$i]}"
             out_file="${ISPS_FILES[$i]}"
+            min_lines="${ISPS_MIN[$i]}"
 
-            download_safe "$GAOYIFAN/$file" "WORKDIR/$out_file.txt"
+            download "$GAOYIFAN/$file" "WORKDIR/$out_file.txt"
             python3 process.py norm "WORKDIR/$out_file.txt" "WORKDIR/$out_file.final" ipv4
-            export_rsc "$list_name" "WORKDIR/$out_file.final" "data/$out_file.rsc" false
+            [ "$(wc -l < "WORKDIR/$out_file.final")" -ge "$min_lines" ] || { echo "ERROR: $list_name count too small"; exit 1; }
+            export_rsc "$list_name" "WORKDIR/$out_file.final" "TMP_DATA/$out_file.rsc" false
           done
 
-          ISPS6_KEYS=("China_Telecom6" "China_Unicom6" "China_Mobile6" "CERNET6" "CSTNET6" "DRPENG6" "CBNNET6" "CIETNET6")
-          ISPS6_VALS=("chinanet6.txt" "unicom6.txt" "cmcc6.txt" "cernet6.txt" "cstnet6.txt" "drpeng6.txt" "cbn6.txt" "ciet6.txt")
-          ISPS6_FILES=("telecom6" "unicom6" "cmcc6" "cernet6" "cstnet6" "drpeng6" "cbnnet6" "cietnet6")
+          ISPS6_KEYS=("China_Telecom6" "China_Unicom6" "China_Mobile6" "CERNET6" "CSTNET6")
+          ISPS6_VALS=("chinanet6.txt" "unicom6.txt" "cmcc6.txt" "cernet6.txt" "cstnet6.txt")
+          ISPS6_FILES=("telecom6" "unicom6" "cmcc6" "cernet6" "cstnet6")
+          ISPS6_MIN=(20 20 20 5 1)
 
           for i in "${!ISPS6_KEYS[@]}"; do
             list_name="${ISPS6_KEYS[$i]}"
             file="${ISPS6_VALS[$i]}"
             out_file="${ISPS6_FILES[$i]}"
+            min_lines="${ISPS6_MIN[$i]}"
 
-            download_safe "$GAOYIFAN/$file" "WORKDIR/$out_file.txt"
+            download "$GAOYIFAN/$file" "WORKDIR/$out_file.txt"
             python3 process.py norm "WORKDIR/$out_file.txt" "WORKDIR/$out_file.final" ipv6
-            export_rsc "$list_name" "WORKDIR/$out_file.final" "data/$out_file.rsc" true
+            [ "$(wc -l < "WORKDIR/$out_file.final")" -ge "$min_lines" ] || { echo "ERROR: $list_name count too small"; exit 1; }
+            export_rsc "$list_name" "WORKDIR/$out_file.final" "TMP_DATA/$out_file.rsc" true
           done
+
+          CBN_ASNS=(7641 146788 146838 9812 17429 24139 17962 17969 38355 131562 58834 58852 59016 23771 23841 24150 63539 63540 63607 63590)
+          : > WORKDIR/cbnnet.txt
+          : > WORKDIR/cbnnet6.txt
+
+          for asn in "${CBN_ASNS[@]}"; do
+            download_safe "$IPVERSE/$asn/ipv4-aggregated.txt" "WORKDIR/cbn-$asn.txt"
+            cat "WORKDIR/cbn-$asn.txt" >> WORKDIR/cbnnet.txt
+            echo >> WORKDIR/cbnnet.txt
+
+            download_safe "$IPVERSE/$asn/ipv6-aggregated.txt" "WORKDIR/cbn-$asn-v6.txt"
+            cat "WORKDIR/cbn-$asn-v6.txt" >> WORKDIR/cbnnet6.txt
+            echo >> WORKDIR/cbnnet6.txt
+          done
+
+          python3 process.py norm WORKDIR/cbnnet.txt WORKDIR/cbnnet.final ipv4
+          python3 process.py norm WORKDIR/cbnnet6.txt WORKDIR/cbnnet6.final ipv6
+
+          [ "$(wc -l < WORKDIR/cbnnet.final)" -ge 10 ] || { echo "ERROR: CBNNET IPv4 count too small"; exit 1; }
+          [ "$(wc -l < WORKDIR/cbnnet6.final)" -ge 1 ] || { echo "ERROR: CBNNET6 IPv6 count too small"; exit 1; }
+
+          export_rsc "CBNNET" WORKDIR/cbnnet.final TMP_DATA/cbnnet.rsc false
+          export_rsc "CBNNET6" WORKDIR/cbnnet6.final TMP_DATA/cbnnet6.rsc true
+
+          rm -f data/*.rsc
+          mv TMP_DATA/*.rsc data/
 
       - name: Commit & Push
         env:
@@ -186,6 +241,6 @@ jobs:
           if git diff --staged --quiet; then
             exit 0
           else
-            git commit -m "Force generate all 18 rsc files"
+            git commit -m "Update MikroTik v7 IP lists (14 rsc files)"
             git push origin main
           fi
