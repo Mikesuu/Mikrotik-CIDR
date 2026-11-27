@@ -2272,7 +2272,6 @@
 :do { add list="CN6" address=2406:840:9900::/42 } on-error={}
 :do { add list="CN6" address=2406:840:9940::/43 } on-error={}
 :do { add list="CN6" address=2406:840:9960::/47 } on-error={}
-:do { add list="CN6" address=2406:840:9963::/48 } on-error={}
 :do { add list="CN6" address=2406:840:9965::/48 } on-error={}
 :do { add list="CN6" address=2406:840:9968::/46 } on-error={}
 :do { add list="CN6" address=2406:840:996d::/48 } on-error={}
