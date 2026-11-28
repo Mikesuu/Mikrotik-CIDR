@@ -936,10 +936,7 @@
 :do { add list="China_Telecom" address=110.40.14.0/23 } on-error={}
 :do { add list="China_Telecom" address=110.40.16.0/24 } on-error={}
 :do { add list="China_Telecom" address=110.42.15.0/24 } on-error={}
-:do { add list="China_Telecom" address=110.42.16.0/24 } on-error={}
-:do { add list="China_Telecom" address=110.42.18.0/23 } on-error={}
-:do { add list="China_Telecom" address=110.42.20.0/22 } on-error={}
-:do { add list="China_Telecom" address=110.42.24.0/21 } on-error={}
+:do { add list="China_Telecom" address=110.42.16.0/20 } on-error={}
 :do { add list="China_Telecom" address=110.42.32.0/19 } on-error={}
 :do { add list="China_Telecom" address=110.42.64.0/18 } on-error={}
 :do { add list="China_Telecom" address=110.43.0.0/18 } on-error={}
@@ -1563,7 +1560,7 @@
 :do { add list="China_Telecom" address=121.55.0.0/18 } on-error={}
 :do { add list="China_Telecom" address=121.56.0.0/15 } on-error={}
 :do { add list="China_Telecom" address=121.58.0.0/17 } on-error={}
-:do { add list="China_Telecom" address=121.58.158.0/23 } on-error={}
+:do { add list="China_Telecom" address=121.58.156.0/22 } on-error={}
 :do { add list="China_Telecom" address=121.59.4.0/22 } on-error={}
 :do { add list="China_Telecom" address=121.59.8.0/21 } on-error={}
 :do { add list="China_Telecom" address=121.59.160.0/20 } on-error={}
@@ -1599,6 +1596,8 @@
 :do { add list="China_Telecom" address=122.200.84.0/23 } on-error={}
 :do { add list="China_Telecom" address=122.200.86.0/24 } on-error={}
 :do { add list="China_Telecom" address=122.200.92.0/23 } on-error={}
+:do { add list="China_Telecom" address=122.200.104.0/22 } on-error={}
+:do { add list="China_Telecom" address=122.200.120.0/22 } on-error={}
 :do { add list="China_Telecom" address=122.224.0.0/12 } on-error={}
 :do { add list="China_Telecom" address=122.240.0.0/13 } on-error={}
 :do { add list="China_Telecom" address=122.248.48.0/21 } on-error={}
@@ -2384,7 +2383,7 @@
 :do { add list="China_Telecom" address=210.5.145.0/24 } on-error={}
 :do { add list="China_Telecom" address=210.5.146.0/23 } on-error={}
 :do { add list="China_Telecom" address=210.5.148.0/23 } on-error={}
-:do { add list="China_Telecom" address=210.5.152.0/23 } on-error={}
+:do { add list="China_Telecom" address=210.5.152.0/24 } on-error={}
 :do { add list="China_Telecom" address=210.5.154.0/24 } on-error={}
 :do { add list="China_Telecom" address=210.5.156.0/22 } on-error={}
 :do { add list="China_Telecom" address=210.14.65.0/24 } on-error={}

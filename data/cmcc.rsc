@@ -895,6 +895,7 @@
 :do { add list="China_Mobile" address=210.5.22.0/24 } on-error={}
 :do { add list="China_Mobile" address=210.5.144.0/24 } on-error={}
 :do { add list="China_Mobile" address=210.5.150.0/23 } on-error={}
+:do { add list="China_Mobile" address=210.5.153.0/24 } on-error={}
 :do { add list="China_Mobile" address=210.5.155.0/24 } on-error={}
 :do { add list="China_Mobile" address=210.14.128.0/19 } on-error={}
 :do { add list="China_Mobile" address=210.73.208.0/20 } on-error={}

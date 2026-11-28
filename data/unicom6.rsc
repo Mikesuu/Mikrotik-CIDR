@@ -16,6 +16,7 @@
 :do { add list="China_Unicom6" address=2400:cb80:e30::/44 } on-error={}
 :do { add list="China_Unicom6" address=2400:cb80:e40::/44 } on-error={}
 :do { add list="China_Unicom6" address=2400:f720::/32 } on-error={}
+:do { add list="China_Unicom6" address=2400:fe00::/32 } on-error={}
 :do { add list="China_Unicom6" address=2401:18ef:1000::/44 } on-error={}
 :do { add list="China_Unicom6" address=2401:1d40:100::/48 } on-error={}
 :do { add list="China_Unicom6" address=2401:1d40:f21::/48 } on-error={}

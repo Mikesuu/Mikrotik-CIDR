@@ -899,6 +899,7 @@
 :do { add list="China_Unicom" address=121.52.216.0/22 } on-error={}
 :do { add list="China_Unicom" address=121.52.220.0/23 } on-error={}
 :do { add list="China_Unicom" address=121.52.224.0/19 } on-error={}
+:do { add list="China_Unicom" address=121.58.156.0/23 } on-error={}
 :do { add list="China_Unicom" address=121.69.0.0/16 } on-error={}
 :do { add list="China_Unicom" address=122.9.0.0/17 } on-error={}
 :do { add list="China_Unicom" address=122.9.128.0/18 } on-error={}
@@ -923,6 +924,8 @@
 :do { add list="China_Unicom" address=122.200.82.0/24 } on-error={}
 :do { add list="China_Unicom" address=122.200.86.0/24 } on-error={}
 :do { add list="China_Unicom" address=122.200.92.0/24 } on-error={}
+:do { add list="China_Unicom" address=122.200.104.0/22 } on-error={}
+:do { add list="China_Unicom" address=122.200.120.0/22 } on-error={}
 :do { add list="China_Unicom" address=122.200.124.0/24 } on-error={}
 :do { add list="China_Unicom" address=123.4.0.0/14 } on-error={}
 :do { add list="China_Unicom" address=123.8.0.0/13 } on-error={}
